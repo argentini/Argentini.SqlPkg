@@ -9,6 +9,8 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        Console.WriteLine($"SqlPkg => Started at {DateTime.Now:o}");
+
         if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;
         
@@ -32,9 +34,7 @@ public class Program
         #endregion
 
         timer.Start();
-
-        Console.WriteLine($"SqlPkg => Started at {DateTime.Now:o}");
-
+        
         var arguments = new List<string>();
         var tableDataList = new List<string>();
         

@@ -2,19 +2,17 @@
 
 SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool, providing additional features, like the exclusion of specific database objects or table data.
 
-## Install Microsoft SqlPackage
+## Features
 
-According to the SqlPackage [website](https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage), the recommended way to install SqlPackage is as a dotnet tool.
+The following SqlPackage action modes have new features when using SqlPkg.
 
-```
-dotnet tool install -g microsoft.sqlpackage
-```
+### Action:Extract
 
-This requires that you already have the Microsoft dotnet CLI tool installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. The table name format is the same as the `/p:TableData=` property. To exclude table data you must also use `/p:TableData=` properties to include specific tables, or `/p:ExtractAllTableData=true` to include all table data, otherwise there is nothing to exclude.
 
-## Install SqlPkg
+### Action:Export
 
-Follow the instructions in the release for your operating system and platform.
+You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. See *Action:Extract* for more details.
 
 ## Usage
 
@@ -28,18 +26,22 @@ sqlpkg /Action:Extract /TargetFile:MyDatabaseBackup.dacpac /DiagnosticsFile:MyDa
 
 There are additional features as well, as are listed below.
 
-## Status
+## Installation
+
+### 1. Install Microsoft SqlPackage
+
+According to the SqlPackage [website](https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage), the recommended way to install SqlPackage is as a dotnet tool.
+
+```
+dotnet tool install -g microsoft.sqlpackage
+```
+
+This requires that you already have the Microsoft dotnet CLI tool installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+
+### 2. Install SqlPkg
+
+Download the latest release and follow the instructions in the release for your operating system and platform.
+
+## Project Status
 
 This application is under active development so check back for updates.
-
-## Features
-
-The following SqlPackage action modes have new features when using SqlPkg.
-
-### Action:Extract
-
-You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. The table name format is the same as the `/p:TableData=` property. To exclude table data you must also use `/p:TableData=` properties to include specific tables, or `/p:ExtractAllTableData=true` to include all table data, otherwise there is nothing to exclude.
-
-### Action:Export
-
-You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. See *Action:Extract* for more details.

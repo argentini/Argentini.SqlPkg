@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using Argentini.SqlPkg.Extensions;
 using CliWrap;
 using Microsoft.Data.SqlClient;
@@ -10,25 +9,8 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        var sb = new StringBuilder();
-        var cmd = Cli.Wrap("SqlPackage")
-            .WithArguments(arguments => { arguments.Add("/version:true"); })
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(sb))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(sb));
-
-        try
-        {
-            await cmd.ExecuteAsync();
-        }
-
-        catch
-        {
-            Console.WriteLine("SqlPkg => Could not execute the 'SqlPackage' command.");
-            Console.WriteLine("Be sure to install it using \"dotnet tool install -g microsoft.sqlpackage\".");
-            Console.WriteLine("You will need the dotnet tool (version 6 or later) installed from \"https://dotnet.microsoft.com\" in order to install Microsoft SqlPackage.");
-            
+        if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;
-        }
         
         var timer = new Stopwatch();
 
@@ -172,7 +154,7 @@ public class Program
         
         await using var stdOut = Console.OpenStandardOutput();
         
-        cmd = Cli.Wrap("SqlPackage")
+        var cmd = Cli.Wrap("SqlPackage")
             .WithArguments(arguments)
             .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
             .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));

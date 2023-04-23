@@ -10,6 +10,11 @@ public static class SqlTools
 {
 	#region Data Helpers
 
+	/// <summary>
+	/// Create a list of table names from a connection string.
+	/// </summary>
+	/// <param name="connectionString"></param>
+	/// <returns></returns>
 	public static async Task<List<string>> LoadTableNames(string connectionString)
 	{
 		var tableNameList = new List<string>();

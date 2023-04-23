@@ -35,6 +35,8 @@ msbuild.wrn
 
 # Binary installer packages
 *.deb
+*.dacpac
+*.bacpac
 /Installers/**/publish/
 .idea
 publish/

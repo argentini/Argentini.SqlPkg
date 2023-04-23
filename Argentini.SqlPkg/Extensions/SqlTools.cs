@@ -8,6 +8,51 @@ namespace Argentini.SqlPkg.Extensions;
 /// </summary>
 public static class SqlTools
 {
+	#region Data Helpers
+
+	public static async Task<List<string>> LoadTableNames(string connectionString)
+	{
+		var tableNameList = new List<string>();
+		
+		using (var sqlReader = new SqlReader(new SqlReaderConfiguration
+		       {
+			       ConnectionString = connectionString,
+			       CommandText = @"
+select
+schema_name(schema_id) as [SCHEMA_NAME],
+[Tables].name as [TABLE_NAME],
+[Tables].is_memory_optimized as [TABLE_IS_MEMORY_OPTIMIZED],
+[Tables].durability as [TABLE_DURABILITY],
+[Tables].durability_desc as [TABLE_DURABILITY_DESC]
+from
+sys.tables as [Tables]
+group by
+schema_name(schema_id), [Tables].name, [Tables].is_memory_optimized, [Tables].durability, [Tables].durability_desc
+order by
+[SCHEMA_NAME] asc, [TABLE_NAME] asc;
+"
+		       }))
+		{
+			await using (await sqlReader.ExecuteReaderAsync())
+			{
+				if (sqlReader.HasRows)
+				{
+					while (sqlReader.Read())
+					{
+						var schemaName = await sqlReader.SafeGetStringAsync("SCHEMA_NAME");
+						var tableName = await sqlReader.SafeGetStringAsync("TABLE_NAME");
+
+						tableNameList.Add($"[{schemaName}].[{tableName}]");
+					}
+				}
+			}
+		}
+
+		return tableNameList;
+	}
+	
+	#endregion
+	
 	#region String Helpers
 	
 	/// <summary>

@@ -130,39 +130,7 @@ public class Program
 
                 else if (args.Any(a => a.StartsWith("/p:ExtractAllTableData=true", StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    using (var sqlReader = new SqlReader(new SqlReaderConfiguration
-                           {
-                               ConnectionString = sourceConnectionString,
-                               CommandText = @"
-select
-schema_name(schema_id) as [SCHEMA_NAME],
-[Tables].name as [TABLE_NAME],
-[Tables].is_memory_optimized as [TABLE_IS_MEMORY_OPTIMIZED],
-[Tables].durability as [TABLE_DURABILITY],
-[Tables].durability_desc as [TABLE_DURABILITY_DESC]
-from
-sys.tables as [Tables]
-group by
-schema_name(schema_id), [Tables].name, [Tables].is_memory_optimized, [Tables].durability, [Tables].durability_desc
-order by
-[SCHEMA_NAME] asc, [TABLE_NAME] asc;
-"
-                           }))
-                    {
-                        await using (await sqlReader.ExecuteReaderAsync())
-                        {
-                            if (sqlReader.HasRows)
-                            {
-                                while (sqlReader.Read())
-                                {
-                                    var schemaName = await sqlReader.SafeGetStringAsync("SCHEMA_NAME");
-                                    var tableName = await sqlReader.SafeGetStringAsync("TABLE_NAME");
-
-                                    tableDataList.Add($"[{schemaName}].[{tableName}]");
-                                }
-                            }
-                        }
-                    }
+                    tableDataList.AddRange(await SqlTools.LoadTableNames(sourceConnectionString));
                 }
             
                 if (args.Any(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))

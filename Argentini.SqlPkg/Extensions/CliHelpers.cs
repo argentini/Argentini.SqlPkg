@@ -1,14 +1,150 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 using CliWrap;
+using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg.Extensions;
 
 public static class CliHelpers
 {
+	#region Constants
+	
+	public static List<string> ExtractOptions => new()
+	{
+		"/AccessToken:",
+		"/at:",
+		//"/Action:",
+		//"/a:",
+		"/AzureCloudConfig:",
+		"/acc:",
+		"/Diagnostics:",
+		"/d:",
+		"/DiagnosticsFile:",
+		"/df:",
+		"/MaxParallelism:",
+		"/mp:",
+		"/OverwriteFiles:",
+		"/of:",
+		"/Properties:",
+		"/p:",
+		"/Quiet:",
+		"/q:",
+		"/SourceConnectionString:",
+		"/scs:",
+		"/SourceDatabaseName:",
+		"/sdn:",
+		"/SourceEncryptConnection:",
+		"/sec:",
+		"/SourceHostNameInCertificate:",
+		"/shnic:",
+		"/SourcePassword:",
+		"/sp:",
+		"/SourceServerName:",
+		"/ssn:",
+		"/SourceTimeout:",
+		"/st:",
+		"/SourceTrustServerCertificate:",
+		"/stsc:",
+		"/SourceUser:",
+		"/su:",
+		"/TargetFile:",
+		"/tf:",
+		"/TenantId:",
+		"/tid:",
+		"/ThreadMaxStackSize:",
+		"/tmss:",
+		"/UniversalAuthentication:",
+		"/ua:",
+		"/p:AzureStorageBlobEndpoint=",
+		"/p:AzureStorageContainer=",
+		"/p:AzureStorageKey=",
+		"/p:AzureStorageRootPath=",
+		"/p:CommandTimeout=",
+		"/p:CompressionOption=",
+		"/p:DacApplicationDescription=",
+		"/p:DacApplicationName=",
+		"/p:DacMajorVersion=",
+		"/p:DacMinorVersion=",
+		"/p:DatabaseLockTimeout=",
+		//"/p:ExtractAllTableData=", // Disallow for schema arguments
+		"/p:ExtractApplicationScopedObjectsOnly=",
+		"/p:ExtractReferencedServerScopedElements=",
+		"/p:ExtractTarget=",
+		"/p:ExtractUsageProperties=",
+		"/p:HashObjectNamesInLogs=",
+		"/p:IgnoreExtendedProperties=",
+		"/p:IgnorePermissions=",
+		"/p:IgnoreUserLoginMappings=",
+		"/p:LongRunningCommandTimeout=",
+		"/p:Storage=",
+		//"/p:TableData=", // Disallow for schema arguments
+		//"/p:TempDirectoryForTableData=", // Disallow for schema arguments
+		"/p:VerifyExtraction="
+	};	
+
+	public static List<string> ExportOptions => new()
+	{
+		"/AccessToken:",
+		"/at:",
+		//"/Action:",
+		//"/a:",
+		"/AzureCloudConfig:",
+		"/acc:",
+		"/Diagnostics:",
+		"/d:",
+		"/DiagnosticsFile:",
+		"/df:",
+		"/MaxParallelism:",
+		"/mp:",
+		"/OverwriteFiles:",
+		"/of:",
+		"/Properties:",
+		"/p:",
+		"/Quiet:",
+		"/q:",
+		"/SourceConnectionString:",
+		"/scs:",
+		"/SourceDatabaseName:",
+		"/sdn:",
+		"/SourceEncryptConnection:",
+		"/sec:",
+		"/SourceHostNameInCertificate:",
+		"/shnic:",
+		"/SourcePassword:",
+		"/sp:",
+		"/SourceServerName:",
+		"/ssn:",
+		"/SourceTimeout:",
+		"/st:",
+		"/SourceTrustServerCertificate:",
+		"/stsc:",
+		"/SourceUser:",
+		"/su:",
+		"/TargetFile:",
+		"/tf:",
+		"/TenantId:",
+		"/tid:",
+		"/ThreadMaxStackSize:",
+		"/tmss:",
+		"/UniversalAuthentication:",
+		"/ua:",
+		"/p:CommandTimeout=",
+		"/p:CompressionOption=",
+		"/p:DatabaseLockTimeout=",
+		"/p:HashObjectNamesInLogs=",
+		"/p:IgnoreIndexesStatisticsOnEnclaveEnabledColumns=",
+		"/p:LongRunningCommandTimeout=",
+		"/p:Storage=",
+		"/p:TableData=",
+		"/p:TempDirectoryForTableData=",
+		"/p:VerifyExtraction=",
+		"/p:VerifyFullTextDocumentTypesSupported="
+	};	
+	
+	#endregion
+	
     #region OS and Runtime
 
     /// <summary>
@@ -107,6 +243,8 @@ public static class CliHelpers
 
     #endregion
     
+    #region Dependencies
+    
     /// <summary>
     /// Determine if SqlPackage is installed.
     /// </summary>
@@ -135,6 +273,10 @@ public static class CliHelpers
         }
     }
     
+    #endregion
+    
+    #region Argument Handling
+    
     /// <summary>
     /// Get a CLI argument value, or an emtpy string if not found.
     /// </summary>
@@ -152,16 +294,16 @@ public static class CliHelpers
 
         if (args.Any() == false)
             return string.Empty;
+
+        if (!args.Any(a =>
+	            a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) ||
+	            a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)))
+	        return string.Empty;
         
-        if (args.Any(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)))
-        {
-            var splits = args.First(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)).Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-                        
-            if (splits.Length == 2)
-            {
-                return splits[1];
-            }
-        }
+        var splits = args.First(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)).Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+                    
+        if (splits.Length == 2)
+	        return splits[1];
 
         return string.Empty;
     }
@@ -173,15 +315,222 @@ public static class CliHelpers
     /// <param name="argumentPrefix"></param>
     /// <param name="appendValue"></param>
     /// <returns></returns>
-    public static string[] SetDefault(this string[] args, string argumentPrefix, string appendValue)
+    public static void SetDefault(this List<string> args, string argumentPrefix, string appendValue)
     {
-        if (args.Any(a => a.StartsWith(argumentPrefix, StringComparison.CurrentCultureIgnoreCase)))
-            return args;
+        if (args.ToList().Any(a => a.StartsWith(argumentPrefix, StringComparison.CurrentCultureIgnoreCase)))
+            return;
         
-        var tempArgs = args.ToList();
+        args.Add($"{argumentPrefix}{appendValue}");
+	}
+    
+    #endregion
+    
+    #region Configuration
+
+    /// <summary>
+    /// Process server/database info to ensure connection strings exist.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="settings"></param>
+    public static void NormalizeConnectionInfo(this string[] args, Settings settings)
+    {
+	    #region Source
             
-        tempArgs.Add($"{argumentPrefix}{appendValue}");
+	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':');
+	    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
+	    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
+	    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
+	    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
+
+	    if (string.IsNullOrEmpty(settings.SourceConnectionString) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString)
+		    {
+			    TrustServerCertificate = true,
+			    ConnectTimeout = 45,
+			    CommandTimeout = 45
+		    };
+
+		    settings.SourceConnectionString = builder.ToString();
+
+		    settings.SourceServerName = builder.DataSource;
+		    settings.SourceUserName = builder.UserID;
+		    settings.SourcePassword = builder.Password;
+		    settings.SourceDatabaseName = builder.InitialCatalog;
+	    }
+
+	    else if (string.IsNullOrEmpty(settings.SourceServerName) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder
+		    {
+			    DataSource = settings.SourceServerName,
+			    InitialCatalog = settings.SourceDatabaseName,
+			    UserID = settings.SourceUserName,
+			    Password = settings.SourcePassword,
+			    TrustServerCertificate = true,
+			    Authentication = SqlAuthenticationMethod.SqlPassword,
+			    ConnectTimeout = 45,
+			    CommandTimeout = 45
+		    };
+
+		    settings.SourceConnectionString = builder.ToString();
+	    }
+
+	    #endregion
+	    
+	    #region Target
             
-        return tempArgs.ToArray();
+	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/scs", ':');
+	    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/ssn", ':');
+	    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/sdn", ':');
+	    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/su", ':');
+	    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/sp", ':');
+
+	    if (string.IsNullOrEmpty(settings.TargetConnectionString) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)
+		    {
+			    TrustServerCertificate = true,
+			    ConnectTimeout = 45,
+			    CommandTimeout = 45
+		    };
+
+		    settings.TargetConnectionString = builder.ToString();
+
+		    settings.TargetServerName = builder.DataSource;
+		    settings.TargetUserName = builder.UserID;
+		    settings.TargetPassword = builder.Password;
+		    settings.TargetDatabaseName = builder.InitialCatalog;
+	    }
+
+	    else if (string.IsNullOrEmpty(settings.TargetServerName) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder
+		    {
+			    DataSource = settings.TargetServerName,
+			    InitialCatalog = settings.TargetDatabaseName,
+			    UserID = settings.TargetUserName,
+			    Password = settings.TargetPassword,
+			    TrustServerCertificate = true,
+			    Authentication = SqlAuthenticationMethod.SqlPassword,
+			    ConnectTimeout = 45,
+			    CommandTimeout = 45
+		    };
+
+		    settings.TargetConnectionString = builder.ToString();
+	    }
+
+	    #endregion
     }
+
+    /// <summary>
+    /// Set defaults for Backup and Restore actions.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="allowed"></param>
+    public static void BetterDefaults(this List<string> args, List<string> allowed)
+    {
+	    #region Better Defaults
+
+	    if (allowed.Any(a => a.StartsWith("/SourceTrustServerCertificate:", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/SourceTrustServerCertificate:", "true");
+	    
+	    if (allowed.Any(a => a.StartsWith("/p:IgnoreUserLoginMappings=", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
+	
+	    if (allowed.Any(a => a.StartsWith("/p:IgnorePermissions=", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/p:IgnorePermissions=", "true");
+	
+	    if (allowed.Any(a => a.StartsWith("/p:ExtractAllTableData=", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/p:ExtractAllTableData=", "true");
+	    
+	    if (allowed.Any(a => a.StartsWith("/p:VerifyExtraction=", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/p:VerifyExtraction=", "false");
+	    
+	    #endregion
+    }
+
+    /// <summary>
+    /// Set the file extension to dacpac or bacpac.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="argumentPrefix"></param>
+    /// <param name="fileExtension"></param>
+    public static void SetArgumentFileExtension(this List<string> arguments, string argumentPrefix, string fileExtension)
+    {
+	    var targetFileArg = arguments.FirstOrDefault(a => a.StartsWith(argumentPrefix));
+
+	    if (string.IsNullOrEmpty(targetFileArg))
+		    return;
+
+	    var fileSplits = targetFileArg.Split(':', StringSplitOptions.RemoveEmptyEntries);
+
+	    if (fileSplits.Length != 2)
+		    return;
+
+	    var fileName = fileSplits[1].Trim('\"');
+
+	    fileName = fileName.TrimEnd(".dacpac", StringComparison.CurrentCultureIgnoreCase);
+	    fileName = fileName.TrimEnd(".bacpac", StringComparison.CurrentCultureIgnoreCase);
+	    fileName = fileName.TrimEnd($".{fileExtension.Trim('.')}", StringComparison.CurrentCultureIgnoreCase);
+	    fileName = $"{fileName}.{fileExtension.Trim('.')}";
+
+	    #region Ensure Target Paths Exist
+
+	    arguments.RemoveAll(a => a.Equals(targetFileArg, StringComparison.CurrentCultureIgnoreCase));
+	    arguments.Add($"{fileSplits[0]}:\"{fileName}\"");
+	    
+	    if (fileName.Contains(Path.DirectorySeparatorChar) == false)
+		    return;
+
+	    var directoryPath = Path.GetDirectoryName(fileName) ?? string.Empty;
+        
+	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
+		    Directory.CreateDirectory(directoryPath);
+	    
+	    #endregion
+    }
+    
+    public static List<string> BuildSchemaBackupArguments(this IEnumerable<string> args)
+    {
+	    var arguments = new List<string>();
+
+	    foreach (var arg in args)
+	    {
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0];
+		    
+		    if (ExtractOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+			    arguments.Add(arg);
+	    }
+
+	    arguments.Insert(0, "/a:Extract");
+	    arguments.Add("/p:ExtractAllTableData=false");
+	    arguments.SetArgumentFileExtension("/TargetFile:", ".dacpac");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log");
+	    arguments.BetterDefaults(ExtractOptions);
+	    
+	    return arguments;
+    }
+
+    public static List<string> BuildDataBackupArguments(this IEnumerable<string> args)
+    {
+	    var arguments = new List<string>();
+
+	    foreach (var arg in args)
+	    {
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0];
+
+		    if (ExportOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+			    arguments.Add(arg);
+	    }
+
+	    arguments.Insert(0, "/a:Export");
+	    arguments.SetArgumentFileExtension("/TargetFile:", ".bacpac");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log");
+	    arguments.BetterDefaults(ExportOptions);
+	    
+	    return arguments;
+    }
+    
+    #endregion
 }

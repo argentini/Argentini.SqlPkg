@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using Argentini.SqlPkg.Extensions;
 using CliWrap;
-using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg;
 
@@ -9,50 +8,45 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        const string version = "1.0.0.0";
+        const string version = "1.0.1";
+        var settings = new Settings();
+        var schemaElapsed = string.Empty;
+        var dataElapsed = string.Empty;
+        var resultCode = 0;
         
-        #region Export Debug Test
+        await using var stdOut = Console.OpenStandardOutput();
+
+        #region Backup Debug Test
 
         // args = new[]
         // {
-        //     "/Action:Export",
-        //     "/TargetFile:datoids.bacpac",
-        //     "/DiagnosticsFile:sqlpkg.log",
-        //     "/p:ExtractAllTableData=true",
-        //     "/p:ExcludeTableData=[dbo].[_luceneQueue]",
+        //     "/Action:Backup",
+        //     "/TargetFile:\"Database/bullhorn\"",
+        //     "/DiagnosticsFile:\"Database/bullhorn.log\"",
+        //     "/p:ExcludeTableData=[Bullhorn1].[devTemp_*]",
+        //     "/p:ExcludeTableData=[Bullhorn1].[devTmp_*]",
+        //     "/p:ExcludeTableData=[Bullhorn1].[dbaTmp_*]",
+        //     "/p:ExcludeTableData=[dbo].[temp_*]",
         //     "/SourceServerName:sqlserver,1433",
-        //     "/SourceDatabaseName:datoids",
+        //     "/SourceDatabaseName:bullhorn",
         //     "/SourceUser:sa",
         //     "/SourcePassword:P@ssw0rdz!"
         // };
         
         #endregion
         
-        #region Extract Debug Test
-
-        // args = new[]
-        // {
-        //     "/Action:Extract",
-        //     "/TargetFile:datoids.dacpac",
-        //     "/DiagnosticsFile:sqlpkg.log",
-        //     "/p:ExtractAllTableData=true",
-        //     "/p:ExcludeTableData=[dbo].[_luceneQueue]",
-        //     "/SourceServerName:sqlserver,1433",
-        //     "/SourceDatabaseName:datoids",
-        //     "/SourceUser:sa",
-        //     "/SourcePassword:P@ssw0rdz!"
-        // };
+        var title = $"SqlPkg for SqlPackage {version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}";
         
-        #endregion
-        
-        Console.WriteLine($"SqlPkg for SqlPackage {version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}");
+        Console.WriteLine(title);
+        Console.WriteLine("=".Repeat(title.Length));
 
         if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;
 
-        var action = string.Empty;
         var timer = new Stopwatch();
 
+        timer.Start();
+        
         #region Get Action
 
         if (args.Length > 1 && args.Any(a => a.StartsWith("/a:", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith("/action:", StringComparison.CurrentCultureIgnoreCase)))
@@ -63,156 +57,188 @@ public class Program
 
             if (splits.Length == 2)
             {
-                action = splits[1].ApTitleCase();
+                settings.Action = splits[1].ApTitleCase();
             }
-        }            
-            
-        #endregion
+        }
 
-        Console.WriteLine($"{(action != string.Empty ? action + " " : string.Empty)}Started {DateTime.Now:o}");
-        Console.WriteLine("=".Repeat(Console.WindowWidth));
+        if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+        {
+            Console.WriteLine($"SqlPkg => {settings.Action} Started {DateTime.Now:o}");
+        }
+
+        else
+        {
+            Console.WriteLine("SqlPkg => Backup/Restore Not Used => Passing Control to SqlPackage");
+            Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
+        }
         
-        timer.Start();
+        #endregion
         
-        var arguments = new List<string>();
         var tableDataList = new List<string>();
         
         if (args.Length > 1)
         {
-            #region Normalize Connection Info
-            
-            var sourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':');
-            var sourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
-            var sourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
-            var sourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
-            var sourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
-
-            if (string.IsNullOrEmpty(sourceConnectionString) == false)
+            if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
             {
-                var builder = new SqlConnectionStringBuilder(sourceConnectionString)
+                args.NormalizeConnectionInfo(settings);
+
+                if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    TrustServerCertificate = true,
-                    ConnectTimeout = 45,
-                    CommandTimeout = 45
-                };
+                    Console.WriteLine("SqlPkg => Processing Schema...");
 
-                sourceConnectionString = builder.ToString();
+                    #region Backup Schema as DACPAC
 
-                sourceServerName = builder.DataSource;
-                sourceUserName = builder.UserID;
-                sourcePassword = builder.Password;
-                sourceDatabaseName = builder.InitialCatalog;
-            }
+                    var taskTimer = new Stopwatch();
+                        
+                    taskTimer.Start();
 
-            else
-            {
-                var builder = new SqlConnectionStringBuilder
-                {
-                    DataSource = sourceServerName,
-                    InitialCatalog = sourceDatabaseName,
-                    UserID = sourceUserName,
-                    Password = sourcePassword,
-                    TrustServerCertificate = true,
-                    Authentication = SqlAuthenticationMethod.SqlPassword,
-                    ConnectTimeout = 45,
-                    CommandTimeout = 45
-                };
-
-                sourceConnectionString = builder.ToString();
-            }
-
-            #endregion
-            
-            #region Better Defaults
-
-            args = args.SetDefault("/SourceTrustServerCertificate:", "true");
-            args = args.SetDefault("/p:VerifyExtraction=", "false");
-
-            if (action.Equals("extract", StringComparison.CurrentCultureIgnoreCase))
-            {
-                args = args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
-                args = args.SetDefault("/p:IgnorePermissions=", "true");
-            }            
-            
-            #endregion
-        
-            #region Extract, Export
-
-            if (action.Equals("extract", StringComparison.CurrentCultureIgnoreCase) || action.Equals("export", StringComparison.CurrentCultureIgnoreCase))
-            {
-                if (args.Any(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    foreach (var table in args.Where(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        var splits = table.Split('=', StringSplitOptions.RemoveEmptyEntries);
+                    var schemaArguments = args.BuildSchemaBackupArguments();
                     
-                        if (splits.Length == 2)
-                        {
-                            tableDataList.Add(splits[1]);
-                        }
-                    }
-                }
+                    var cmd = Cli.Wrap("SqlPackage")
+                        .WithArguments(string.Join(" ", schemaArguments))
+                        .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                        .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
-                else if (args.Any(a => a.StartsWith("/p:ExtractAllTableData=true", StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    tableDataList.AddRange(await SqlTools.LoadTableNames(sourceConnectionString));
-                }
-            
-                if (args.Any(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+                    var result = await cmd.ExecuteAsync();
+
+                    resultCode = result.ExitCode;
+
+                    schemaElapsed = $"{taskTimer.Elapsed:g}";
+                    var taskElapsedSplits = schemaElapsed.Split('.');
+
+                    if (taskElapsedSplits is [_, { Length: > 1 }])
+                        schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
+                    
+                    Console.WriteLine($"SqlPkg => Schema Complete: {schemaElapsed}");
+                    
+                    #endregion
+                    
+                    if (resultCode > -1)
                     {
-                        var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+                        #region Backup Data as BACPAC
 
-                        if (string.IsNullOrEmpty(excludedTableName))
-                            continue;
+                        Console.WriteLine("SqlPkg => Processing Data...");
 
-                        excludedTableName = excludedTableName.NormalizeTableName();
+                        taskTimer.Restart();
+                        
+                        var dataArguments = args.BuildDataBackupArguments();
 
-                        tableDataList.RemoveAll(t => t.Equals(excludedTableName, StringComparison.CurrentCultureIgnoreCase));
+                        if (args.Any(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            foreach (var table in args.Where(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                var splits = table.Split('=', StringSplitOptions.RemoveEmptyEntries);
+
+                                if (splits.Length == 2)
+                                {
+                                    tableDataList.Add(splits[1]);
+                                }
+                            }
+                        }
+
+                        else
+                        {
+                            tableDataList.AddRange(await SqlTools.LoadUserTableNames(settings.SourceConnectionString));
+                            
+                            #region Handle Table Data Exclusions
+
+                            if (args.Any(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+                                {
+                                    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+
+                                    if (string.IsNullOrEmpty(excludedTableName))
+                                        continue;
+
+                                    excludedTableName = excludedTableName.NormalizeTableName();
+
+                                    if (excludedTableName.Contains('*'))
+                                    {
+                                        var wildcard = excludedTableName.Left("*");
+                                        tableDataList.RemoveAll(t => t.StartsWith(wildcard, StringComparison.CurrentCultureIgnoreCase));
+                                    }
+
+                                    else
+                                    {
+                                        tableDataList.RemoveAll(t => t.Equals(excludedTableName, StringComparison.CurrentCultureIgnoreCase));
+                                    }
+                                }
+
+                                var additions = new List<string>();
+                                
+                                foreach (var arg in dataArguments)
+                                {
+                                    if (arg.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase) || arg.StartsWith("/p:ExtractAllTableData=true", StringComparison.CurrentCultureIgnoreCase))
+                                        continue;
+
+                                    additions.Add(arg.Replace(";", "\\;"));
+                                }
+
+                                dataArguments.Clear();
+                                dataArguments.AddRange(additions);
+                                dataArguments.AddRange(tableDataList.Select(tableName => $"/p:TableData={tableName}"));
+                            }
+
+                            #endregion
+                        }
+
+                        cmd = Cli.Wrap("SqlPackage")
+                            .WithArguments(string.Join(" ", dataArguments))
+                            .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                            .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+                        result = await cmd.ExecuteAsync();
+
+                        resultCode = result.ExitCode;
+
+                        dataElapsed = $"{taskTimer.Elapsed:g}";
+                        taskElapsedSplits = dataElapsed.Split('.');
+
+                        if (taskElapsedSplits is [_, { Length: > 1 }])
+                            dataElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
+                    
+                        Console.WriteLine($"SqlPkg => Data Complete: {dataElapsed}");
+                        
+                        #endregion
                     }
                 }
-                
-                foreach (var arg in args)
+
+                else if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    if (arg.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase) || arg.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase) || arg.StartsWith("/p:ExtractAllTableData=true", StringComparison.CurrentCultureIgnoreCase))
-                        continue;
-
-                    arguments.Add(arg.Replace(";", "\\;"));
+                    // TODO: Optionally recreate target
+                    
+                    // TODO: Restore schema using dacpac
+                    
+                    // TODO: Restore data using bacpac
                 }
-
-                arguments.AddRange(tableDataList.Select(tableName => $"/p:TableData={tableName}"));
             }
 
-            #endregion
-            
             else
             {
-                foreach (var arg in args)
-                {
-                    arguments.Add(arg.Replace(";", "\\;"));
-                }
+                var cmd = Cli.Wrap("SqlPackage")
+                    .WithArguments(string.Join(" ", args))
+                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+                var result = await cmd.ExecuteAsync();
+
+                resultCode = result.ExitCode;
             }
         }
-        
-        await using var stdOut = Console.OpenStandardOutput();
-        
-        var cmd = Cli.Wrap("SqlPackage")
-            .WithArguments(arguments)
-            .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-            .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
-        var result = await cmd.ExecuteAsync();
         var elapsed = $"{timer.Elapsed:g}";
         var elapsedSplits = elapsed.Split('.');
 
         if (elapsedSplits is [_, { Length: > 1 }])
             elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
         
-        Console.WriteLine("=".Repeat(Console.WindowWidth));
-        Console.WriteLine($"SqlPkg {(action != string.Empty ? action + " " : string.Empty)}Finished {DateTime.Now:o}");
-        Console.WriteLine($"Total Time Elapsed: {elapsed}");
+        Console.WriteLine("=".Repeat(title.Length));
+        Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Finished {DateTime.Now:o}");
+        Console.WriteLine($"SqlPkg => Schema Time: {schemaElapsed}");
+        Console.WriteLine($"SqlPkg => Data Time: {dataElapsed}");
+        Console.WriteLine($"SqlPkg => Total Time: {elapsed}");
         
-        return result.ExitCode;
+        return resultCode;
     }
 }

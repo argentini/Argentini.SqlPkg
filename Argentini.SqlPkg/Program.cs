@@ -175,12 +175,9 @@ order by
 
                         if (string.IsNullOrEmpty(excludedTableName))
                             continue;
-                        
-                        var splits = excludedTableName.Split('.', StringSplitOptions.RemoveEmptyEntries);
 
-                        if (splits.Length != 2) continue;
-                            
-                        excludedTableName = $"[{splits[0].Trim('[').Trim(']')}].[{splits[1].Trim('[').Trim(']')}]";
+                        excludedTableName = excludedTableName.NormalizeTableName();
+
                         tableDataList.RemoveAll(t => t.Equals(excludedTableName, StringComparison.CurrentCultureIgnoreCase));
                     }
                 }

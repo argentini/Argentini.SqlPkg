@@ -8,6 +8,34 @@ namespace Argentini.SqlPkg.Extensions;
 /// </summary>
 public static class SqlTools
 {
+	#region String Helpers
+	
+	/// <summary>
+	/// Normalize a table name to be in the format [schema].[table].
+	/// </summary>
+	/// <param name="tableName"></param>
+	/// <returns></returns>
+	public static string NormalizeTableName(this string tableName)
+	{
+		if (string.IsNullOrEmpty(tableName))
+			return string.Empty;
+		
+		var splits = tableName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+		var normalized = string.Empty;
+
+		foreach (var segment in splits)
+			normalized += $"[{segment.Trim('[').Trim(']')}].";
+
+		normalized = normalized.TrimEnd('.');
+
+		if (normalized.Contains('.') == false)
+			return $"[dbo].{normalized}";
+		
+		return normalized;
+	}
+	
+	#endregion
+	
 	#region Column Exists
 	
 	/// <summary>

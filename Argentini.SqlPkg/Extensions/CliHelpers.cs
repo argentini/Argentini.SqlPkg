@@ -70,18 +70,6 @@ public static class CliHelpers
 
 		return result;
 	}
-
-	/// <summary>
-	/// Get the application version (e.g. "1.0.0.0").
-	/// </summary> 
-	/// <returns>String with the application version number</returns> 
-	public static string GetAssemblyVersion()
-	{
-		var assembly = Assembly.GetExecutingAssembly();
-		var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
-
-		return fileVersion.FileVersion ?? "0.0.0.0";
-	}
 	
 	/// <summary>
 	/// Get platform architecture (e.g. x64).

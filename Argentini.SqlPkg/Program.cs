@@ -9,6 +9,8 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        const string version = "1.0.0.0";
+        
         #region Export Debug Test
 
         // args = new[]
@@ -43,7 +45,7 @@ public class Program
         
         #endregion
         
-        Console.WriteLine($"SqlPkg for SqlPackage {CliHelpers.GetAssemblyVersion()}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}");
+        Console.WriteLine($"SqlPkg for SqlPackage {version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}");
 
         if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;

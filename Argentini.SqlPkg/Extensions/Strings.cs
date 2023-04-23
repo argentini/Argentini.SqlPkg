@@ -782,15 +782,15 @@ public static class Strings
 
 	/// <summary>
 	/// Format the elapsed time as a more friendly time span string.
-	/// Example: 3 days 10:37:15.123
+	/// Example: 3 days 10h:37m:15.123s
 	/// </summary>
 	/// <param name="msecs"></param>
 	/// <returns>Formatted timespan</returns>
-	public static string FormatTimer(double msecs)
+	public static string FormatTimer(this long msecs)
 	{
 		var timespan = TimeSpan.FromMilliseconds(msecs);
 
-		return $"{(timespan.Days > 0 ? timespan.Days.ToString("#,##0") + " days " : "")}{timespan.Hours:00}:{timespan.Minutes:00}:{timespan.Seconds:00}.{timespan.Milliseconds:#000}";
+		return $"{(timespan.Days > 0 ? timespan.Days.ToString("#,##0") + " days " : "")}{timespan.Hours:00}h:{timespan.Minutes:00}m:{timespan.Seconds:00}.{timespan.Milliseconds:D}s";
 	}
 
 	/// <summary>
@@ -801,7 +801,7 @@ public static class Strings
 	/// <param name="msecs">Number milliseconds to output (overrides ElapsedMs)</param>
 	/// <param name="decimalPlaces">Number of decimal places to show</param>
 	/// <returns></returns>
-	public static string PerformanceTimeString(int numberProcessed, double msecs, int decimalPlaces = 1)
+	public static string PerformanceTimeString(int numberProcessed, long msecs, int decimalPlaces = 1)
 	{
 		return $"{FormatTimer(msecs)} ({PerformanceString(numberProcessed, msecs, decimalPlaces)})";
 	}

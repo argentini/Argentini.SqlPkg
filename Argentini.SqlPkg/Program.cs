@@ -43,13 +43,10 @@ public class Program
             "/DiagnosticsFile:sqlpkg.log",
             "/p:ExtractAllTableData=true",
             "/p:ExcludeTableData=[dbo].[_luceneQueue]",
-            "/p:VerifyExtraction=false",
             "/SourceServerName:sqlserver,1433",
             "/SourceDatabaseName:datoids",
             "/SourceUser:sa",
-            "/SourcePassword:P@ssw0rdz!",
-            "/p:IgnoreUserLoginMappings=true",
-            "/p:IgnorePermissions=true"            
+            "/SourcePassword:P@ssw0rdz!"
         };
         
         #endregion
@@ -117,6 +114,30 @@ public class Program
                 args = tempArgs.ToArray();
             }
 
+            if (args.Any(a => a.StartsWith("/p:IgnoreUserLoginMappings=", StringComparison.CurrentCultureIgnoreCase)) == false)
+            {
+                var tempArgs = args.ToList();
+
+                tempArgs.Add("/p:IgnoreUserLoginMappings=true");
+                args = tempArgs.ToArray();
+            }
+
+            if (args.Any(a => a.StartsWith("/p:IgnorePermissions=", StringComparison.CurrentCultureIgnoreCase)) == false)
+            {
+                var tempArgs = args.ToList();
+
+                tempArgs.Add("/p:IgnorePermissions=true");
+                args = tempArgs.ToArray();
+            }
+
+            if (args.Any(a => a.StartsWith("/p:VerifyExtraction=", StringComparison.CurrentCultureIgnoreCase)) == false)
+            {
+                var tempArgs = args.ToList();
+
+                tempArgs.Add("/p:VerifyExtraction=false");
+                args = tempArgs.ToArray();
+            }
+            
             #endregion
         
             #region Extract

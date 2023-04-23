@@ -23,7 +23,7 @@ You use SqlPkg as you would use the Microsoft SqlPackage CLI application. All ar
 Here's an example:
 
 ```
-SqlPackage /Action:Extract /TargetFile:MyDatabaseBackup.dacpac /DiagnosticsFile:MyDatabaseBackup.log /p:ExtractAllTableData=false /p:VerifyExtraction=true /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
+sqlpkg /Action:Extract /TargetFile:MyDatabaseBackup.dacpac /DiagnosticsFile:MyDatabaseBackup.log /p:ExtractAllTableData=false /p:VerifyExtraction=true /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
 ```
 
 There are additional features as well, as are listed below.

@@ -178,7 +178,7 @@ public class Program
                     if (arg.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase) || arg.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase) || arg.StartsWith("/p:ExtractAllTableData=true", StringComparison.CurrentCultureIgnoreCase))
                         continue;
 
-                    arguments.Add(arg);
+                    arguments.Add(arg.Replace(";", "\\;"));
                 }
 
                 arguments.AddRange(tableDataList.Select(tableName => $"/p:TableData={tableName}"));
@@ -190,7 +190,7 @@ public class Program
             {
                 foreach (var arg in args)
                 {
-                    arguments.Add(arg);
+                    arguments.Add(arg.Replace(";", "\\;"));
                 }
             }
         }

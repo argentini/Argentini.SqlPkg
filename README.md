@@ -12,7 +12,7 @@ dotnet tool install -g microsoft.sqlpackage
 
 This requires that you already have the Microsoft dotnet CLI tool installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
 
-## Installation SqlPkg
+## Install SqlPkg
 
 Follow the instructions in the release for your operating system and platform.
 

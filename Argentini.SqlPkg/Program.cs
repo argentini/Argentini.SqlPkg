@@ -16,7 +16,24 @@ public class Program
         
         var timer = new Stopwatch();
 
-        #region Debug Test
+        #region Export Debug Test
+
+        // args = new[]
+        // {
+        //     "/Action:Export",
+        //     "/TargetFile:datoids.bacpac",
+        //     "/DiagnosticsFile:sqlpkg.log",
+        //     "/p:ExtractAllTableData=true",
+        //     "/p:ExcludeTableData=[dbo].[_luceneQueue]",
+        //     "/SourceServerName:sqlserver,1433",
+        //     "/SourceDatabaseName:datoids",
+        //     "/SourceUser:sa",
+        //     "/SourcePassword:P@ssw0rdz!"
+        // };
+        
+        #endregion
+        
+        #region Extract Debug Test
 
         args = new[]
         {
@@ -87,15 +104,27 @@ public class Program
             #region Better Defaults
 
             args = args.SetDefault("/SourceTrustServerCertificate:", "true");
-            args = args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
-            args = args.SetDefault("/p:IgnorePermissions=", "true");
             args = args.SetDefault("/p:VerifyExtraction=", "false");
 
+            if (args.Any(a =>
+                    a.StartsWith("/a:extract", StringComparison.CurrentCultureIgnoreCase) ||
+                    a.StartsWith("/action:extract", StringComparison.CurrentCultureIgnoreCase))
+                )
+            {
+                args = args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
+                args = args.SetDefault("/p:IgnorePermissions=", "true");
+            }            
+            
             #endregion
         
-            #region Extract
-            
-            if (args.Any(a => a.StartsWith("/a:extract", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith("/action:extract", StringComparison.CurrentCultureIgnoreCase)))
+            #region Extract, Export
+
+            if (args.Any(a =>
+                    a.StartsWith("/a:export", StringComparison.CurrentCultureIgnoreCase) ||
+                    a.StartsWith("/a:extract", StringComparison.CurrentCultureIgnoreCase) ||
+                    a.StartsWith("/action:export", StringComparison.CurrentCultureIgnoreCase) ||
+                    a.StartsWith("/action:extract", StringComparison.CurrentCultureIgnoreCase))
+                )
             {
                 if (args.Any(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
                 {

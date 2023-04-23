@@ -265,6 +265,28 @@ public static class Strings
 	#region Transform
 
 	/// <summary>
+	/// Repeat a string a specified number of times.
+	/// </summary>
+	/// <param name="text"></param>
+	/// <param name="n"></param>
+	/// <returns></returns>
+	public static string Repeat(this string text, int n)
+	{
+		if (string.IsNullOrEmpty(text))
+			return string.Empty;
+		
+		var textAsSpan = text.AsSpan();
+		var span = new Span<char>(new char[textAsSpan.Length * n]);
+	
+		for (var i = 0; i < n; i++)
+		{
+			textAsSpan.CopyTo(span.Slice(i * textAsSpan.Length, textAsSpan.Length));
+		}
+
+		return span.ToString();
+	}
+	
+	/// <summary>
 	/// Remove the query string from a URL.
 	/// </summary>
 	/// <param name="value"></param>

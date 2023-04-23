@@ -9,13 +9,6 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        Console.WriteLine($"SqlPkg => Started at {DateTime.Now:o}");
-
-        if (await CliHelpers.SqlPackageIsInstalled() == false)
-            return -1;
-        
-        var timer = new Stopwatch();
-
         #region Export Debug Test
 
         // args = new[]
@@ -49,7 +42,34 @@ public class Program
         // };
         
         #endregion
+        
+        Console.WriteLine($"SqlPkg for SqlPackage {CliHelpers.GetAssemblyVersion()}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}");
 
+        if (await CliHelpers.SqlPackageIsInstalled() == false)
+            return -1;
+
+        var action = string.Empty;
+        var timer = new Stopwatch();
+
+        #region Get Action
+
+        if (args.Length > 1 && args.Any(a => a.StartsWith("/a:", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith("/action:", StringComparison.CurrentCultureIgnoreCase)))
+        {
+            var splits = args.First(a =>
+                a.StartsWith("/a:", StringComparison.CurrentCultureIgnoreCase) ||
+                a.StartsWith("/action:", StringComparison.CurrentCultureIgnoreCase)).Split(':', StringSplitOptions.RemoveEmptyEntries);
+
+            if (splits.Length == 2)
+            {
+                action = splits[1].ApTitleCase();
+            }
+        }            
+            
+        #endregion
+
+        Console.WriteLine($"{(action != string.Empty ? action + " " : string.Empty)}Started {DateTime.Now:o}");
+        Console.WriteLine("=".Repeat(Console.WindowWidth));
+        
         timer.Start();
         
         var arguments = new List<string>();
@@ -106,10 +126,7 @@ public class Program
             args = args.SetDefault("/SourceTrustServerCertificate:", "true");
             args = args.SetDefault("/p:VerifyExtraction=", "false");
 
-            if (args.Any(a =>
-                    a.StartsWith("/a:extract", StringComparison.CurrentCultureIgnoreCase) ||
-                    a.StartsWith("/action:extract", StringComparison.CurrentCultureIgnoreCase))
-                )
+            if (action.Equals("extract", StringComparison.CurrentCultureIgnoreCase))
             {
                 args = args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
                 args = args.SetDefault("/p:IgnorePermissions=", "true");
@@ -119,12 +136,7 @@ public class Program
         
             #region Extract, Export
 
-            if (args.Any(a =>
-                    a.StartsWith("/a:export", StringComparison.CurrentCultureIgnoreCase) ||
-                    a.StartsWith("/a:extract", StringComparison.CurrentCultureIgnoreCase) ||
-                    a.StartsWith("/action:export", StringComparison.CurrentCultureIgnoreCase) ||
-                    a.StartsWith("/action:extract", StringComparison.CurrentCultureIgnoreCase))
-                )
+            if (action.Equals("extract", StringComparison.CurrentCultureIgnoreCase) || action.Equals("export", StringComparison.CurrentCultureIgnoreCase))
             {
                 if (args.Any(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
                 {
@@ -195,8 +207,9 @@ public class Program
         if (elapsedSplits is [_, { Length: > 1 }])
             elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
         
-        Console.WriteLine($"SqlPkg => Finished at {DateTime.Now:o}");
-        Console.WriteLine($"SqlPkg => Total Elapsed: {elapsed}");
+        Console.WriteLine("=".Repeat(Console.WindowWidth));
+        Console.WriteLine($"SqlPkg {(action != string.Empty ? action + " " : string.Empty)}Finished {DateTime.Now:o}");
+        Console.WriteLine($"Total Time Elapsed: {elapsed}");
         
         return result.ExitCode;
     }

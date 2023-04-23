@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using Argentini.SqlPkg.Extensions;
 using CliWrap;

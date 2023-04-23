@@ -14,7 +14,7 @@ This requires that you already have the Microsoft dotnet CLI tool installed, whi
 
 ## Installation SqlPkg
 
-TBD
+Follow the instructions in the release for your operating system and platform.
 
 ## Usage
 

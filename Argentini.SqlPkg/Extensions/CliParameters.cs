@@ -24,4 +24,16 @@ public static class CliParameters
 
         return string.Empty;
     }
+
+    public static string[] SetDefault(this string[] args, string argumentPrefix, string appendValue)
+    {
+        if (args.Any(a => a.StartsWith(argumentPrefix, StringComparison.CurrentCultureIgnoreCase)))
+            return args;
+        
+        var tempArgs = args.ToList();
+            
+        tempArgs.Add($"{argumentPrefix}{appendValue}");
+            
+        return tempArgs.ToArray();
+    }
 }

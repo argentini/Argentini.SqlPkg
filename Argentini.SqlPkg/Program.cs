@@ -106,38 +106,11 @@ public class Program
             
             #region Better Defaults
 
-            if (args.Any(a => a.StartsWith("/SourceTrustServerCertificate:", StringComparison.CurrentCultureIgnoreCase)) == false)
-            {
-                var tempArgs = args.ToList();
+            args = args.SetDefault("/SourceTrustServerCertificate:", "true");
+            args = args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
+            args = args.SetDefault("/p:IgnorePermissions=", "true");
+            args = args.SetDefault("/p:VerifyExtraction=", "false");
 
-                tempArgs.Add("/SourceTrustServerCertificate:true");
-                args = tempArgs.ToArray();
-            }
-
-            if (args.Any(a => a.StartsWith("/p:IgnoreUserLoginMappings=", StringComparison.CurrentCultureIgnoreCase)) == false)
-            {
-                var tempArgs = args.ToList();
-
-                tempArgs.Add("/p:IgnoreUserLoginMappings=true");
-                args = tempArgs.ToArray();
-            }
-
-            if (args.Any(a => a.StartsWith("/p:IgnorePermissions=", StringComparison.CurrentCultureIgnoreCase)) == false)
-            {
-                var tempArgs = args.ToList();
-
-                tempArgs.Add("/p:IgnorePermissions=true");
-                args = tempArgs.ToArray();
-            }
-
-            if (args.Any(a => a.StartsWith("/p:VerifyExtraction=", StringComparison.CurrentCultureIgnoreCase)) == false)
-            {
-                var tempArgs = args.ToList();
-
-                tempArgs.Add("/p:VerifyExtraction=false");
-                args = tempArgs.ToArray();
-            }
-            
             #endregion
         
             #region Extract

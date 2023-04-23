@@ -456,7 +456,8 @@ public static class CliHelpers
     /// <param name="arguments"></param>
     /// <param name="argumentPrefix"></param>
     /// <param name="fileExtension"></param>
-    public static void SetArgumentFileExtension(this List<string> arguments, string argumentPrefix, string fileExtension)
+    /// <param name="action"></param>
+    public static void SetArgumentFileExtension(this List<string> arguments, string argumentPrefix, string fileExtension, string action = "")
     {
 	    var targetFileArg = arguments.FirstOrDefault(a => a.StartsWith(argumentPrefix));
 
@@ -473,7 +474,7 @@ public static class CliHelpers
 	    fileName = fileName.TrimEnd(".dacpac", StringComparison.CurrentCultureIgnoreCase);
 	    fileName = fileName.TrimEnd(".bacpac", StringComparison.CurrentCultureIgnoreCase);
 	    fileName = fileName.TrimEnd($".{fileExtension.Trim('.')}", StringComparison.CurrentCultureIgnoreCase);
-	    fileName = $"{fileName}.{fileExtension.Trim('.')}";
+	    fileName = $"{fileName}{(action != string.Empty ? $"-{action}" : string.Empty)}.{fileExtension.Trim('.')}";
 
 	    #region Ensure Target Paths Exist
 
@@ -487,6 +488,8 @@ public static class CliHelpers
         
 	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
 		    Directory.CreateDirectory(directoryPath);
+	    
+	    File.Delete(fileName);
 	    
 	    #endregion
     }
@@ -506,7 +509,7 @@ public static class CliHelpers
 	    arguments.Insert(0, "/a:Extract");
 	    arguments.Add("/p:ExtractAllTableData=false");
 	    arguments.SetArgumentFileExtension("/TargetFile:", ".dacpac");
-	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", "schema");
 	    arguments.BetterDefaults(ExtractOptions);
 	    
 	    return arguments;
@@ -526,7 +529,7 @@ public static class CliHelpers
 
 	    arguments.Insert(0, "/a:Export");
 	    arguments.SetArgumentFileExtension("/TargetFile:", ".bacpac");
-	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", "data");
 	    arguments.BetterDefaults(ExportOptions);
 	    
 	    return arguments;

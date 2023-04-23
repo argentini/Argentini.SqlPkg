@@ -8,7 +8,7 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        const string version = "1.0.1";
+        const string version = "1.0.1"; // Single file executables can't get the Assembly version so use this
         var settings = new Settings();
         var schemaElapsed = string.Empty;
         var dataElapsed = string.Empty;

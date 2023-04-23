@@ -10,3 +10,15 @@ According to the SqlPackage [website](https://learn.microsoft.com/en-us/sql/tool
 ```
 
 This requires that you already have the Microsoft dotnet CLI tool installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+
+## Installation SqlPkg
+
+TBD
+
+## Features
+
+The following SqlPackage action modes have new features when using SqlPkg.
+
+### Action:Extract
+
+You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. The table name format is the same as the `/p:TableData=` property. To exclude table data you must also use `/p:TableData=` properties to include specific tables, or `/p:ExtractAllTableData=true` to include all table data, otherwise there is nothing to exclude.

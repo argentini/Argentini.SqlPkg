@@ -35,18 +35,18 @@ public class Program
         
         #region Extract Debug Test
 
-        args = new[]
-        {
-            "/Action:Extract",
-            "/TargetFile:datoids.dacpac",
-            "/DiagnosticsFile:sqlpkg.log",
-            "/p:ExtractAllTableData=true",
-            "/p:ExcludeTableData=[dbo].[_luceneQueue]",
-            "/SourceServerName:sqlserver,1433",
-            "/SourceDatabaseName:datoids",
-            "/SourceUser:sa",
-            "/SourcePassword:P@ssw0rdz!"
-        };
+        // args = new[]
+        // {
+        //     "/Action:Extract",
+        //     "/TargetFile:datoids.dacpac",
+        //     "/DiagnosticsFile:sqlpkg.log",
+        //     "/p:ExtractAllTableData=true",
+        //     "/p:ExcludeTableData=[dbo].[_luceneQueue]",
+        //     "/SourceServerName:sqlserver,1433",
+        //     "/SourceDatabaseName:datoids",
+        //     "/SourceUser:sa",
+        //     "/SourcePassword:P@ssw0rdz!"
+        // };
         
         #endregion
 

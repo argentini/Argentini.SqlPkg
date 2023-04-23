@@ -16,6 +16,22 @@ This requires that you already have the Microsoft dotnet CLI tool installed, whi
 
 TBD
 
+## Usage
+
+You use SqlPkg as you would use the Microsoft SqlPackage CLI application. All arguments are passed to SqlPackage as-is, but some default values have been changed to make using it easier, like defaulting to ignore permissions and to accept server certificates.
+
+Here's an example:
+
+```
+SqlPackage /Action:Extract /TargetFile:MyDatabaseBackup.dacpac /DiagnosticsFile:MyDatabaseBackup.log /p:ExtractAllTableData=false /p:VerifyExtraction=true /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log]
+```
+
+There are additional features as well, as are listed below.
+
+## Status
+
+This application is under active development so check back for updates.
+
 ## Features
 
 The following SqlPackage action modes have new features when using SqlPkg.

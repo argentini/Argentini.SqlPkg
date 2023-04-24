@@ -142,7 +142,267 @@ public static class CliHelpers
 		"/p:VerifyExtraction=",
 		"/p:VerifyFullTextDocumentTypesSupported="
 	};	
+
+	public static List<string> PublishOptions => new()
+	{
+		"/AccessToken:",
+		"/at:",
+		//"/Action:",
+		//"/a:",
+		"/AzureCloudConfig:",
+		"/acc:",
+		"/AzureKeyVaultAuthMethod:",
+		"/akv:",
+		"/ClientId:",
+		"/cid:",
+		"/DeployReportPath:",
+		"/drp:",
+		"/DeployScriptPath:",
+		"/dsp:",
+		"/Diagnostics:",
+		"/d:",
+		"/DiagnosticsFile:",
+		"/df:",
+		"/MaxParallelism:",
+		"/mp:",
+		"/ModelFilePath:",
+		"/mfp:",
+		"/OverwriteFiles:",
+		"/of:",
+		"/Profile:",
+		"/pr:",
+		"/Properties:",
+		"/p:",
+		"/Quiet:",
+		"/q:",
+		"/ReferencePaths:",
+		"/rp:",
+		"/Secret:",
+		"/secr:",
+		"/SourceFile:",
+		"/sf:",
+		"/SourceConnectionString:",
+		"/scs:",
+		"/SourceDatabaseName:",
+		"/sdn:",
+		"/SourceEncryptConnection:",
+		"/sec:",
+		"/SourceHostNameInCertificate:",
+		"/shnic:",
+		"/SourcePassword:",
+		"/sp:",
+		"/SourceServerName:",
+		"/ssn:",
+		"/SourceTimeout:",
+		"/st:",
+		"/SourceTrustServerCertificate:",
+		"/stsc:",
+		"/SourceUser:",
+		"/su:",
+		"/TargetConnectionString:",
+		"/tcs:",
+		"/TargetDatabaseName:",
+		"/tdn:",
+		"/TargetEncryptConnection:",
+		"/tec:",
+		"/TargetHostNameInCertificate:",
+		"/thnic:",
+		"/TargetPassword:",
+		"/tp:",
+		"/TargetServerName:",
+		"/tsn:",
+		"/TargetTimeout:",
+		"/tt:",
+		"/TargetTrustServerCertificate:",
+		"/ttsc:",
+		"/TargetUser:",
+		"/tu:",
+		"/TenantId:",
+		"/tid:",
+		"/ThreadMaxStackSize:",
+		"/tmss:",
+		"/UniversalAuthentication:",
+		"/ua:",
+		"/Variables:",
+		"/v:",
+		"/p:AdditionalDeploymentContributorArguments=",
+		"/p:AdditionalDeploymentContributorPaths=",
+		"/p:AdditionalDeploymentContributors=",
+		"/p:AllowDropBlockingAssemblies=",
+		"/p:AllowExternalLanguagePaths=",
+		"/p:AllowExternalLibraryPaths=",
+		"/p:AllowIncompatiblePlatform=",
+		"/p:AllowUnsafeRowLevelSecurityDataMovement=",
+		"/p:AzureSharedAccessSignatureToken=",
+		"/p:AzureStorageBlobEndpoint=",
+		"/p:AzureStorageContainer=",
+		"/p:AzureStorageKey=",
+		"/p:AzureStorageRootPath=",
+		"/p:BackupDatabaseBeforeChanges=",
+		"/p:BlockOnPossibleDataLoss=",
+		"/p:BlockWhenDriftDetected=",
+		"/p:CommandTimeout=",
+		"/p:CommentOutSetVarDeclarations=",
+		"/p:CompareUsingTargetCollation=",
+		"/p:CreateNewDatabase=",
+		"/p:DatabaseEdition=",
+		"/p:DatabaseLockTimeout=",
+		"/p:DatabaseMaximumSize=",
+		"/p:DatabaseServiceObjective=",
+		"/p:DeployDatabaseInSingleUserMode=",
+		"/p:DisableAndReenableDdlTriggers=",
+		"/p:DisableIndexesForDataPhase=",
+		"/p:DisableParallelismForEnablingIndexes=",
+		"/p:DoNotAlterChangeDataCaptureObjects=",
+		"/p:DoNotAlterReplicatedObjects=",
+		"/p:DoNotDropDatabaseWorkloadGroups=",
+		"/p:DoNotDropObjectType=",
+		"/p:DoNotDropObjectTypes=",
+		"/p:DoNotDropWorkloadClassifiers=",
+		"/p:DoNotEvaluateSqlCmdVariables=",
+		"/p:DropConstraintsNotInSource=",
+		"/p:DropDmlTriggersNotInSource=",
+		"/p:DropExtendedPropertiesNotInSource=",
+		"/p:DropIndexesNotInSource=",
+		"/p:DropObjectsNotInSource=",
+		"/p:DropPermissionsNotInSource=",
+		"/p:DropRoleMembersNotInSource=",
+		"/p:DropStatisticsNotInSource=",
+		"/p:EnclaveAttestationProtocol=",
+		"/p:EnclaveAttestationUrl=",
+		"/p:ExcludeObjectType=",
+		"/p:ExcludeObjectTypes=",
+		"/p:GenerateSmartDefaults=",
+		"/p:HashObjectNamesInLogs=",
+		"/p:IgnoreAnsiNulls=",
+		"/p:IgnoreAuthorizer=",
+		"/p:IgnoreColumnCollation=",
+		"/p:IgnoreColumnOrder=",
+		"/p:IgnoreComments=",
+		"/p:IgnoreCryptographicProviderFilePath=",
+		"/p:IgnoreDatabaseWorkloadGroups=",
+		"/p:IgnoreDdlTriggerOrder=",
+		"/p:IgnoreDdlTriggerState=",
+		"/p:IgnoreDefaultSchema=",
+		"/p:IgnoreDmlTriggerOrder=",
+		"/p:IgnoreDmlTriggerState=",
+		"/p:IgnoreExtendedProperties=",
+		"/p:IgnoreFileAndLogFilePath=",
+		"/p:IgnoreFilegroupPlacement=",
+		"/p:IgnoreFileSize=",
+		"/p:IgnoreFillFactor=",
+		"/p:IgnoreFullTextCatalogFilePath=",
+		"/p:IgnoreIdentitySeed=",
+		"/p:IgnoreIncrement=",
+		"/p:IgnoreIndexOptions=",
+		"/p:IgnoreIndexPadding=",
+		"/p:IgnoreKeywordCasing=",
+		"/p:IgnoreLockHintsOnIndexes=",
+		"/p:IgnoreLoginSids=",
+		"/p:IgnoreNotForReplication=",
+		"/p:IgnoreObjectPlacementOnPartitionScheme=",
+		"/p:IgnorePartitionSchemes=",
+		"/p:IgnorePermissions=",
+		"/p:IgnoreQuotedIdentifiers=",
+		"/p:IgnoreRoleMembership=",
+		"/p:IgnoreRouteLifetime=",
+		"/p:IgnoreSemicolonBetweenStatements=",
+		"/p:IgnoreSensitivityClassifications=",
+		"/p:IgnoreTableOptions=",
+		"/p:IgnoreTablePartitionOptions=",
+		"/p:IgnoreUserSettingsObjects=",
+		"/p:IgnoreWhitespace=",
+		"/p:IgnoreWithNocheckOnCheckConstraints=",
+		"/p:IgnoreWithNocheckOnForeignKeys=",
+		"/p:IgnoreWorkloadClassifiers=",
+		"/p:IncludeCompositeObjects=",
+		"/p:IncludeTransactionalScripts=",
+		"/p:IsAlwaysEncryptedParameterizationEnabled=",
+		"/p:LongRunningCommandTimeout=",
+		"/p:NoAlterStatementsToChangeClrTypes=",
+		"/p:PopulateFilesOnFileGroups=",
+		"/p:PreserveIdentityLastValues=",
+		"/p:RebuildIndexesOfflineForDataPhase=",
+		"/p:RegisterDataTierApplication=",
+		"/p:RestoreSequenceCurrentValue=",
+		"/p:RunDeploymentPlanExecutors=",
+		"/p:ScriptDatabaseCollation=",
+		"/p:ScriptDatabaseCompatibility=",
+		"/p:ScriptDatabaseOptions=",
+		"/p:ScriptDeployStateChecks=",
+		"/p:ScriptFileSize=",
+		"/p:ScriptNewConstraintValidation=",
+		"/p:ScriptRefreshModule=",
+		"/p:Storage=",
+		"/p:TreatVerificationErrorsAsWarnings=",
+		"/p:UnmodifiableObjectWarnings=",
+		"/p:VerifyCollationCompatibility=",
+		"/p:VerifyDeployment="
+	};	
 	
+	public static List<string> ImportOptions => new()
+	{
+		"/AccessToken:",
+		"/at:",
+		//"/Action:",
+		//"/a:",
+		"/AzureCloudConfig:",
+		"/acc:",
+		"/Diagnostics:",
+		"/d:",
+		"/DiagnosticsFile:",
+		"/df:",
+		"/MaxParallelism:",
+		"/mp:",
+		"/ModelFilePath:",
+		"/mfp:",
+		"/Properties:",
+		"/p:",
+		"/Quiet:",
+		"/q:",
+		"/SourceFile:",
+		"/sf:",
+		"/TargetConnectionString:",
+		"/tcs:",
+		"/TargetDatabaseName:",
+		"/tdn:",
+		"/TargetEncryptConnection:",
+		"/tec:",
+		"/TargetHostNameInCertificate:",
+		"/thnic:",
+		"/TargetPassword:",
+		"/tp:",
+		"/TargetServerName:",
+		"/tsn:",
+		"/TargetTimeout:",
+		"/tt:",
+		"/TargetTrustServerCertificate:",
+		"/ttsc:",
+		"/TargetUser:",
+		"/tu:",
+		"/TenantId:",
+		"/tid:",
+		"/ThreadMaxStackSize:",
+		"/tmss:",
+		"/UniversalAuthentication:",
+		"/ua:",
+		"/p:CommandTimeout=",
+		"/p:DatabaseEdition=",
+		"/p:DatabaseLockTimeout=",
+		"/p:DatabaseMaximumSize=",
+		"/p:DatabaseServiceObjective=",
+		"/p:DisableIndexesForDataPhase=",
+		"/p:DisableParallelismForEnablingIndexes=",
+		"/p:HashObjectNamesInLogs=",
+		"/p:ImportContributorArguments=",
+		"/p:ImportContributorPaths=",
+		"/p:ImportContributors=",
+		"/p:LongRunningCommandTimeout=",
+		"/p:PreserveIdentityLastValues=",
+		"/p:RebuildIndexesOfflineForDataPhase=",
+		"/p:Storage="
+	};	
+
 	#endregion
 	
     #region OS and Runtime
@@ -347,8 +607,8 @@ public static class CliHelpers
 		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString)
 		    {
 			    TrustServerCertificate = true,
-			    ConnectTimeout = 45,
-			    CommandTimeout = 45
+			    ConnectTimeout = 30,
+			    CommandTimeout = 120
 		    };
 
 		    settings.SourceConnectionString = builder.ToString();
@@ -369,8 +629,8 @@ public static class CliHelpers
 			    Password = settings.SourcePassword,
 			    TrustServerCertificate = true,
 			    Authentication = SqlAuthenticationMethod.SqlPassword,
-			    ConnectTimeout = 45,
-			    CommandTimeout = 45
+			    ConnectTimeout = 30,
+			    CommandTimeout = 120
 		    };
 
 		    settings.SourceConnectionString = builder.ToString();
@@ -391,8 +651,8 @@ public static class CliHelpers
 		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)
 		    {
 			    TrustServerCertificate = true,
-			    ConnectTimeout = 45,
-			    CommandTimeout = 45
+			    ConnectTimeout = 30,
+			    CommandTimeout = 120
 		    };
 
 		    settings.TargetConnectionString = builder.ToString();
@@ -413,8 +673,8 @@ public static class CliHelpers
 			    Password = settings.TargetPassword,
 			    TrustServerCertificate = true,
 			    Authentication = SqlAuthenticationMethod.SqlPassword,
-			    ConnectTimeout = 45,
-			    CommandTimeout = 45
+			    ConnectTimeout = 30,
+			    CommandTimeout = 120
 		    };
 
 		    settings.TargetConnectionString = builder.ToString();
@@ -441,11 +701,14 @@ public static class CliHelpers
 	    if (allowed.Any(a => a.StartsWith("/p:IgnorePermissions=", StringComparison.CurrentCultureIgnoreCase)))
 		    args.SetDefault("/p:IgnorePermissions=", "true");
 	
-	    if (allowed.Any(a => a.StartsWith("/p:ExtractAllTableData=", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/p:ExtractAllTableData=", "true");
-	    
 	    if (allowed.Any(a => a.StartsWith("/p:VerifyExtraction=", StringComparison.CurrentCultureIgnoreCase)))
 		    args.SetDefault("/p:VerifyExtraction=", "false");
+
+	    if (allowed.Any(a => a.StartsWith("/p:CreateNewDatabase=", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/p:CreateNewDatabase=", "true");
+
+	    if (allowed.Any(a => a.StartsWith("/TargetTrustServerCertificate:", StringComparison.CurrentCultureIgnoreCase)))
+		    args.SetDefault("/TargetTrustServerCertificate:", "true");
 	    
 	    #endregion
     }
@@ -456,8 +719,8 @@ public static class CliHelpers
     /// <param name="arguments"></param>
     /// <param name="argumentPrefix"></param>
     /// <param name="fileExtension"></param>
-    /// <param name="action"></param>
-    public static void SetArgumentFileExtension(this List<string> arguments, string argumentPrefix, string fileExtension, string action = "")
+    /// <param name="delete"></param>
+    public static void SetArgumentFileExtension(this List<string> arguments, string argumentPrefix, string fileExtension, bool delete = false)
     {
 	    var targetFileArg = arguments.FirstOrDefault(a => a.StartsWith(argumentPrefix));
 
@@ -474,7 +737,7 @@ public static class CliHelpers
 	    fileName = fileName.TrimEnd(".dacpac", StringComparison.CurrentCultureIgnoreCase);
 	    fileName = fileName.TrimEnd(".bacpac", StringComparison.CurrentCultureIgnoreCase);
 	    fileName = fileName.TrimEnd($".{fileExtension.Trim('.')}", StringComparison.CurrentCultureIgnoreCase);
-	    fileName = $"{fileName}{(action != string.Empty ? $"-{action}" : string.Empty)}.{fileExtension.Trim('.')}";
+	    fileName = $"{fileName}.{fileExtension.Trim('.')}";
 
 	    #region Ensure Target Paths Exist
 
@@ -489,50 +752,187 @@ public static class CliHelpers
 	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
 		    Directory.CreateDirectory(directoryPath);
 	    
-	    File.Delete(fileName);
+	    if (delete)
+		    File.Delete(fileName);
 	    
 	    #endregion
     }
-    
-    public static List<string> BuildSchemaBackupArguments(this IEnumerable<string> args)
-    {
-	    var arguments = new List<string>();
 
-	    foreach (var arg in args)
-	    {
-		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0];
+    /*
+    /// <summary>
+    /// Process CLI arguments and filter based on allowed arguments for Action:Extract.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+	public static List<string> BuildExtractArguments(this IEnumerable<string> args)
+	{
+		var arguments = new List<string>();
+
+		foreach (var arg in args)
+		{
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
 		    
 		    if (ExtractOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
 			    arguments.Add(arg);
-	    }
+		}
 
-	    arguments.Insert(0, "/a:Extract");
-	    arguments.Add("/p:ExtractAllTableData=false");
-	    arguments.SetArgumentFileExtension("/TargetFile:", ".dacpac");
-	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", "schema");
-	    arguments.BetterDefaults(ExtractOptions);
-	    
-	    return arguments;
-    }
+		arguments.Insert(0, "/a:Extract");
+		arguments.Add("/p:ExtractAllTableData=false");
+		arguments.SetArgumentFileExtension("/TargetFile:", ".dacpac", true);
+		arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", true, "schema");
+		arguments.BetterDefaults(ExtractOptions);
 
-    public static List<string> BuildDataBackupArguments(this IEnumerable<string> args)
+		return arguments;
+	}
+	*/
+    
+    /// <summary>
+    /// Process CLI arguments and filter based on allowed arguments for Action:Export.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public static List<string> BuildExportArguments(this IEnumerable<string> args)
     {
 	    var arguments = new List<string>();
 
 	    foreach (var arg in args)
 	    {
-		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0];
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
 
 		    if (ExportOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
 			    arguments.Add(arg);
 	    }
 
 	    arguments.Insert(0, "/a:Export");
-	    arguments.SetArgumentFileExtension("/TargetFile:", ".bacpac");
-	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", "data");
+	    arguments.SetArgumentFileExtension("/TargetFile:", ".bacpac", true);
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", true);
 	    arguments.BetterDefaults(ExportOptions);
 	    
 	    return arguments;
+    }
+
+    /*
+    /// <summary>
+    /// Process CLI arguments and filter based on allowed arguments for Action:Extract.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public static List<string> BuildPublishArguments(this IEnumerable<string> args)
+    {
+	    var arguments = new List<string>();
+
+	    foreach (var arg in args)
+	    {
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
+		    
+		    if (PublishOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+			    arguments.Add(arg);
+	    }
+
+	    arguments.Insert(0, "/a:Publish");
+	    arguments.SetArgumentFileExtension("/SourceFile:", ".dacpac");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", false, "schema");
+	    arguments.BetterDefaults(PublishOptions);
+	    
+	    return arguments;
+    }
+	*/
+    
+    /// <summary>
+    /// Process CLI arguments and filter based on allowed arguments for Action:Export.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public static List<string> BuildImportArguments(this IEnumerable<string> args)
+    {
+	    var arguments = new List<string>();
+
+	    foreach (var arg in args)
+	    {
+		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
+
+		    if (ImportOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+			    arguments.Add(arg);
+	    }
+
+	    arguments.Insert(0, "/a:Import");
+	    arguments.SetArgumentFileExtension("/SourceFile:", ".bacpac");
+	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log");
+	    arguments.BetterDefaults(ImportOptions);
+	    
+	    return arguments;
+    }
+    
+    /// <summary>
+    /// Process table names and remove excluded tables from arguments.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="originalCliArgs"></param>
+    /// <param name="settings"></param>
+    public static async Task ProcessTableDataArguments(this List<string> arguments, IEnumerable<string> originalCliArgs, Settings settings)
+    {
+	    var tableDataList = new List<string>();
+	    var args = originalCliArgs.ToList();	    
+
+        if (args.Any(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
+        {
+            foreach (var table in args.Where(a => a.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                var splits = table.Split('=', StringSplitOptions.RemoveEmptyEntries);
+
+                if (splits.Length == 2)
+                {
+                    tableDataList.Add(splits[1]);
+                }
+            }
+        }
+
+        else
+        {
+            tableDataList.AddRange(await SqlTools.LoadUserTableNames(settings.SourceConnectionString));
+            
+            #region Handle Table Data Exclusions
+
+            if (args.Any(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+
+                    if (string.IsNullOrEmpty(excludedTableName))
+                        continue;
+
+                    excludedTableName = excludedTableName.NormalizeTableName();
+
+                    if (excludedTableName.Contains('*'))
+                    {
+                        var wildcard = excludedTableName.Left("*");
+                        tableDataList.RemoveAll(t => t.StartsWith(wildcard, StringComparison.CurrentCultureIgnoreCase));
+                    }
+
+                    else
+                    {
+                        tableDataList.RemoveAll(t => t.Equals(excludedTableName, StringComparison.CurrentCultureIgnoreCase));
+                    }
+                }
+
+                var filteredArguments = new List<string>();
+                
+                foreach (var arg in arguments)
+                {
+                    if (arg.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase))
+                        continue;
+
+                    filteredArguments.Add(arg.Replace(";", "\\;"));
+                }
+
+                arguments.Clear();
+                arguments.AddRange(filteredArguments);
+                arguments.AddRange(tableDataList.Select(tableName => $"/p:TableData={tableName}"));
+            }
+
+            #endregion
+        }
     }
     
     #endregion

@@ -45,104 +45,95 @@ public class Program
         if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
         {
             Console.WriteLine($"SqlPkg => {settings.Action} Started {DateTime.Now:o}");
-        }
+            
+            args.NormalizeConnectionInfo(settings);
 
-        else
-        {
-            Console.WriteLine("SqlPkg => Backup/Restore Not Used => Passing Control to SqlPackage");
-            Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
-        }
-        
-        #endregion
-        
-        if (args.Length > 1)
-        {
-            if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+            if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
             {
-                args.NormalizeConnectionInfo(settings);
+                Console.WriteLine("SqlPkg => Back Up Started...");
 
-                if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Console.WriteLine("SqlPkg => Back Up Started...");
+                #region Backup Schema as DACPAC
 
-                    #region Backup Schema as DACPAC
-
-                    var taskTimer = new Stopwatch();
-                        
-                    taskTimer.Start();
-
-                    var schemaArguments = args.BuildExportArguments();
+                var taskTimer = new Stopwatch();
                     
-                    await schemaArguments.ProcessTableDataArguments(args, settings);
-                    
-                    var cmd = Cli.Wrap("SqlPackage")
-                        .WithArguments(string.Join(" ", schemaArguments))
-                        .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                        .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+                taskTimer.Start();
 
-                    var result = await cmd.ExecuteAsync();
-
-                    resultCode = result.ExitCode;
-
-                    schemaElapsed = $"{taskTimer.Elapsed:g}";
-                    var taskElapsedSplits = schemaElapsed.Split('.');
-
-                    if (taskElapsedSplits is [_, { Length: > 1 }])
-                        schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
-                    
-                    Console.WriteLine($"SqlPkg => Backup Complete: {schemaElapsed}");
-                    
-                    #endregion
-                }
-
-                else if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Console.WriteLine("SqlPkg => Restoring Database...");
-
-                    #region Restore Schema from DACPAC
-
-                    var taskTimer = new Stopwatch();
-                        
-                    taskTimer.Start();
-
-                    var schemaArguments = args.BuildImportArguments();
-                    
-                    await SqlTools.PurgeDatabase(settings);
-                    
-                    var cmd = Cli.Wrap("SqlPackage")
-                        .WithArguments(string.Join(" ", schemaArguments))
-                        .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                        .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
-
-                    var result = await cmd.ExecuteAsync();
-
-                    resultCode = result.ExitCode;
-
-                    schemaElapsed = $"{taskTimer.Elapsed:g}";
-                    var taskElapsedSplits = schemaElapsed.Split('.');
-
-                    if (taskElapsedSplits is [_, { Length: > 1 }])
-                        schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
-                    
-                    Console.WriteLine($"SqlPkg => Restoration Complete: {schemaElapsed}");
-                    
-                    #endregion
-                }
-            }
-
-            else
-            {
+                var schemaArguments = args.BuildExportArguments();
+                
+                await schemaArguments.ProcessTableDataArguments(args, settings);
+                
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(string.Join(" ", args))
+                    .WithArguments(string.Join(" ", schemaArguments))
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
+
+                schemaElapsed = $"{taskTimer.Elapsed:g}";
+                var taskElapsedSplits = schemaElapsed.Split('.');
+
+                if (taskElapsedSplits is [_, { Length: > 1 }])
+                    schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
+                
+                Console.WriteLine($"SqlPkg => Backup Complete: {schemaElapsed}");
+                
+                #endregion
+            }
+
+            else if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+            {
+                Console.WriteLine("SqlPkg => Restoring Database...");
+
+                #region Restore Schema from DACPAC
+
+                var taskTimer = new Stopwatch();
+                    
+                taskTimer.Start();
+
+                var schemaArguments = args.BuildImportArguments();
+                
+                await SqlTools.PurgeDatabase(settings);
+                
+                var cmd = Cli.Wrap("SqlPackage")
+                    .WithArguments(string.Join(" ", schemaArguments))
+                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+                var result = await cmd.ExecuteAsync();
+
+                resultCode = result.ExitCode;
+
+                schemaElapsed = $"{taskTimer.Elapsed:g}";
+                var taskElapsedSplits = schemaElapsed.Split('.');
+
+                if (taskElapsedSplits is [_, { Length: > 1 }])
+                    schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
+                
+                Console.WriteLine($"SqlPkg => Restoration Complete: {schemaElapsed}");
+                
+                #endregion
             }
         }
 
+        else
+        {
+            Console.WriteLine("SqlPkg => Backup/Restore Not Used => Passing Control to SqlPackage");
+            Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
+            
+            var cmd = Cli.Wrap("SqlPackage")
+                .WithArguments(string.Join(" ", args))
+                .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+            var result = await cmd.ExecuteAsync();
+
+            resultCode = result.ExitCode;
+        }
+        
+        #endregion
+        
         var elapsed = $"{timer.Elapsed:g}";
         var elapsedSplits = elapsed.Split('.');
 

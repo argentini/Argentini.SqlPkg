@@ -1,30 +1,42 @@
 # SqlPkg for Microsoft SqlPackage
 
-SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool, providing additional features, like the exclusion of specific database objects or table data.
+SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool, providing additional features, like the exclusion of specific table data and destination purging prior to import.
 
 ## Features
 
-The following SqlPackage action modes have new features when using SqlPkg.
+The following SqlPackage action modes provide enhanced features.
 
-### Action:Extract
+### Action:Backup
 
-You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. The table name format is the same as the `/p:TableData=` property. To exclude table data you must also use `/p:TableData=` properties to include specific tables, or `/p:ExtractAllTableData=true` to include all table data, otherwise there is nothing to exclude.
+This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the following differences.
 
-### Action:Export
+- Specify one or more `/p:ExcludeTableData=` properties to exclude sepcific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
 
-You can specify a `/p:ExcludeTableData=` property for each table to exclude its data from the dacpac file. See *Action:Extract* for more details.
+### Action:Restore
+
+This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
+
+- The destination database will be purged of all user objects (tables, views, etc.), except security objects, before the restoration.
+
+### Other Actions
+
+When not using Backup or Restore modes, the entire argument list is simply piped to SqlPackage and will run normally. So you can use `sqlpkg` everywhere SqlPackage is used.
 
 ## Usage
 
 You use SqlPkg as you would use the Microsoft SqlPackage CLI application. All arguments are passed to SqlPackage as-is, but some default values have been changed to make using it easier, like defaulting to ignore permissions and to accept server certificates.
 
-Here's an example:
+Here's a backup example:
 
 ```
-sqlpkg /Action:Extract /TargetFile:MyDatabaseBackup.dacpac /DiagnosticsFile:MyDatabaseBackup.log /p:ExtractAllTableData=false /p:VerifyExtraction=true /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
+sqlpkg /Action:Backup /TargetFile:MyDatabaseBackup.bacpac /DiagnosticsFile:MyDatabaseBackup.log /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
 ```
 
-There are additional features as well, as are listed below.
+Here's a restore example:
+
+```
+sqlpkg /Action:Restore /SourceFile:MyDatabaseBackup.bacpac /DiagnosticsFile:MyDatabaseBackup.log /TargetServerName:mydatabase.net,1433 /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
+```
 
 ## Installation
 

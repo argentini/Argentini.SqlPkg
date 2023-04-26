@@ -149,7 +149,7 @@ public class Program
         if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
             Console.WriteLine($"=> Restore to [{settings.TargetDatabaseName}] on {settings.TargetServerName} complete at {DateTime.Now:o}");
         
-        Console.WriteLine($"=> Total {settings.Action} Time: {elapsed}");
+        Console.WriteLine($"=> Total {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Time: {elapsed}");
         
         return resultCode;
     }

@@ -21,12 +21,14 @@ public class Program
         //     "/TargetFile:\"Database/athepedia.bacpac\"",
         //     "/DiagnosticsFile:\"Database/athepedia.log\"",
         //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog2]",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog3]",
         //     "/SourceServerName:sqlserver,1433",
         //     "/SourceDatabaseName:athepedia",
         //     "/SourceUser:sa",
         //     "/SourcePassword:P@ssw0rdz!"
         // };
-        //
+
         // args = new[]
         // {
         //     "/a:Restore",
@@ -41,12 +43,6 @@ public class Program
         
         #endregion
         
-        var title = $"SqlPkg for SqlPackage {Settings.Version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}";
-        
-        Console.WriteLine("-".Repeat(title.Length));
-        Console.WriteLine(title);
-        Console.WriteLine("-".Repeat(title.Length));
-
         if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;
 
@@ -68,15 +64,30 @@ public class Program
             }
         }
 
+        #endregion
+        
+        var title = $"SQLPKG for SqlPackage {Settings.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(settings.Action) ? "HELP" : settings.Action.ToUpper())} MODE —{{{{gap}}}}{CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}".FillWidth(CliHelpers.ColumnWidth);
+        
+        Console.WriteLine(title);
+        Console.WriteLine(CliHelpers.GetHeaderBar().Repeat(CliHelpers.ColumnWidth));
+        Console.WriteLine();
+        
         if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
         {
-            Console.WriteLine($"=> {settings.Action} Started {DateTime.Now:o}");
-            Console.WriteLine("=".Repeat(title.Length));
+            Console.Write("Started      ");
+            CliHelpers.WriteBar();
+            Console.WriteLine("  " + CliHelpers.GetDateTime());
+            Console.WriteLine();
             
             args.NormalizeConnectionInfo(settings);
 
             if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
             {
+                CliHelpers.OutputBackupInfo(args, settings);
+                
+                Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+                Console.WriteLine();
+                
                 #region Backup Schema as DACPAC
 
                 var backupArguments = args.BuildExportArguments(settings);
@@ -97,6 +108,11 @@ public class Program
 
             else if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
             {
+                CliHelpers.OutputRestoreInfo(args, settings);
+
+                Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+                Console.WriteLine();
+                
                 #region Restore Schema from DACPAC
                 
                 var restoreArguments = args.BuildImportArguments(settings);
@@ -116,11 +132,19 @@ public class Program
             }
         }
 
-        else
+        else if (string.IsNullOrEmpty(settings.Action) == false)
         {
-            Console.WriteLine("=> Backup/Restore Not Used => Passing Control to SqlPackage");
-            Console.WriteLine($"=> {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
-            Console.WriteLine("=".Repeat(title.Length));
+            Console.Write("Started      ");
+            CliHelpers.WriteBar();
+            Console.WriteLine("  " + CliHelpers.GetDateTime());
+            
+            Console.Write(" ".Repeat(13));
+            CliHelpers.WriteBar();
+            Console.WriteLine($"  Backup/Restore Not Used, Passing Control to SqlPackage{CliHelpers.Ellipsis}");
+            Console.WriteLine();
+
+            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine();
             
             var cmd = Cli.Wrap("SqlPackage")
                 .WithArguments(string.Join(" ", args))
@@ -131,25 +155,71 @@ public class Program
 
             resultCode = result.ExitCode;
         }
-        
-        #endregion
-        
-        var elapsed = $"{timer.Elapsed:g}";
-        var elapsedSplits = elapsed.Split('.');
 
-        if (elapsedSplits is [_, { Length: > 1 }])
-            elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
-        
-        Console.WriteLine("=".Repeat(title.Length));
-        
-        if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
-            Console.WriteLine($"=> Backup of [{settings.SourceDatabaseName}] on {settings.SourceServerName} complete at {DateTime.Now:o}");
+        else
+        {
+            Console.WriteLine("SqlPkg can be used in 'Backup' or 'Restore' action modes, which are");
+            Console.WriteLine("functionally equivalent to SqlPackage's 'Export' and 'Import' action modes.");
+            Console.WriteLine("These modes have tailored default values and provide additional features.");
+            Console.WriteLine();
+            Console.WriteLine("/Action:Backup (/a:Backup)");
+            Console.WriteLine("    Accepts all Action:Export arguments, and also provides /ExcludeTableData:");
+            Console.WriteLine("    which is functionally equivalent to /TableData: but excludes the specified");
+            Console.WriteLine("    tables. Can be listed multiple times to exclude multiple tables.");
+            Console.WriteLine();
+            Console.WriteLine("/Action:Restore (/a:Restore)");
+            Console.WriteLine("    Accepts all Action:Import arguments. This mode will always fully erase the");
+            Console.WriteLine("    target database prior to restoring the .bacpac file, so there's no need to");
+            Console.WriteLine("    create a new database each time.");
+            Console.WriteLine();
+            Console.WriteLine("You can use standard SqlPackage modes and all arguments are sent to Sqlpackage");
+            Console.WriteLine("so you can use SqlPkg as the sole way to run SqlPackage, for convenience.");
+            Console.WriteLine();
+            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine();
+            
+            var cmd = Cli.Wrap("SqlPackage")
+                .WithArguments(string.Join(" ", args))
+                .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
-        if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
-            Console.WriteLine($"=> Restore to [{settings.TargetDatabaseName}] on {settings.TargetServerName} complete at {DateTime.Now:o}");
-        
-        Console.WriteLine($"=> Total {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Time: {elapsed}");
-        
+            var result = await cmd.ExecuteAsync();
+
+            resultCode = result.ExitCode;
+        }
+
+        if (string.IsNullOrEmpty(settings.Action) == false)
+        {
+            var elapsed = $"{timer.Elapsed:g}";
+            var elapsedSplits = elapsed.Split('.');
+
+            if (elapsedSplits is [_, { Length: > 1 }])
+                elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
+
+            Console.WriteLine();
+            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine();
+
+            Console.Write("Action       ");
+            CliHelpers.WriteBar();
+            Console.WriteLine($"  {(string.IsNullOrEmpty(settings.Action) ? "HELP" : settings.Action)}");
+            Console.WriteLine();
+
+            if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
+                CliHelpers.OutputBackupInfo(args, settings);
+
+            if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+                CliHelpers.OutputBackupInfo(args, settings);
+
+            Console.Write("Completed    ");
+            CliHelpers.WriteBar();
+            Console.WriteLine("  " + CliHelpers.GetDateTime());
+            Console.Write(" ".Repeat(13));
+            CliHelpers.WriteBar();
+            Console.WriteLine($"  {elapsed} Total Time");
+            Console.WriteLine();
+        }
+
         return resultCode;
     }
 }

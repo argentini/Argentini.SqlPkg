@@ -138,6 +138,65 @@ public static class CliHelpers
 	};
 
 	public static string RestoreExcludableObjects => @"ExcludeObjectTypes=Aggregates;ApplicationRoles;Assemblies;AssemblyFiles;AsymmetricKeys;BrokerPriorities;Certificates;ColumnEncryptionKeys;ColumnMasterKeys;Contracts;DatabaseOptions;DatabaseRoles;DatabaseTriggers;Defaults;ExtendedProperties;ExternalDataSources;ExternalFileFormats;ExternalTables;Filegroups;Files;FileTables;FullTextCatalogs;FullTextStoplists;MessageTypes;PartitionFunctions;PartitionSchemes;Permissions;Queues;RemoteServiceBindings;RoleMembership;Rules;ScalarValuedFunctions;SearchPropertyLists;SecurityPolicies;Sequences;Services;Signatures;StoredProcedures;SymmetricKeys;Synonyms;TableValuedFunctions;UserDefinedDataTypes;UserDefinedTableTypes;ClrUserDefinedTypes;Users;Views;XmlSchemaCollections;Audits;Credentials;CryptographicProviders;DatabaseAuditSpecifications;DatabaseEncryptionKeys;DatabaseScopedCredentials;Endpoints;ErrorMessages;EventNotifications;EventSessions;LinkedServerLogins;LinkedServers;Logins;MasterKeys;Routes;ServerAuditSpecifications;ServerRoleMembership;ServerRoles;ServerTriggers;ExternalStreams;ExternalStreamingJobs;DatabaseWorkloadGroups;WorkloadClassifiers;ExternalLibraries;ExternalLanguages";
+
+	/// <summary>
+	/// Bullet and space.
+	/// </summary>
+	public static string Bullet = "• ";
+
+	public const string HeaderBar = "■";
+
+	public const string HeaderBarMac = "▀";
+
+	/// <summary>
+	/// Ellipsis character.
+	/// </summary>
+	public const string Ellipsis = "…  ";
+
+	/// <summary>
+	/// Overall app indentation.
+	/// </summary>
+	public const string Padding = "  ";
+
+	/// <summary>
+	/// Vertical bar character for console output (Windows)
+	/// </summary>
+	public const string Bar = "|";
+
+	/// <summary>
+	/// Vertical bar character for console output (Mac/Linux)
+	/// </summary>
+	public const string BarMac = "|";
+
+	/// <summary>
+	/// Arrow for console output (Windows)
+	/// </summary>
+	public const string Arrow = " → ";
+
+	/// <summary>
+	/// Arrow for console output (Linux)
+	/// </summary>
+	public const string ArrowLinux = " ➜  ";
+
+	/// <summary>
+	/// Arrow for console output (Mac)
+	/// </summary>
+	public const string ArrowMac = " → ";
+
+	/// <summary>
+	/// Indentation for console output (Windows)
+	/// </summary>
+	public const string IndentationArrow = "  −→ ";
+
+	/// <summary>
+	/// Indentation for console output (Linux)
+	/// </summary>
+	public const string IndentationArrowLinux = "  ➜  ";
+
+	/// <summary>
+	/// Indentation for console output (Mac)
+	/// </summary>
+	public const string IndentationArrowMac = "  ⮑  ";
 	
 	#endregion
 	
@@ -500,10 +559,14 @@ public static class CliHelpers
     /// </summary>
     /// <param name="arguments"></param>
     /// <param name="argumentPrefix"></param>
-    public static void EnsurePathAndDeleteExistingFile(this List<string> arguments, string argumentPrefix)
+    /// <param name="argumentAbbrevPrefix"></param>
+    public static void EnsurePathAndDeleteExistingFile(this List<string> arguments, string argumentPrefix, string argumentAbbrevPrefix)
     {
 	    var targetFileArg = arguments.FirstOrDefault(a => a.StartsWith(argumentPrefix));
 
+	    if (string.IsNullOrEmpty(targetFileArg))
+		    targetFileArg = arguments.FirstOrDefault(a => a.StartsWith(argumentAbbrevPrefix));
+	    
 	    if (string.IsNullOrEmpty(targetFileArg))
 		    return;
 
@@ -517,7 +580,7 @@ public static class CliHelpers
 	    #region Ensure Target Paths Exist
 
 	    arguments.RemoveAll(a => a.Equals(targetFileArg, StringComparison.CurrentCultureIgnoreCase));
-	    arguments.Add($"{fileSplits[0]}:\"{fileName}\"");
+	    arguments.Add($"{fileSplits[0].TrimEnd(':')}:\"{fileName}\"");
 	    
 	    if (fileName.Contains(Path.DirectorySeparatorChar) == false)
 		    return;
@@ -580,8 +643,7 @@ public static class CliHelpers
 
 	    arguments.Insert(0, "/a:Export");
 	    arguments.Insert(1, $"/SourceConnectionString:\"{settings.SourceConnectionString}\"");
-	    arguments.EnsurePathAndDeleteExistingFile("/TargetFile:");
-	    arguments.EnsurePathAndDeleteExistingFile("/DiagnosticsFile:");
+	    arguments.EnsurePathAndDeleteExistingFile("/TargetFile:", "/tf:");
 	    arguments.BetterDefaults(ExportOptions);
 	    
 	    return arguments;
@@ -709,6 +771,298 @@ public static class CliHelpers
 
             #endregion
         }
+    }
+    
+    #endregion
+    
+    #region Output Helpers
+
+    public static string GetExcludedTableDataList(this IEnumerable<string> args)
+    {
+	    var result = string.Empty;
+	    
+	    foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
+	    {
+		    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+
+		    if (string.IsNullOrEmpty(excludedTableName))
+			    continue;
+
+		    if (string.IsNullOrEmpty(result) == false)
+				    result += Environment.NewLine + " ".Repeat(13) + " ".Repeat(3);
+
+		    result += excludedTableName.NormalizeTableName();
+	    }
+
+	    if (string.IsNullOrEmpty(result))
+	    {
+		    result += "All Tables";
+	    }
+	    else
+	    {
+		    result = "All Tables, Excluding:" + Environment.NewLine + " ".Repeat(13) + " ".Repeat(3) + result;
+	    }
+	    
+	    return result;
+    }
+    
+    /// <summary>
+    /// Column width of the console output for items that require cropping.
+    /// </summary>
+    public static int ColumnWidth
+    {
+	    get
+	    {
+		    var minWidth = 76;
+		    var maxWidth = 110;
+		    var currentWidth = Console.WindowWidth - (Padding.Length * 2);
+
+		    if (currentWidth < minWidth)
+		    {
+			    return minWidth;
+		    }
+
+		    else
+		    {
+			    if (currentWidth > maxWidth)
+			    {
+				    return maxWidth;
+			    }
+
+			    else
+			    {
+				    return currentWidth;
+			    }
+		    }
+	    }
+    }
+    
+    /// <summary>
+    /// Output an indentation arrow.
+    /// </summary>
+    public static void WriteIndentationArrow()
+    {
+	    Console.Write(GetIndentationArrow());
+    }
+
+    /// <summary>
+    /// Output a separator arrow.
+    /// </summary>
+    public static void WriteArrow()
+    {
+	    Console.Write(GetArrow());
+    }
+
+    /// <summary>
+    /// Output a bullet.
+    /// </summary>
+    public static void WriteBullet()
+    {
+	    Console.Write(GetBullet());
+    }
+
+    /// <summary>
+    /// Output a separator bar.
+    /// </summary>
+    public static void WriteBar()
+    {
+	    Console.Write(GetBar());
+    }
+    
+    /// <summary>
+    /// Output the current date and time as Fri-10-Aug-2018.
+    /// </summary>
+    public static string GetDateTime()
+    {
+	    // Thu-2018-May-10 @ 12:30 PM
+	    return DateTime.Now.ToString("ddd-dd-MMM-yyyy @ ") + DateTime.Now.ToString("h:mm tt");
+    }
+	
+    /// <summary>
+    /// Get the best arrow for console output on the current platform.
+    /// </summary>
+    /// <returns>String with the arrow</returns>
+    public static string GetArrow()
+    {
+	    var result = ArrowMac;
+
+	    if (GetOsPlatform() == OSPlatform.Windows)
+		    result = Arrow;
+
+	    else if (GetOsPlatform() == OSPlatform.Linux)
+		    result = ArrowLinux;
+
+	    return result;
+    }
+
+    /// <summary>
+    /// Get the best indentation arrow for console output on the current platform.
+    /// </summary>
+    /// <returns>String with the indented arrow</returns>
+    public static string GetIndentationArrow()
+    {
+	    var result = IndentationArrowMac;
+
+	    if (GetOsPlatform() == OSPlatform.Windows)
+		    result = IndentationArrow;
+
+	    else if (GetOsPlatform() == OSPlatform.Linux)
+		    result = IndentationArrowLinux;
+
+	    return result;
+    }
+    
+    /// <summary>
+    /// Get the bullet for console output on the current platform.
+    /// </summary>
+    /// <returns>String with the bullet</returns>
+    public static string GetBullet()
+    {
+	    return Bullet;
+    }
+    
+    /// <summary>
+    /// Get the vertical bar for console output on the current platform.
+    /// </summary>
+    /// <returns>String with the vertical bar</returns>
+    public static string GetBar()
+    {
+	    var result = BarMac;
+
+	    if (GetOsPlatform() == OSPlatform.Windows)
+		    result = Bar;
+
+	    return result;
+    }
+    
+    /// <summary>
+    /// Get the thick title bar character for underliniing the app title on the current platform.
+    /// </summary>
+    /// <returns>String with the title bar character</returns>
+    public static string GetHeaderBar()
+    {
+	    var result = HeaderBarMac;
+
+	    if (GetOsPlatform() == OSPlatform.Windows)
+		    result = HeaderBar;
+
+	    return result;
+    }
+    
+    /// <summary>
+    /// Insert spaces to ensure a string is a specific width.
+    /// Spaces are inserted in place of "{{gap}}". This only
+    /// support one instance of the gap text.
+    /// </summary>
+    /// <param name="text">Text with {{gap}} in the middle for expansion</param>
+    /// <param name="width">Column width</param>
+    /// <returns>Text with {{gap}} expanded into spaces to make the text equal a given column width</returns>
+    public static string FillWidth(this string text, int width)
+    {
+	    var result = text.Replace("{{gap}}", " ");
+
+	    if (string.IsNullOrWhiteSpace(text))
+		    return result;
+
+	    if (width <= 0)
+		    return result;
+	    
+	    var chunks = text.Split(new [] { "{{gap}}" }, StringSplitOptions.None);
+	    var length = 0;
+
+	    if (chunks.Length <= 1)
+		    return result;
+	    
+	    foreach (var chunk in chunks)
+	    {
+		    length += chunk.Length;
+
+		    result += chunk;
+	    }
+
+	    if (length >= width)
+		    return result;
+	    
+	    result = string.Empty;
+
+	    var gap = (width - length) / (chunks.Length - 1);
+
+	    foreach (var chunk in chunks)
+	    {
+		    if (chunk == chunks.Last())
+		    {
+			    if ((width - length) % (chunks.Length - 1) > 0)
+				    result += " ";
+		    }
+
+		    result += chunk;
+
+		    if (chunk != chunks.Last())
+		    {
+			    result += new string(' ', gap);
+		    }
+	    }
+
+	    return result;
+    }
+
+    /// <summary>
+    /// Backup information output.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="settings"></param>
+    public static void OutputBackupInfo(IEnumerable<string> arguments, Settings settings)
+    {
+	    var args = arguments.ToList();
+	    
+	    Console.Write("Source       ");
+	    WriteBar();
+	    Console.Write("  " + settings.SourceServerName);
+	    WriteArrow();
+	    Console.WriteLine(settings.SourceDatabaseName);
+	    Console.WriteLine();
+
+	    Console.Write("Table Data   ");
+	    WriteBar();
+	    Console.WriteLine("  " + args.GetExcludedTableDataList());
+	    Console.WriteLine();
+                
+	    Console.Write("Destination  ");
+	    WriteBar();
+	    Console.WriteLine("  " + (args.HasArgument("/TargetFile:", "/tf:") ? args.GetArgumentValue("/TargetFile", "/tf", ':').Trim('\"') : "None"));
+	    Console.WriteLine();
+                
+	    Console.Write("Log File     ");
+	    WriteBar();
+	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"') : "None"));
+	    Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Restore information output.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="settings"></param>
+    public static void OutputRestoreInfo(IEnumerable<string> arguments, Settings settings)
+    {
+	    var args = arguments.ToList();
+	    
+	    Console.Write("Source       ");
+	    WriteBar();
+	    Console.WriteLine("  " + (args.HasArgument("/SourceFile:", "/sf:") ? args.GetArgumentValue("/SourceFile", "/sf", ':').Trim('\"') : "None"));
+	    Console.WriteLine();
+                
+	    Console.Write("Destination  ");
+	    WriteBar();
+	    Console.Write("  " + settings.TargetServerName);
+	    WriteArrow();
+	    Console.WriteLine(settings.TargetDatabaseName);
+	    Console.WriteLine();
+
+	    Console.Write("Log File     ");
+	    WriteBar();
+	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"') : "None"));
+	    Console.WriteLine();
     }
     
     #endregion

@@ -12,6 +12,7 @@ public class Settings
     public int SourceConnectionTimeout { get; set; } = 30;
     public int SourceCommandTimeout { get; set; } = 120;
     public bool SourceTrustServerCertificate { get; set; } = true;
+    public string SourceFilePath { get; set; } = string.Empty;
 
     public string TargetConnectionString { get; set; } = string.Empty;
     public string TargetServerName { get; set; } = string.Empty;
@@ -21,6 +22,9 @@ public class Settings
     public int TargetConnectionTimeout { get; set; } = 30;
     public int TargetCommandTimeout { get; set; } = 120;
     public bool TargetTrustServerCertificate { get; set; } = true;
+    public string TargetFilePath { get; set; } = string.Empty;
+
+    public string LogFilePath { get; set; } = string.Empty;
     
     public static string AppMajorVersion
     {

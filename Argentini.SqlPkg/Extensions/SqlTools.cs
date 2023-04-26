@@ -12,9 +12,9 @@ public static class SqlTools
 
 	public static async Task PurgeDatabase(Settings settings)
 	{
-		Console.WriteLine($"SqlPkg => Purging database {settings.TargetDatabaseName} on {settings.TargetServerName}...");
+		Console.WriteLine($"=> Purging Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
 		
-		Console.WriteLine("SqlPkg => Setting single user mode...");
+		Console.WriteLine("=> Setting Single User Mode...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 			ConnectionString = settings.TargetConnectionString,
@@ -27,7 +27,7 @@ EXEC sp_executesql @sqlprep
 "
         });
 
-        Console.WriteLine("SqlPkg => Dropping Extended Properties...");
+        Console.WriteLine("=> Dropping Extended Properties...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -50,7 +50,7 @@ END
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Triggers...");
+        Console.WriteLine("=> Dropping Triggers...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -76,7 +76,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Foreign Keys...");
+        Console.WriteLine("=> Dropping Foreign Keys...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -95,7 +95,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Fulltext Catalogs...");
+        Console.WriteLine("=> Dropping Fulltext Catalogs...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -213,7 +213,7 @@ DEALLOCATE FTCur
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Table Indexes...");
+        Console.WriteLine("=> Dropping Table Indexes...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -284,7 +284,7 @@ END
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Table Check Constraints...");
+        Console.WriteLine("=> Dropping Table Check Constraints...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -305,7 +305,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Views...");
+        Console.WriteLine("=> Dropping Views...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -324,7 +324,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Stored Procedures...");
+        Console.WriteLine("=> Dropping Stored Procedures...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -342,7 +342,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Table Primary Keys...");
+        Console.WriteLine("=> Dropping Table Primary Keys...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -363,7 +363,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Tables...");
+        Console.WriteLine("=> Dropping Tables...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -383,7 +383,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping User-Defined Table Types...");
+        Console.WriteLine("=> Dropping User-Defined Table Types...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -402,7 +402,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping User-Defined Data Types...");
+        Console.WriteLine("=> Dropping User-Defined Data Types...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -421,7 +421,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping User-Defined Functions...");
+        Console.WriteLine("=> Dropping User-Defined Functions...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -439,7 +439,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping XML Schema Collections...");
+        Console.WriteLine("=> Dropping XML Schema Collections...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -462,7 +462,7 @@ EXEC sp_executesql @dynsql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping Default Types...");
+        Console.WriteLine("=> Dropping Default Types...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -479,7 +479,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Dropping User Schemas...");
+        Console.WriteLine("=> Dropping User Schemas...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -500,7 +500,7 @@ EXEC sp_executesql @sql
 "
         });
         
-        Console.WriteLine("SqlPkg => Restoring multi-user mode...");
+        Console.WriteLine("=> Restoring multi-user mode...");
         await Sql.ExecuteAsync(new SqlExecuteSettings
         {
 	        ConnectionString = settings.TargetConnectionString,
@@ -513,7 +513,7 @@ EXEC sp_executesql @sqlfinish2
 "
         });
         
-        Console.WriteLine("SqlPkg => Database Purged");
+        Console.WriteLine("=> Database Purge Complete");
 	}
 	
 	/// <summary>

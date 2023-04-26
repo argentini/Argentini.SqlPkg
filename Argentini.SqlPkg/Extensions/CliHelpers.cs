@@ -11,85 +11,14 @@ public static class CliHelpers
 {
 	#region Constants
 	
-	// public static List<string> ExtractOptions => new()
-	// {
-	// 	"/AccessToken:",
-	// 	"/at:",
-	// 	//"/Action:",
-	// 	//"/a:",
-	// 	"/AzureCloudConfig:",
-	// 	"/acc:",
-	// 	"/Diagnostics:",
-	// 	"/d:",
-	// 	"/DiagnosticsFile:",
-	// 	"/df:",
-	// 	"/MaxParallelism:",
-	// 	"/mp:",
-	// 	"/OverwriteFiles:",
-	// 	"/of:",
-	// 	"/Properties:",
-	// 	"/p:",
-	// 	"/Quiet:",
-	// 	"/q:",
-	// 	"/SourceConnectionString:",
-	// 	"/scs:",
-	// 	"/SourceDatabaseName:",
-	// 	"/sdn:",
-	// 	"/SourceEncryptConnection:",
-	// 	"/sec:",
-	// 	"/SourceHostNameInCertificate:",
-	// 	"/shnic:",
-	// 	"/SourcePassword:",
-	// 	"/sp:",
-	// 	"/SourceServerName:",
-	// 	"/ssn:",
-	// 	"/SourceTimeout:",
-	// 	"/st:",
-	// 	"/SourceTrustServerCertificate:",
-	// 	"/stsc:",
-	// 	"/SourceUser:",
-	// 	"/su:",
-	// 	"/TargetFile:",
-	// 	"/tf:",
-	// 	"/TenantId:",
-	// 	"/tid:",
-	// 	"/ThreadMaxStackSize:",
-	// 	"/tmss:",
-	// 	"/UniversalAuthentication:",
-	// 	"/ua:",
-	// 	"/p:AzureStorageBlobEndpoint=",
-	// 	"/p:AzureStorageContainer=",
-	// 	"/p:AzureStorageKey=",
-	// 	"/p:AzureStorageRootPath=",
-	// 	"/p:CommandTimeout=",
-	// 	"/p:CompressionOption=",
-	// 	"/p:DacApplicationDescription=",
-	// 	"/p:DacApplicationName=",
-	// 	"/p:DacMajorVersion=",
-	// 	"/p:DacMinorVersion=",
-	// 	"/p:DatabaseLockTimeout=",
-	// 	//"/p:ExtractAllTableData=", // Disallow for schema arguments
-	// 	"/p:ExtractApplicationScopedObjectsOnly=",
-	// 	"/p:ExtractReferencedServerScopedElements=",
-	// 	"/p:ExtractTarget=",
-	// 	"/p:ExtractUsageProperties=",
-	// 	"/p:HashObjectNamesInLogs=",
-	// 	"/p:IgnoreExtendedProperties=",
-	// 	"/p:IgnorePermissions=",
-	// 	"/p:IgnoreUserLoginMappings=",
-	// 	"/p:LongRunningCommandTimeout=",
-	// 	"/p:Storage=",
-	// 	//"/p:TableData=", // Disallow for schema arguments
-	// 	//"/p:TempDirectoryForTableData=", // Disallow for schema arguments
-	// 	"/p:VerifyExtraction="
-	// };	
-
 	public static List<string> ExportOptions => new()
 	{
+		// Commented items are replaced by SqlPkg
+
 		"/AccessToken:",
 		"/at:",
-		//"/Action:",
-		//"/a:",
+		// "/Action:",
+		// "/a:",
 		"/AzureCloudConfig:",
 		"/acc:",
 		"/Diagnostics:",
@@ -104,24 +33,24 @@ public static class CliHelpers
 		"/p:",
 		"/Quiet:",
 		"/q:",
-		"/SourceConnectionString:",
-		"/scs:",
-		"/SourceDatabaseName:",
-		"/sdn:",
+		// "/SourceConnectionString:",
+		// "/scs:",
+		// "/SourceDatabaseName:",
+		// "/sdn:",
 		"/SourceEncryptConnection:",
 		"/sec:",
 		"/SourceHostNameInCertificate:",
 		"/shnic:",
-		"/SourcePassword:",
-		"/sp:",
-		"/SourceServerName:",
-		"/ssn:",
-		"/SourceTimeout:",
-		"/st:",
-		"/SourceTrustServerCertificate:",
-		"/stsc:",
-		"/SourceUser:",
-		"/su:",
+		// "/SourcePassword:",
+		// "/sp:",
+		// "/SourceServerName:",
+		// "/ssn:",
+		// "/SourceTimeout:",
+		// "/st:",
+		// "/SourceTrustServerCertificate:",
+		// "/stsc:",
+		// "/SourceUser:",
+		// "/su:",
 		"/TargetFile:",
 		"/tf:",
 		"/TenantId:",
@@ -130,7 +59,7 @@ public static class CliHelpers
 		"/tmss:",
 		"/UniversalAuthentication:",
 		"/ua:",
-		"/p:CommandTimeout=",
+		// "/p:CommandTimeout=",
 		"/p:CompressionOption=",
 		"/p:DatabaseLockTimeout=",
 		"/p:HashObjectNamesInLogs=",
@@ -143,209 +72,14 @@ public static class CliHelpers
 		"/p:VerifyFullTextDocumentTypesSupported="
 	};	
 
-	// public static List<string> PublishOptions => new()
-	// {
-	// 	"/AccessToken:",
-	// 	"/at:",
-	// 	//"/Action:",
-	// 	//"/a:",
-	// 	"/AzureCloudConfig:",
-	// 	"/acc:",
-	// 	"/AzureKeyVaultAuthMethod:",
-	// 	"/akv:",
-	// 	"/ClientId:",
-	// 	"/cid:",
-	// 	"/DeployReportPath:",
-	// 	"/drp:",
-	// 	"/DeployScriptPath:",
-	// 	"/dsp:",
-	// 	"/Diagnostics:",
-	// 	"/d:",
-	// 	"/DiagnosticsFile:",
-	// 	"/df:",
-	// 	"/MaxParallelism:",
-	// 	"/mp:",
-	// 	"/ModelFilePath:",
-	// 	"/mfp:",
-	// 	"/OverwriteFiles:",
-	// 	"/of:",
-	// 	"/Profile:",
-	// 	"/pr:",
-	// 	"/Properties:",
-	// 	"/p:",
-	// 	"/Quiet:",
-	// 	"/q:",
-	// 	"/ReferencePaths:",
-	// 	"/rp:",
-	// 	"/Secret:",
-	// 	"/secr:",
-	// 	"/SourceFile:",
-	// 	"/sf:",
-	// 	"/SourceConnectionString:",
-	// 	"/scs:",
-	// 	"/SourceDatabaseName:",
-	// 	"/sdn:",
-	// 	"/SourceEncryptConnection:",
-	// 	"/sec:",
-	// 	"/SourceHostNameInCertificate:",
-	// 	"/shnic:",
-	// 	"/SourcePassword:",
-	// 	"/sp:",
-	// 	"/SourceServerName:",
-	// 	"/ssn:",
-	// 	"/SourceTimeout:",
-	// 	"/st:",
-	// 	"/SourceTrustServerCertificate:",
-	// 	"/stsc:",
-	// 	"/SourceUser:",
-	// 	"/su:",
-	// 	"/TargetConnectionString:",
-	// 	"/tcs:",
-	// 	"/TargetDatabaseName:",
-	// 	"/tdn:",
-	// 	"/TargetEncryptConnection:",
-	// 	"/tec:",
-	// 	"/TargetHostNameInCertificate:",
-	// 	"/thnic:",
-	// 	"/TargetPassword:",
-	// 	"/tp:",
-	// 	"/TargetServerName:",
-	// 	"/tsn:",
-	// 	"/TargetTimeout:",
-	// 	"/tt:",
-	// 	"/TargetTrustServerCertificate:",
-	// 	"/ttsc:",
-	// 	"/TargetUser:",
-	// 	"/tu:",
-	// 	"/TenantId:",
-	// 	"/tid:",
-	// 	"/ThreadMaxStackSize:",
-	// 	"/tmss:",
-	// 	"/UniversalAuthentication:",
-	// 	"/ua:",
-	// 	"/Variables:",
-	// 	"/v:",
-	// 	"/p:AdditionalDeploymentContributorArguments=",
-	// 	"/p:AdditionalDeploymentContributorPaths=",
-	// 	"/p:AdditionalDeploymentContributors=",
-	// 	"/p:AllowDropBlockingAssemblies=",
-	// 	"/p:AllowExternalLanguagePaths=",
-	// 	"/p:AllowExternalLibraryPaths=",
-	// 	"/p:AllowIncompatiblePlatform=",
-	// 	"/p:AllowUnsafeRowLevelSecurityDataMovement=",
-	// 	"/p:AzureSharedAccessSignatureToken=",
-	// 	"/p:AzureStorageBlobEndpoint=",
-	// 	"/p:AzureStorageContainer=",
-	// 	"/p:AzureStorageKey=",
-	// 	"/p:AzureStorageRootPath=",
-	// 	"/p:BackupDatabaseBeforeChanges=",
-	// 	"/p:BlockOnPossibleDataLoss=",
-	// 	"/p:BlockWhenDriftDetected=",
-	// 	"/p:CommandTimeout=",
-	// 	"/p:CommentOutSetVarDeclarations=",
-	// 	"/p:CompareUsingTargetCollation=",
-	// 	"/p:CreateNewDatabase=",
-	// 	"/p:DatabaseEdition=",
-	// 	"/p:DatabaseLockTimeout=",
-	// 	"/p:DatabaseMaximumSize=",
-	// 	"/p:DatabaseServiceObjective=",
-	// 	"/p:DeployDatabaseInSingleUserMode=",
-	// 	"/p:DisableAndReenableDdlTriggers=",
-	// 	"/p:DisableIndexesForDataPhase=",
-	// 	"/p:DisableParallelismForEnablingIndexes=",
-	// 	"/p:DoNotAlterChangeDataCaptureObjects=",
-	// 	"/p:DoNotAlterReplicatedObjects=",
-	// 	"/p:DoNotDropDatabaseWorkloadGroups=",
-	// 	"/p:DoNotDropObjectType=",
-	// 	"/p:DoNotDropObjectTypes=",
-	// 	"/p:DoNotDropWorkloadClassifiers=",
-	// 	"/p:DoNotEvaluateSqlCmdVariables=",
-	// 	"/p:DropConstraintsNotInSource=",
-	// 	"/p:DropDmlTriggersNotInSource=",
-	// 	"/p:DropExtendedPropertiesNotInSource=",
-	// 	"/p:DropIndexesNotInSource=",
-	// 	"/p:DropObjectsNotInSource=",
-	// 	"/p:DropPermissionsNotInSource=",
-	// 	"/p:DropRoleMembersNotInSource=",
-	// 	"/p:DropStatisticsNotInSource=",
-	// 	"/p:EnclaveAttestationProtocol=",
-	// 	"/p:EnclaveAttestationUrl=",
-	// 	"/p:ExcludeObjectType=",
-	// 	"/p:ExcludeObjectTypes=",
-	// 	"/p:GenerateSmartDefaults=",
-	// 	"/p:HashObjectNamesInLogs=",
-	// 	"/p:IgnoreAnsiNulls=",
-	// 	"/p:IgnoreAuthorizer=",
-	// 	"/p:IgnoreColumnCollation=",
-	// 	"/p:IgnoreColumnOrder=",
-	// 	"/p:IgnoreComments=",
-	// 	"/p:IgnoreCryptographicProviderFilePath=",
-	// 	"/p:IgnoreDatabaseWorkloadGroups=",
-	// 	"/p:IgnoreDdlTriggerOrder=",
-	// 	"/p:IgnoreDdlTriggerState=",
-	// 	"/p:IgnoreDefaultSchema=",
-	// 	"/p:IgnoreDmlTriggerOrder=",
-	// 	"/p:IgnoreDmlTriggerState=",
-	// 	"/p:IgnoreExtendedProperties=",
-	// 	"/p:IgnoreFileAndLogFilePath=",
-	// 	"/p:IgnoreFilegroupPlacement=",
-	// 	"/p:IgnoreFileSize=",
-	// 	"/p:IgnoreFillFactor=",
-	// 	"/p:IgnoreFullTextCatalogFilePath=",
-	// 	"/p:IgnoreIdentitySeed=",
-	// 	"/p:IgnoreIncrement=",
-	// 	"/p:IgnoreIndexOptions=",
-	// 	"/p:IgnoreIndexPadding=",
-	// 	"/p:IgnoreKeywordCasing=",
-	// 	"/p:IgnoreLockHintsOnIndexes=",
-	// 	"/p:IgnoreLoginSids=",
-	// 	"/p:IgnoreNotForReplication=",
-	// 	"/p:IgnoreObjectPlacementOnPartitionScheme=",
-	// 	"/p:IgnorePartitionSchemes=",
-	// 	"/p:IgnorePermissions=",
-	// 	"/p:IgnoreQuotedIdentifiers=",
-	// 	"/p:IgnoreRoleMembership=",
-	// 	"/p:IgnoreRouteLifetime=",
-	// 	"/p:IgnoreSemicolonBetweenStatements=",
-	// 	"/p:IgnoreSensitivityClassifications=",
-	// 	"/p:IgnoreTableOptions=",
-	// 	"/p:IgnoreTablePartitionOptions=",
-	// 	"/p:IgnoreUserSettingsObjects=",
-	// 	"/p:IgnoreWhitespace=",
-	// 	"/p:IgnoreWithNocheckOnCheckConstraints=",
-	// 	"/p:IgnoreWithNocheckOnForeignKeys=",
-	// 	"/p:IgnoreWorkloadClassifiers=",
-	// 	"/p:IncludeCompositeObjects=",
-	// 	"/p:IncludeTransactionalScripts=",
-	// 	"/p:IsAlwaysEncryptedParameterizationEnabled=",
-	// 	"/p:LongRunningCommandTimeout=",
-	// 	"/p:NoAlterStatementsToChangeClrTypes=",
-	// 	"/p:PopulateFilesOnFileGroups=",
-	// 	"/p:PreserveIdentityLastValues=",
-	// 	"/p:RebuildIndexesOfflineForDataPhase=",
-	// 	"/p:RegisterDataTierApplication=",
-	// 	"/p:RestoreSequenceCurrentValue=",
-	// 	"/p:RunDeploymentPlanExecutors=",
-	// 	"/p:ScriptDatabaseCollation=",
-	// 	"/p:ScriptDatabaseCompatibility=",
-	// 	"/p:ScriptDatabaseOptions=",
-	// 	"/p:ScriptDeployStateChecks=",
-	// 	"/p:ScriptFileSize=",
-	// 	"/p:ScriptNewConstraintValidation=",
-	// 	"/p:ScriptRefreshModule=",
-	// 	"/p:Storage=",
-	// 	"/p:TreatVerificationErrorsAsWarnings=",
-	// 	"/p:UnmodifiableObjectWarnings=",
-	// 	"/p:VerifyCollationCompatibility=",
-	// 	"/p:VerifyDeployment="
-	// };	
-	
 	public static List<string> ImportOptions => new()
 	{
+		// Commented items are replaced by SqlPkg
+		
 		"/AccessToken:",
 		"/at:",
-		//"/Action:",
-		//"/a:",
+		// "/Action:",
+		// "/a:",
 		"/AzureCloudConfig:",
 		"/acc:",
 		"/Diagnostics:",
@@ -362,31 +96,31 @@ public static class CliHelpers
 		"/q:",
 		"/SourceFile:",
 		"/sf:",
-		"/TargetConnectionString:",
-		"/tcs:",
-		"/TargetDatabaseName:",
-		"/tdn:",
+		// "/TargetConnectionString:",
+		// "/tcs:",
+		// "/TargetDatabaseName:",
+		// "/tdn:",
 		"/TargetEncryptConnection:",
 		"/tec:",
 		"/TargetHostNameInCertificate:",
 		"/thnic:",
-		"/TargetPassword:",
-		"/tp:",
-		"/TargetServerName:",
-		"/tsn:",
-		"/TargetTimeout:",
-		"/tt:",
-		"/TargetTrustServerCertificate:",
-		"/ttsc:",
-		"/TargetUser:",
-		"/tu:",
+		// "/TargetPassword:",
+		// "/tp:",
+		// "/TargetServerName:",
+		// "/tsn:",
+		// "/TargetTimeout:",
+		// "/tt:",
+		// "/TargetTrustServerCertificate:",
+		// "/ttsc:",
+		// "/TargetUser:",
+		// "/tu:",
 		"/TenantId:",
 		"/tid:",
 		"/ThreadMaxStackSize:",
 		"/tmss:",
 		"/UniversalAuthentication:",
 		"/ua:",
-		"/p:CommandTimeout=",
+		// "/p:CommandTimeout=",
 		"/p:DatabaseEdition=",
 		"/p:DatabaseLockTimeout=",
 		"/p:DatabaseMaximumSize=",
@@ -401,8 +135,10 @@ public static class CliHelpers
 		"/p:PreserveIdentityLastValues=",
 		"/p:RebuildIndexesOfflineForDataPhase=",
 		"/p:Storage="
-	};	
+	};
 
+	public static string RestoreExcludableObjects => @"ExcludeObjectTypes=Aggregates;ApplicationRoles;Assemblies;AssemblyFiles;AsymmetricKeys;BrokerPriorities;Certificates;ColumnEncryptionKeys;ColumnMasterKeys;Contracts;DatabaseOptions;DatabaseRoles;DatabaseTriggers;Defaults;ExtendedProperties;ExternalDataSources;ExternalFileFormats;ExternalTables;Filegroups;Files;FileTables;FullTextCatalogs;FullTextStoplists;MessageTypes;PartitionFunctions;PartitionSchemes;Permissions;Queues;RemoteServiceBindings;RoleMembership;Rules;ScalarValuedFunctions;SearchPropertyLists;SecurityPolicies;Sequences;Services;Signatures;StoredProcedures;SymmetricKeys;Synonyms;TableValuedFunctions;UserDefinedDataTypes;UserDefinedTableTypes;ClrUserDefinedTypes;Users;Views;XmlSchemaCollections;Audits;Credentials;CryptographicProviders;DatabaseAuditSpecifications;DatabaseEncryptionKeys;DatabaseScopedCredentials;Endpoints;ErrorMessages;EventNotifications;EventSessions;LinkedServerLogins;LinkedServers;Logins;MasterKeys;Routes;ServerAuditSpecifications;ServerRoleMembership;ServerRoles;ServerTriggers;ExternalStreams;ExternalStreamingJobs;DatabaseWorkloadGroups;WorkloadClassifiers;ExternalLibraries;ExternalLanguages";
+	
 	#endregion
 	
     #region OS and Runtime
@@ -536,6 +272,28 @@ public static class CliHelpers
     #endregion
     
     #region Argument Handling
+
+    /// <summary>
+    /// Determine if an argument has been passed on the command line.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="startsWith"></param>
+    /// <param name="startsWithAbbrev"></param>
+    /// <returns></returns>
+    public static bool HasArgument(this IEnumerable<string>? arguments, string startsWith, string startsWithAbbrev = "")
+    {
+	    if (arguments == null)
+		    return false;
+
+	    var args = arguments.ToList();
+
+	    if (args.Any() == false)
+		    return false;
+
+	    return args.Any(a =>
+		    a.StartsWith(startsWith, StringComparison.CurrentCultureIgnoreCase) ||
+	        (string.IsNullOrEmpty(startsWithAbbrev) == false && a.StartsWith(startsWithAbbrev, StringComparison.CurrentCultureIgnoreCase)));
+    }
     
     /// <summary>
     /// Get a CLI argument value, or an emtpy string if not found.
@@ -544,28 +302,29 @@ public static class CliHelpers
     /// <param name="startsWith"></param>
     /// <param name="startsWithAbbrev"></param>
     /// <param name="delimiter"></param>
+    /// <param name="defaultValue"></param>
     /// <returns></returns>
-    public static string GetArgumentValue(this IEnumerable<string>? arguments, string startsWith, string startsWithAbbrev, char delimiter)
+    public static string GetArgumentValue(this IEnumerable<string>? arguments, string startsWith, string startsWithAbbrev, char delimiter, string defaultValue = "")
     {
         if (arguments == null)
-            return string.Empty;
+            return defaultValue;
 
         var args = arguments.ToList();
 
         if (args.Any() == false)
-            return string.Empty;
+            return defaultValue;
 
-        if (!args.Any(a =>
+        if (args.Any(a =>
 	            a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) ||
-	            a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)))
-	        return string.Empty;
+	            (string.IsNullOrEmpty(startsWithAbbrev) == false && a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase))) == false)
+	        return defaultValue;
         
-        var splits = args.First(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase)).Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+        var splits = args.First(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(startsWithAbbrev) == false && a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase))).Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                     
         if (splits.Length == 2)
 	        return splits[1];
 
-        return string.Empty;
+        return defaultValue;
     }
 
     /// <summary>
@@ -594,43 +353,59 @@ public static class CliHelpers
     /// <param name="settings"></param>
     public static void NormalizeConnectionInfo(this string[] args, Settings settings)
     {
-	    #region Source
-            
-	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':');
-	    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
-	    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
-	    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
-	    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
+	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"');
+	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"');
 
+	    #region Source
+	    
 	    if (string.IsNullOrEmpty(settings.SourceConnectionString) == false)
 	    {
-		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString)
-		    {
-			    TrustServerCertificate = true,
-			    ConnectTimeout = 30,
-			    CommandTimeout = 120
-		    };
+		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString);
 
-		    settings.SourceConnectionString = builder.ToString();
+		    builder.TrustServerCertificate =
+			    args.HasArgument("/SourceTrustServerCertificate:", "/stsc:")
+				    ? args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
+				    : builder.TrustServerCertificate;
+
+		    builder.ConnectTimeout =
+			    args.HasArgument("/SourceTimeout:", "/st:")
+				    ? int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"))
+				    : builder.ConnectTimeout;
+		    
+		    builder.CommandTimeout =
+			    args.HasArgument("/p:CommandTimeout=")
+				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
+				    : builder.CommandTimeout;
 
 		    settings.SourceServerName = builder.DataSource;
 		    settings.SourceUserName = builder.UserID;
 		    settings.SourcePassword = builder.Password;
 		    settings.SourceDatabaseName = builder.InitialCatalog;
+		    settings.SourceConnectionTimeout = builder.ConnectTimeout;
+		    settings.SourceCommandTimeout = builder.CommandTimeout;
+		    settings.SourceTrustServerCertificate = builder.TrustServerCertificate;
+		    settings.SourceConnectionString = builder.ToString();
 	    }
 
-	    else if (string.IsNullOrEmpty(settings.SourceServerName) == false)
+	    else
 	    {
+		    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
+		    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
+		    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
+		    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
+		    settings.SourceConnectionTimeout = int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"));
+		    settings.SourceCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
+		    settings.SourceTrustServerCertificate = args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
+
 		    var builder = new SqlConnectionStringBuilder
 		    {
 			    DataSource = settings.SourceServerName,
 			    InitialCatalog = settings.SourceDatabaseName,
 			    UserID = settings.SourceUserName,
 			    Password = settings.SourcePassword,
-			    TrustServerCertificate = true,
-			    Authentication = SqlAuthenticationMethod.SqlPassword,
-			    ConnectTimeout = 30,
-			    CommandTimeout = 120
+			    TrustServerCertificate = settings.SourceTrustServerCertificate,
+			    ConnectTimeout = settings.SourceConnectionTimeout,
+			    CommandTimeout = settings.SourceCommandTimeout
 		    };
 
 		    settings.SourceConnectionString = builder.ToString();
@@ -639,42 +414,55 @@ public static class CliHelpers
 	    #endregion
 	    
 	    #region Target
-            
-	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/scs", ':');
-	    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/ssn", ':');
-	    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/sdn", ':');
-	    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/su", ':');
-	    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/sp", ':');
-
+	    
 	    if (string.IsNullOrEmpty(settings.TargetConnectionString) == false)
 	    {
-		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)
-		    {
-			    TrustServerCertificate = true,
-			    ConnectTimeout = 30,
-			    CommandTimeout = 120
-		    };
+		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
 
-		    settings.TargetConnectionString = builder.ToString();
+		    builder.TrustServerCertificate =
+			    args.HasArgument("/TargetTrustServerCertificate:", "/ttsc:")
+				    ? args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
+				    : builder.TrustServerCertificate;
+
+		    builder.ConnectTimeout =
+			    args.HasArgument("/TargetTimeout:", "/tt:")
+				    ? int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"))
+				    : builder.ConnectTimeout;
+		    
+		    builder.CommandTimeout =
+			    args.HasArgument("/p:CommandTimeout=")
+				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
+				    : builder.CommandTimeout;
 
 		    settings.TargetServerName = builder.DataSource;
 		    settings.TargetUserName = builder.UserID;
 		    settings.TargetPassword = builder.Password;
 		    settings.TargetDatabaseName = builder.InitialCatalog;
+		    settings.TargetConnectionTimeout = builder.ConnectTimeout;
+		    settings.TargetCommandTimeout = builder.CommandTimeout;
+		    settings.TargetTrustServerCertificate = builder.TrustServerCertificate;
+		    settings.TargetConnectionString = builder.ToString();
 	    }
 
-	    else if (string.IsNullOrEmpty(settings.TargetServerName) == false)
+	    else
 	    {
+		    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/tsn", ':');
+		    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/tdn", ':');
+		    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/tu", ':');
+		    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/tp", ':');
+		    settings.TargetConnectionTimeout = int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"));
+		    settings.TargetCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
+		    settings.TargetTrustServerCertificate = args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
+
 		    var builder = new SqlConnectionStringBuilder
 		    {
 			    DataSource = settings.TargetServerName,
 			    InitialCatalog = settings.TargetDatabaseName,
 			    UserID = settings.TargetUserName,
 			    Password = settings.TargetPassword,
-			    TrustServerCertificate = true,
-			    Authentication = SqlAuthenticationMethod.SqlPassword,
-			    ConnectTimeout = 30,
-			    CommandTimeout = 120
+			    TrustServerCertificate = settings.TargetTrustServerCertificate,
+			    ConnectTimeout = settings.TargetConnectionTimeout,
+			    CommandTimeout = settings.TargetCommandTimeout
 		    };
 
 		    settings.TargetConnectionString = builder.ToString();
@@ -692,9 +480,6 @@ public static class CliHelpers
     {
 	    #region Better Defaults
 
-	    if (allowed.Any(a => a.StartsWith("/SourceTrustServerCertificate:", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/SourceTrustServerCertificate:", "true");
-	    
 	    if (allowed.Any(a => a.StartsWith("/p:IgnoreUserLoginMappings=", StringComparison.CurrentCultureIgnoreCase)))
 		    args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
 	
@@ -707,9 +492,6 @@ public static class CliHelpers
 	    if (allowed.Any(a => a.StartsWith("/p:CreateNewDatabase=", StringComparison.CurrentCultureIgnoreCase)))
 		    args.SetDefault("/p:CreateNewDatabase=", "true");
 
-	    if (allowed.Any(a => a.StartsWith("/TargetTrustServerCertificate:", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/TargetTrustServerCertificate:", "true");
-	    
 	    #endregion
     }
 
@@ -777,13 +559,14 @@ public static class CliHelpers
 		return arguments;
 	}
 	*/
-    
+
     /// <summary>
     /// Process CLI arguments and filter based on allowed arguments for Action:Export.
     /// </summary>
     /// <param name="args"></param>
+    /// <param name="settings"></param>
     /// <returns></returns>
-    public static List<string> BuildExportArguments(this IEnumerable<string> args)
+    public static List<string> BuildExportArguments(this IEnumerable<string> args, Settings settings)
     {
 	    var arguments = new List<string>();
 
@@ -796,6 +579,7 @@ public static class CliHelpers
 	    }
 
 	    arguments.Insert(0, "/a:Export");
+	    arguments.Insert(1, $"/SourceConnectionString:\"{settings.SourceConnectionString}\"");
 	    arguments.EnsurePathAndDeleteExistingFile("/TargetFile:");
 	    arguments.EnsurePathAndDeleteExistingFile("/DiagnosticsFile:");
 	    arguments.BetterDefaults(ExportOptions);
@@ -829,13 +613,14 @@ public static class CliHelpers
 	    return arguments;
     }
 	*/
-    
+
     /// <summary>
     /// Process CLI arguments and filter based on allowed arguments for Action:Export.
     /// </summary>
     /// <param name="args"></param>
+    /// <param name="settings"></param>
     /// <returns></returns>
-    public static List<string> BuildImportArguments(this IEnumerable<string> args)
+    public static List<string> BuildImportArguments(this IEnumerable<string> args, Settings settings)
     {
 	    var arguments = new List<string>();
 
@@ -848,6 +633,7 @@ public static class CliHelpers
 	    }
 
 	    arguments.Insert(0, "/a:Import");
+	    arguments.Insert(1, $"/TargetConnectionString:\"{settings.TargetConnectionString}\"");
 	    arguments.BetterDefaults(ImportOptions);
 	    
 	    return arguments;
@@ -913,7 +699,7 @@ public static class CliHelpers
                     if (arg.StartsWith("/p:TableData=", StringComparison.CurrentCultureIgnoreCase))
                         continue;
 
-                    filteredArguments.Add(arg.Replace(";", "\\;"));
+                    filteredArguments.Add(arg);
                 }
 
                 arguments.Clear();

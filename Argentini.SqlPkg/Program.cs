@@ -10,16 +10,43 @@ public class Program
     {
         const string version = "1.0.2"; // Single file executables can't get the Assembly version so use this
         var settings = new Settings();
-        var schemaElapsed = string.Empty;
-        var dataElapsed = string.Empty;
         var resultCode = 0;
         
         await using var stdOut = Console.OpenStandardOutput();
 
+        #region Backup Debug Test
+
+        // args = new[]
+        // {
+        //     "/a:backup",
+        //     "/TargetFile:\"Database/athepedia.bacpac\"",
+        //     "/DiagnosticsFile:\"Database/athepedia.log\"",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
+        //     "/SourceServerName:sqlserver,1433",
+        //     "/SourceDatabaseName:athepedia",
+        //     "/SourceUser:sa",
+        //     "/SourcePassword:P@ssw0rdz!"
+        // };
+        //
+        // args = new[]
+        // {
+        //     "/a:Restore",
+        //     "/SourceFile:\"Database/athepedia.bacpac\"",
+        //     "/DiagnosticsFile:\"Database/athepedia.log\"",
+        //     "/TargetServerName:10.1.10.3,1433",
+        //     "/TargetDatabaseName:temp",
+        //     "/TargetUser:sa",
+        //     "/TargetPassword:P@ssw0rdz!",
+        //     "/p:ExcludeObjectTypes=Filegroups;Files;FileTables;PartitionFunctions;PartitionSchemes;ServerTriggers;DatabaseTriggers"
+        // };
+        
+        #endregion
+        
         var title = $"SqlPkg for SqlPackage {version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}";
         
+        Console.WriteLine("-".Repeat(title.Length));
         Console.WriteLine(title);
-        Console.WriteLine("=".Repeat(title.Length));
+        Console.WriteLine("-".Repeat(title.Length));
 
         if (await CliHelpers.SqlPackageIsInstalled() == false)
             return -1;
@@ -44,74 +71,47 @@ public class Program
 
         if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
         {
-            Console.WriteLine($"SqlPkg => {settings.Action} Started {DateTime.Now:o}");
+            Console.WriteLine($"=> {settings.Action} Started {DateTime.Now:o}");
+            Console.WriteLine("=".Repeat(title.Length));
             
             args.NormalizeConnectionInfo(settings);
 
             if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
             {
-                Console.WriteLine("SqlPkg => Back Up Started...");
-
                 #region Backup Schema as DACPAC
 
-                var taskTimer = new Stopwatch();
-                    
-                taskTimer.Start();
-
-                var schemaArguments = args.BuildExportArguments();
+                var backupArguments = args.BuildExportArguments(settings);
                 
-                await schemaArguments.ProcessTableDataArguments(args, settings);
+                await backupArguments.ProcessTableDataArguments(args, settings);
                 
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(string.Join(" ", schemaArguments))
+                    .WithArguments(string.Join(" ", backupArguments))
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
-
-                schemaElapsed = $"{taskTimer.Elapsed:g}";
-                var taskElapsedSplits = schemaElapsed.Split('.');
-
-                if (taskElapsedSplits is [_, { Length: > 1 }])
-                    schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
-                
-                Console.WriteLine($"SqlPkg => Backup Complete: {schemaElapsed}");
                 
                 #endregion
             }
 
             else if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
             {
-                Console.WriteLine("SqlPkg => Restoring Database...");
-
                 #region Restore Schema from DACPAC
-
-                var taskTimer = new Stopwatch();
-                    
-                taskTimer.Start();
-
-                var schemaArguments = args.BuildImportArguments();
+                
+                var restoreArguments = args.BuildImportArguments(settings);
                 
                 await SqlTools.PurgeDatabase(settings);
                 
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(string.Join(" ", schemaArguments))
+                    .WithArguments(string.Join(" ", restoreArguments))
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
-
-                schemaElapsed = $"{taskTimer.Elapsed:g}";
-                var taskElapsedSplits = schemaElapsed.Split('.');
-
-                if (taskElapsedSplits is [_, { Length: > 1 }])
-                    schemaElapsed = $"{taskElapsedSplits[0]}.{taskElapsedSplits[1][..2]}";
-                
-                Console.WriteLine($"SqlPkg => Restoration Complete: {schemaElapsed}");
                 
                 #endregion
             }
@@ -119,8 +119,9 @@ public class Program
 
         else
         {
-            Console.WriteLine("SqlPkg => Backup/Restore Not Used => Passing Control to SqlPackage");
-            Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
+            Console.WriteLine("=> Backup/Restore Not Used => Passing Control to SqlPackage");
+            Console.WriteLine($"=> {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Started {DateTime.Now:o}");
+            Console.WriteLine("=".Repeat(title.Length));
             
             var cmd = Cli.Wrap("SqlPackage")
                 .WithArguments(string.Join(" ", args))
@@ -141,10 +142,14 @@ public class Program
             elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
         
         Console.WriteLine("=".Repeat(title.Length));
-        Console.WriteLine($"SqlPkg => {(settings.Action != string.Empty ? settings.Action + " " : string.Empty)}Finished {DateTime.Now:o}");
-        Console.WriteLine($"SqlPkg => Schema Time: {schemaElapsed}");
-        Console.WriteLine($"SqlPkg => Data Time: {dataElapsed}");
-        Console.WriteLine($"SqlPkg => Total Time: {elapsed}");
+        
+        if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
+            Console.WriteLine($"=> Backup of [{settings.SourceDatabaseName}] on {settings.SourceServerName} complete at {DateTime.Now:o}");
+
+        if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+            Console.WriteLine($"=> Restore to [{settings.TargetDatabaseName}] on {settings.TargetServerName} complete at {DateTime.Now:o}");
+        
+        Console.WriteLine($"=> Total {settings.Action} Time: {elapsed}");
         
         return resultCode;
     }

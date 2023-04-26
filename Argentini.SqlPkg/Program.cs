@@ -8,7 +8,6 @@ public class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        const string version = "1.0.2"; // Single file executables can't get the Assembly version so use this
         var settings = new Settings();
         var resultCode = 0;
         
@@ -42,7 +41,7 @@ public class Program
         
         #endregion
         
-        var title = $"SqlPkg for SqlPackage {version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}";
+        var title = $"SqlPkg for SqlPackage {Settings.Version}; {CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}";
         
         Console.WriteLine("-".Repeat(title.Length));
         Console.WriteLine(title);

@@ -21,4 +21,108 @@ public class Settings
     public int TargetConnectionTimeout { get; set; } = 30;
     public int TargetCommandTimeout { get; set; } = 120;
     public bool TargetTrustServerCertificate { get; set; } = true;
+    
+    public static string AppMajorVersion
+    {
+        get
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                result = assembly.GetName().Version?.Major.ToString();
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Settings.AppMajorVersion Exception: {e.Message}");
+            }
+
+            return result ?? string.Empty;
+        }
+    }
+    
+    public static string AppMinorVersion
+    {
+        get
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                result = assembly.GetName().Version?.Minor.ToString();
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Settings.AppMinorVersion Exception: {e.Message}");
+            }
+
+            return result ?? string.Empty;
+        }
+    }
+    
+    public static string AppBuildVersion
+    {
+        get
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                result = assembly.GetName().Version?.Build.ToString();
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Settings.AppBuildVersion Exception: {e.Message}");
+            }
+
+            return result ?? string.Empty;
+        }
+    }
+
+    public static string AppRevisionVersion
+    {
+        get
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                result = assembly.GetName().Version?.Revision.ToString();
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Settings.AppRevisionVersion Exception: {e.Message}");
+            }
+
+            return result ?? string.Empty;
+        }
+    }
+    
+    public static string Version
+    {
+        get
+        {
+            var result = string.Empty;
+
+            try
+            {
+                result = AppMajorVersion + "." + AppMinorVersion + "." + AppBuildVersion;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Settings.Version Exception: {e.Message}");
+            }
+
+            return result;
+        }
+    }
 }

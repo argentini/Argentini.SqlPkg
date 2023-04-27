@@ -1,9 +1,6 @@
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Text;
 using CliWrap;
-using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg.Extensions;
 
@@ -11,130 +8,47 @@ public static class CliHelpers
 {
 	#region Constants
 	
-	public static List<string> ExportOptions => new()
+	public static IEnumerable<string> ExportSkippedArguments => new []
 	{
-		// Commented items are replaced by SqlPkg
-
-		"/AccessToken:",
-		"/at:",
-		// "/Action:",
-		// "/a:",
-		"/AzureCloudConfig:",
-		"/acc:",
-		"/Diagnostics:",
-		"/d:",
-		"/DiagnosticsFile:",
-		"/df:",
-		"/MaxParallelism:",
-		"/mp:",
-		"/OverwriteFiles:",
-		"/of:",
-		"/Properties:",
-		"/p:",
-		"/Quiet:",
-		"/q:",
-		// "/SourceConnectionString:",
-		// "/scs:",
-		// "/SourceDatabaseName:",
-		// "/sdn:",
-		"/SourceEncryptConnection:",
-		"/sec:",
-		"/SourceHostNameInCertificate:",
-		"/shnic:",
-		// "/SourcePassword:",
-		// "/sp:",
-		// "/SourceServerName:",
-		// "/ssn:",
-		// "/SourceTimeout:",
-		// "/st:",
-		// "/SourceTrustServerCertificate:",
-		// "/stsc:",
-		// "/SourceUser:",
-		// "/su:",
-		"/TargetFile:",
-		"/tf:",
-		"/TenantId:",
-		"/tid:",
-		"/ThreadMaxStackSize:",
-		"/tmss:",
-		"/UniversalAuthentication:",
-		"/ua:",
-		// "/p:CommandTimeout=",
-		"/p:CompressionOption=",
-		"/p:DatabaseLockTimeout=",
-		"/p:HashObjectNamesInLogs=",
-		"/p:IgnoreIndexesStatisticsOnEnclaveEnabledColumns=",
-		"/p:LongRunningCommandTimeout=",
-		"/p:Storage=",
-		"/p:TableData=",
-		"/p:TempDirectoryForTableData=",
-		"/p:VerifyExtraction=",
-		"/p:VerifyFullTextDocumentTypesSupported="
+		"/Action:",
+		"/a:",
+		"/SourceConnectionString:",
+		"/scs:",
+		"/SourceDatabaseName:",
+		"/sdn:",
+		"/SourcePassword:",
+		"/sp:",
+		"/SourceServerName:",
+		"/ssn:",
+		"/SourceTimeout:",
+		"/st:",
+		"/SourceTrustServerCertificate:",
+		"/stsc:",
+		"/SourceUser:",
+		"/su:",
+		"/p:CommandTimeout=",
+		"/p:ExcludeTableData="
 	};	
 
-	public static List<string> ImportOptions => new()
+	public static IEnumerable<string> ImportSkippedArguments => new []
 	{
-		// Commented items are replaced by SqlPkg
-		
-		"/AccessToken:",
-		"/at:",
-		// "/Action:",
-		// "/a:",
-		"/AzureCloudConfig:",
-		"/acc:",
-		"/Diagnostics:",
-		"/d:",
-		"/DiagnosticsFile:",
-		"/df:",
-		"/MaxParallelism:",
-		"/mp:",
-		"/ModelFilePath:",
-		"/mfp:",
-		"/Properties:",
-		"/p:",
-		"/Quiet:",
-		"/q:",
-		"/SourceFile:",
-		"/sf:",
-		// "/TargetConnectionString:",
-		// "/tcs:",
-		// "/TargetDatabaseName:",
-		// "/tdn:",
-		"/TargetEncryptConnection:",
-		"/tec:",
-		"/TargetHostNameInCertificate:",
-		"/thnic:",
-		// "/TargetPassword:",
-		// "/tp:",
-		// "/TargetServerName:",
-		// "/tsn:",
-		// "/TargetTimeout:",
-		// "/tt:",
-		// "/TargetTrustServerCertificate:",
-		// "/ttsc:",
-		// "/TargetUser:",
-		// "/tu:",
-		"/TenantId:",
-		"/tid:",
-		"/ThreadMaxStackSize:",
-		"/tmss:",
-		"/UniversalAuthentication:",
-		"/ua:",
-		// "/p:CommandTimeout=",
-		"/p:DatabaseEdition=",
-		"/p:DatabaseLockTimeout=",
-		"/p:DatabaseMaximumSize=",
-		"/p:DatabaseServiceObjective=",
-		"/p:DisableIndexesForDataPhase=",
-		"/p:DisableParallelismForEnablingIndexes=",
-		"/p:HashObjectNamesInLogs=",
-		"/p:ImportContributorArguments=",
-		"/p:ImportContributorPaths=",
-		"/p:ImportContributors=",
-		"/p:LongRunningCommandTimeout=",
-		"/p:PreserveIdentityLastValues=",
-		"/p:RebuildIndexesOfflineForDataPhase=",
-		"/p:Storage="
+		"/Action:",
+		"/a:",
+		"/TargetConnectionString:",
+		"/tcs:",
+		"/TargetDatabaseName:",
+		"/tdn:",
+		"/TargetPassword:",
+		"/tp:",
+		"/TargetServerName:",
+		"/tsn:",
+		"/TargetTimeout:",
+		"/tt:",
+		"/TargetTrustServerCertificate:",
+		"/ttsc:",
+		"/TargetUser:",
+		"/tu:",
+		"/p:CommandTimeout="
 	};
 
 	public static string RestoreExcludableObjects => @"ExcludeObjectTypes=Aggregates;ApplicationRoles;Assemblies;AssemblyFiles;AsymmetricKeys;BrokerPriorities;Certificates;ColumnEncryptionKeys;ColumnMasterKeys;Contracts;DatabaseOptions;DatabaseRoles;DatabaseTriggers;Defaults;ExtendedProperties;ExternalDataSources;ExternalFileFormats;ExternalTables;Filegroups;Files;FileTables;FullTextCatalogs;FullTextStoplists;MessageTypes;PartitionFunctions;PartitionSchemes;Permissions;Queues;RemoteServiceBindings;RoleMembership;Rules;ScalarValuedFunctions;SearchPropertyLists;SecurityPolicies;Sequences;Services;Signatures;StoredProcedures;SymmetricKeys;Synonyms;TableValuedFunctions;UserDefinedDataTypes;UserDefinedTableTypes;ClrUserDefinedTypes;Users;Views;XmlSchemaCollections;Audits;Credentials;CryptographicProviders;DatabaseAuditSpecifications;DatabaseEncryptionKeys;DatabaseScopedCredentials;Endpoints;ErrorMessages;EventNotifications;EventSessions;LinkedServerLogins;LinkedServers;Logins;MasterKeys;Routes;ServerAuditSpecifications;ServerRoleMembership;ServerRoles;ServerTriggers;ExternalStreams;ExternalStreamingJobs;DatabaseWorkloadGroups;WorkloadClassifiers;ExternalLibraries;ExternalLanguages";
@@ -142,162 +56,59 @@ public static class CliHelpers
 	/// <summary>
 	/// Bullet and space.
 	/// </summary>
-	public static string Bullet = "• ";
+	public static string Bullet => "• ";
 
-	public const string HeaderBar = "■";
+	public static string HeaderBar => "■";
 
-	public const string HeaderBarMac = "▀";
+	public static string HeaderBarMac => "▀";
 
 	/// <summary>
 	/// Ellipsis character.
 	/// </summary>
-	public const string Ellipsis = "…  ";
-
-	/// <summary>
-	/// Overall app indentation.
-	/// </summary>
-	public const string Padding = "  ";
-
+	public static string Ellipsis => "…  ";
+	
 	/// <summary>
 	/// Vertical bar character for console output (Windows)
 	/// </summary>
-	public const string Bar = "|";
+	public static string Bar => "|";
 
 	/// <summary>
 	/// Vertical bar character for console output (Mac/Linux)
 	/// </summary>
-	public const string BarMac = "|";
+	public static string BarMac => "|";
 
 	/// <summary>
 	/// Arrow for console output (Windows)
 	/// </summary>
-	public const string Arrow = " → ";
+	public static string Arrow => " → ";
 
 	/// <summary>
 	/// Arrow for console output (Linux)
 	/// </summary>
-	public const string ArrowLinux = " ➜  ";
+	public static string ArrowLinux => " ➜  ";
 
 	/// <summary>
 	/// Arrow for console output (Mac)
 	/// </summary>
-	public const string ArrowMac = " → ";
+	public static string ArrowMac => " → ";
 
 	/// <summary>
 	/// Indentation for console output (Windows)
 	/// </summary>
-	public const string IndentationArrow = "  −→ ";
+	public static string IndentationArrow => "  −→ ";
 
 	/// <summary>
 	/// Indentation for console output (Linux)
 	/// </summary>
-	public const string IndentationArrowLinux = "  ➜  ";
+	public static string IndentationArrowLinux => "  ➜  ";
 
 	/// <summary>
 	/// Indentation for console output (Mac)
 	/// </summary>
-	public const string IndentationArrowMac = "  ⮑  ";
+	public static string IndentationArrowMac => "  ⮑  ";
 	
 	#endregion
 	
-    #region OS and Runtime
-
-    /// <summary>
-    /// Get OS platform.
-    /// </summary> 
-    /// <returns>OSPlatform object</returns> 
-    public static OSPlatform GetOsPlatform() 
-    { 
-        var osPlatform = OSPlatform.Create("Other platform");
-
-        // Check if it's windows 
-        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows); 
-        osPlatform = isWindows ? OSPlatform.Windows : osPlatform; 
-
-        // Check if it's osx 
-        var isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX); 
-        osPlatform = isOsx ? OSPlatform.OSX : osPlatform; 
-
-        // Check if it's Linux 
-        var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux); 
-        osPlatform = isLinux ? OSPlatform.Linux : osPlatform; 
-
-        return osPlatform; 
-    } 
-
-    /// <summary>
-    /// Get OS platform name for output to users.
-    /// </summary> 
-    /// <returns>OSPlatform name (friendly for output)</returns> 
-    public static string GetOsPlatformName()
-    {
-        if (GetOsPlatform() == OSPlatform.OSX)
-            return "macOS";
-
-        if (GetOsPlatform() == OSPlatform.Linux)
-            return "Linux";
-
-        if (GetOsPlatform() == OSPlatform.Windows)
-            return "Windows";
-
-        return "Other";
-    }
-
-	/// <summary>
-	/// Get the .NET Core runtime version (e.g. "2.2").
-	/// </summary> 
-	/// <returns>String with the .NET Core version number</returns> 
-	public static string GetFrameworkVersion()
-	{
-		var result = Assembly
-			.GetEntryAssembly()?
-			.GetCustomAttribute<TargetFrameworkAttribute>()?
-			.FrameworkName;
-
-		if (result == null || result.IsEmpty()) return string.Empty;
-
-		if (result.Contains("Version="))
-			return result.Right("Version=").TrimStart(new [] { 'v' });
-
-		return result;
-	}
-	
-	/// <summary>
-	/// Get platform architecture (e.g. x64).
-	/// </summary> 
-	/// <returns>OSPlatform object</returns> 
-	public static string GetPlatformArchitecture()
-	{
-		var architecture = RuntimeInformation.ProcessArchitecture.ToString();
-
-		if (GetOsPlatformName() == "macOS" && architecture.Equals("Arm64", StringComparison.CurrentCultureIgnoreCase))
-			architecture = "Apple Silicon";
-		
-		return architecture;
-	}
-	
-	/// <summary>
-	/// Get the .NET CLR runtime version (e.g. "4.6.27110.04").
-	/// Only works in 2.2 or later.
-	/// </summary> 
-	/// <returns>String with the .NET CLR runtime version number</returns> 
-	public static string GetRuntimeVersion()
-	{
-		return RuntimeInformation.FrameworkDescription.Right(" ");
-	}
-
-	/// <summary>
-	/// Get the .NET CLR runtime version string.
-	/// Only works in 2.2 or later.
-	/// </summary> 
-	/// <returns>String with the .NET CLR runtime version number</returns> 
-	public static string GetRuntimeVersionFull()
-	{
-		return RuntimeInformation.FrameworkDescription;
-	}
-
-    #endregion
-    
     #region Dependencies
     
     /// <summary>
@@ -401,159 +212,6 @@ public static class CliHelpers
         args.Add($"{argumentPrefix}{appendValue}");
 	}
     
-    #endregion
-    
-    #region Configuration
-
-    /// <summary>
-    /// Process server/database info to ensure connection strings exist.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="settings"></param>
-    public static void NormalizeConnectionInfo(this string[] args, Settings settings)
-    {
-	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"').Trim('\'');
-	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"').Trim('\'');
-
-	    #region Source
-	    
-	    if (string.IsNullOrEmpty(settings.SourceConnectionString) == false)
-	    {
-		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString);
-
-		    builder.TrustServerCertificate =
-			    args.HasArgument("/SourceTrustServerCertificate:", "/stsc:")
-				    ? args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
-				    : builder.TrustServerCertificate;
-
-		    builder.ConnectTimeout =
-			    args.HasArgument("/SourceTimeout:", "/st:")
-				    ? int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"))
-				    : builder.ConnectTimeout;
-		    
-		    builder.CommandTimeout =
-			    args.HasArgument("/p:CommandTimeout=")
-				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
-				    : builder.CommandTimeout;
-
-		    settings.SourceServerName = builder.DataSource;
-		    settings.SourceUserName = builder.UserID;
-		    settings.SourcePassword = builder.Password;
-		    settings.SourceDatabaseName = builder.InitialCatalog;
-		    settings.SourceConnectionTimeout = builder.ConnectTimeout;
-		    settings.SourceCommandTimeout = builder.CommandTimeout;
-		    settings.SourceTrustServerCertificate = builder.TrustServerCertificate;
-		    settings.SourceConnectionString = builder.ToString();
-	    }
-
-	    else
-	    {
-		    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
-		    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
-		    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
-		    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
-		    settings.SourceConnectionTimeout = int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"));
-		    settings.SourceCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
-		    settings.SourceTrustServerCertificate = args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
-
-		    var builder = new SqlConnectionStringBuilder
-		    {
-			    DataSource = settings.SourceServerName,
-			    InitialCatalog = settings.SourceDatabaseName,
-			    UserID = settings.SourceUserName,
-			    Password = settings.SourcePassword,
-			    TrustServerCertificate = settings.SourceTrustServerCertificate,
-			    ConnectTimeout = settings.SourceConnectionTimeout,
-			    CommandTimeout = settings.SourceCommandTimeout
-		    };
-
-		    settings.SourceConnectionString = builder.ToString();
-	    }
-
-	    #endregion
-	    
-	    #region Target
-	    
-	    if (string.IsNullOrEmpty(settings.TargetConnectionString) == false)
-	    {
-		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
-
-		    builder.TrustServerCertificate =
-			    args.HasArgument("/TargetTrustServerCertificate:", "/ttsc:")
-				    ? args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
-				    : builder.TrustServerCertificate;
-
-		    builder.ConnectTimeout =
-			    args.HasArgument("/TargetTimeout:", "/tt:")
-				    ? int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"))
-				    : builder.ConnectTimeout;
-		    
-		    builder.CommandTimeout =
-			    args.HasArgument("/p:CommandTimeout=")
-				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
-				    : builder.CommandTimeout;
-
-		    settings.TargetServerName = builder.DataSource;
-		    settings.TargetUserName = builder.UserID;
-		    settings.TargetPassword = builder.Password;
-		    settings.TargetDatabaseName = builder.InitialCatalog;
-		    settings.TargetConnectionTimeout = builder.ConnectTimeout;
-		    settings.TargetCommandTimeout = builder.CommandTimeout;
-		    settings.TargetTrustServerCertificate = builder.TrustServerCertificate;
-		    settings.TargetConnectionString = builder.ToString();
-	    }
-
-	    else
-	    {
-		    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/tsn", ':');
-		    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/tdn", ':');
-		    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/tu", ':');
-		    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/tp", ':');
-		    settings.TargetConnectionTimeout = int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"));
-		    settings.TargetCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
-		    settings.TargetTrustServerCertificate = args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
-
-		    var builder = new SqlConnectionStringBuilder
-		    {
-			    DataSource = settings.TargetServerName,
-			    InitialCatalog = settings.TargetDatabaseName,
-			    UserID = settings.TargetUserName,
-			    Password = settings.TargetPassword,
-			    TrustServerCertificate = settings.TargetTrustServerCertificate,
-			    ConnectTimeout = settings.TargetConnectionTimeout,
-			    CommandTimeout = settings.TargetCommandTimeout
-		    };
-
-		    settings.TargetConnectionString = builder.ToString();
-	    }
-
-	    #endregion
-    }
-
-    /// <summary>
-    /// Set defaults for Backup and Restore actions.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="allowed"></param>
-    public static void BetterDefaults(this List<string> args, List<string> allowed)
-    {
-	    #region Better Defaults
-
-	    if (allowed.Any(a => a.StartsWith("/p:IgnoreUserLoginMappings=", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/p:IgnoreUserLoginMappings=", "true");
-	
-	    if (allowed.Any(a => a.StartsWith("/p:IgnorePermissions=", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/p:IgnorePermissions=", "true");
-	
-	    if (allowed.Any(a => a.StartsWith("/p:VerifyExtraction=", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/p:VerifyExtraction=", "false");
-
-	    if (allowed.Any(a => a.StartsWith("/p:CreateNewDatabase=", StringComparison.CurrentCultureIgnoreCase)))
-		    args.SetDefault("/p:CreateNewDatabase=", "true");
-
-	    #endregion
-    }
-
     /// <summary>
     /// Create paths and remove existing files.
     /// </summary>
@@ -609,14 +267,14 @@ public static class CliHelpers
 	    {
 		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
 
-		    if (ExportOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+		    if (ExportSkippedArguments.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)) == false)
 			    arguments.Add(arg);
 	    }
 
 	    arguments.Insert(0, "/a:Export");
 	    arguments.Insert(1, $"/SourceConnectionString:\"{settings.SourceConnectionString}\"");
 	    arguments.EnsurePathAndDeleteExistingFile("/TargetFile:", "/tf:");
-	    arguments.BetterDefaults(ExportOptions);
+	    arguments.SetDefault("/p:VerifyExtraction=", "false");
 	    
 	    return arguments;
     }
@@ -627,7 +285,7 @@ public static class CliHelpers
     /// <param name="args"></param>
     /// <param name="settings"></param>
     /// <returns></returns>
-    public static List<string> BuildImportArguments(this IEnumerable<string> args, Settings settings)
+    public static IEnumerable<string> BuildImportArguments(this IEnumerable<string> args, Settings settings)
     {
 	    var arguments = new List<string>();
 
@@ -635,13 +293,12 @@ public static class CliHelpers
 	    {
 		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
 
-		    if (ImportOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
+		    if (ImportSkippedArguments.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)) == false)
 			    arguments.Add(arg);
 	    }
 
 	    arguments.Insert(0, "/a:Import");
 	    arguments.Insert(1, $"/TargetConnectionString:\"{settings.TargetConnectionString}\"");
-	    arguments.BetterDefaults(ImportOptions);
 	    
 	    return arguments;
     }
@@ -752,37 +409,6 @@ public static class CliHelpers
     }
     
     /// <summary>
-    /// Column width of the console output for items that require cropping.
-    /// </summary>
-    public static int ColumnWidth
-    {
-	    get
-	    {
-		    var minWidth = 76;
-		    var maxWidth = 110;
-		    var currentWidth = Console.WindowWidth - (Padding.Length * 2);
-
-		    if (currentWidth < minWidth)
-		    {
-			    return minWidth;
-		    }
-
-		    else
-		    {
-			    if (currentWidth > maxWidth)
-			    {
-				    return maxWidth;
-			    }
-
-			    else
-			    {
-				    return currentWidth;
-			    }
-		    }
-	    }
-    }
-    
-    /// <summary>
     /// Output an indentation arrow.
     /// </summary>
     public static void WriteIndentationArrow()
@@ -831,10 +457,10 @@ public static class CliHelpers
     {
 	    var result = ArrowMac;
 
-	    if (GetOsPlatform() == OSPlatform.Windows)
+	    if (Identify.GetOsPlatform() == OSPlatform.Windows)
 		    result = Arrow;
 
-	    else if (GetOsPlatform() == OSPlatform.Linux)
+	    else if (Identify.GetOsPlatform() == OSPlatform.Linux)
 		    result = ArrowLinux;
 
 	    return result;
@@ -848,10 +474,10 @@ public static class CliHelpers
     {
 	    var result = IndentationArrowMac;
 
-	    if (GetOsPlatform() == OSPlatform.Windows)
+	    if (Identify.GetOsPlatform() == OSPlatform.Windows)
 		    result = IndentationArrow;
 
-	    else if (GetOsPlatform() == OSPlatform.Linux)
+	    else if (Identify.GetOsPlatform() == OSPlatform.Linux)
 		    result = IndentationArrowLinux;
 
 	    return result;
@@ -874,7 +500,7 @@ public static class CliHelpers
     {
 	    var result = BarMac;
 
-	    if (GetOsPlatform() == OSPlatform.Windows)
+	    if (Identify.GetOsPlatform() == OSPlatform.Windows)
 		    result = Bar;
 
 	    return result;
@@ -888,7 +514,7 @@ public static class CliHelpers
     {
 	    var result = HeaderBarMac;
 
-	    if (GetOsPlatform() == OSPlatform.Windows)
+	    if (Identify.GetOsPlatform() == OSPlatform.Windows)
 		    result = HeaderBar;
 
 	    return result;

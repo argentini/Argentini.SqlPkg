@@ -10,6 +10,131 @@ public static class SqlTools
 {
 	#region Data Helpers
 
+    /// <summary>
+    /// Process server/database info to ensure connection strings exist.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="settings"></param>
+    public static void NormalizeConnectionInfo(this string[] args, Settings settings)
+    {
+	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"').Trim('\'');
+	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"').Trim('\'');
+
+	    #region Source
+	    
+	    if (string.IsNullOrEmpty(settings.SourceConnectionString) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString);
+
+		    builder.TrustServerCertificate =
+			    args.HasArgument("/SourceTrustServerCertificate:", "/stsc:")
+				    ? args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
+				    : builder.TrustServerCertificate;
+
+		    builder.ConnectTimeout =
+			    args.HasArgument("/SourceTimeout:", "/st:")
+				    ? int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"))
+				    : builder.ConnectTimeout;
+		    
+		    builder.CommandTimeout =
+			    args.HasArgument("/p:CommandTimeout=")
+				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
+				    : builder.CommandTimeout;
+
+		    settings.SourceServerName = builder.DataSource;
+		    settings.SourceUserName = builder.UserID;
+		    settings.SourcePassword = builder.Password;
+		    settings.SourceDatabaseName = builder.InitialCatalog;
+		    settings.SourceConnectionTimeout = builder.ConnectTimeout;
+		    settings.SourceCommandTimeout = builder.CommandTimeout;
+		    settings.SourceTrustServerCertificate = builder.TrustServerCertificate;
+		    settings.SourceConnectionString = builder.ToString();
+	    }
+
+	    else
+	    {
+		    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
+		    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
+		    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
+		    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
+		    settings.SourceConnectionTimeout = int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"));
+		    settings.SourceCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
+		    settings.SourceTrustServerCertificate = args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
+
+		    var builder = new SqlConnectionStringBuilder
+		    {
+			    DataSource = settings.SourceServerName,
+			    InitialCatalog = settings.SourceDatabaseName,
+			    UserID = settings.SourceUserName,
+			    Password = settings.SourcePassword,
+			    TrustServerCertificate = settings.SourceTrustServerCertificate,
+			    ConnectTimeout = settings.SourceConnectionTimeout,
+			    CommandTimeout = settings.SourceCommandTimeout
+		    };
+
+		    settings.SourceConnectionString = builder.ToString();
+	    }
+
+	    #endregion
+	    
+	    #region Target
+	    
+	    if (string.IsNullOrEmpty(settings.TargetConnectionString) == false)
+	    {
+		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
+
+		    builder.TrustServerCertificate =
+			    args.HasArgument("/TargetTrustServerCertificate:", "/ttsc:")
+				    ? args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
+				    : builder.TrustServerCertificate;
+
+		    builder.ConnectTimeout =
+			    args.HasArgument("/TargetTimeout:", "/tt:")
+				    ? int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"))
+				    : builder.ConnectTimeout;
+		    
+		    builder.CommandTimeout =
+			    args.HasArgument("/p:CommandTimeout=")
+				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
+				    : builder.CommandTimeout;
+
+		    settings.TargetServerName = builder.DataSource;
+		    settings.TargetUserName = builder.UserID;
+		    settings.TargetPassword = builder.Password;
+		    settings.TargetDatabaseName = builder.InitialCatalog;
+		    settings.TargetConnectionTimeout = builder.ConnectTimeout;
+		    settings.TargetCommandTimeout = builder.CommandTimeout;
+		    settings.TargetTrustServerCertificate = builder.TrustServerCertificate;
+		    settings.TargetConnectionString = builder.ToString();
+	    }
+
+	    else
+	    {
+		    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/tsn", ':');
+		    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/tdn", ':');
+		    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/tu", ':');
+		    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/tp", ':');
+		    settings.TargetConnectionTimeout = int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"));
+		    settings.TargetCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
+		    settings.TargetTrustServerCertificate = args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
+
+		    var builder = new SqlConnectionStringBuilder
+		    {
+			    DataSource = settings.TargetServerName,
+			    InitialCatalog = settings.TargetDatabaseName,
+			    UserID = settings.TargetUserName,
+			    Password = settings.TargetPassword,
+			    TrustServerCertificate = settings.TargetTrustServerCertificate,
+			    ConnectTimeout = settings.TargetConnectionTimeout,
+			    CommandTimeout = settings.TargetCommandTimeout
+		    };
+
+		    settings.TargetConnectionString = builder.ToString();
+	    }
+
+	    #endregion
+    }
+	
 	public static async Task PurgeDatabase(Settings settings)
 	{
 		var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)

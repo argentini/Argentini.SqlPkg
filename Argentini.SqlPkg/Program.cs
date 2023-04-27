@@ -29,17 +29,17 @@ public class Program
         //     "/SourcePassword:'P@ssw0rdz!'"
         // };
 
-        // args = new[]
-        // {
-        //     "/a:Restore",
-        //     "/SourceFile:\"Database/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database/athepedia.log\"",
-        //     "/TargetServerName:10.1.10.3,1433",
-        //     "/TargetDatabaseName:temp",
-        //     "/TargetUser:sa",
-        //     "/TargetPassword:P@ssw0rdz!",
-        //     "/p:ExcludeObjectTypes=Filegroups;Files;FileTables;PartitionFunctions;PartitionSchemes;ServerTriggers;DatabaseTriggers"
-        // };
+        args = new[]
+        {
+            "/a:Restore",
+            "/SourceFile:\"Database/athepedia.bacpac\"",
+            "/DiagnosticsFile:\"Database/athepedia.log\"",
+            "/TargetServerName:10.1.10.3,1433",
+            "/TargetDatabaseName:temp",
+            "/TargetUser:sa",
+            "/TargetPassword:P@ssw0rdz!",
+            //"/p:ExcludeObjectTypes=Filegroups;Files;FileTables;PartitionFunctions;PartitionSchemes;ServerTriggers;DatabaseTriggers"
+        };
         
         #endregion
         
@@ -66,10 +66,10 @@ public class Program
 
         #endregion
         
-        var title = $"SQLPKG for SqlPackage {Settings.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(settings.Action) ? "HELP" : settings.Action.ToUpper())} MODE —{{{{gap}}}}{CliHelpers.GetOsPlatformName()} ({CliHelpers.GetPlatformArchitecture()}); CLR {CliHelpers.GetRuntimeVersion()}".FillWidth(CliHelpers.ColumnWidth);
+        var title = $"SQLPKG for SqlPackage {Settings.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(settings.Action) ? "HELP" : settings.Action.ToUpper())} MODE —{{{{gap}}}}{Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); CLR {Identify.GetRuntimeVersion()}".FillWidth(Settings.ColumnWidth);
         
         Console.WriteLine(title);
-        Console.WriteLine(CliHelpers.GetHeaderBar().Repeat(CliHelpers.ColumnWidth));
+        Console.WriteLine(CliHelpers.GetHeaderBar().Repeat(Settings.ColumnWidth));
         Console.WriteLine();
         
         if (settings.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
@@ -85,10 +85,10 @@ public class Program
             {
                 CliHelpers.OutputBackupInfo(args, settings);
                 
-                Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+                Console.WriteLine("▬".Repeat(Settings.ColumnWidth));
                 Console.WriteLine();
                 
-                #region Backup Schema as DACPAC
+                #region Backup Database as BACPAC
 
                 var backupArguments = args.BuildExportArguments(settings);
                 
@@ -110,10 +110,10 @@ public class Program
             {
                 CliHelpers.OutputRestoreInfo(args, settings);
 
-                Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+                Console.WriteLine("▬".Repeat(Settings.ColumnWidth));
                 Console.WriteLine();
                 
-                #region Restore Schema from DACPAC
+                #region Restore Database from BACPAC
                 
                 var restoreArguments = args.BuildImportArguments(settings);
                 
@@ -143,7 +143,7 @@ public class Program
             Console.WriteLine($"  Backup/Restore Not Used, Passing Control to SqlPackage{CliHelpers.Ellipsis}");
             Console.WriteLine();
 
-            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine("▬".Repeat(Settings.ColumnWidth));
             Console.WriteLine();
             
             var cmd = Cli.Wrap("SqlPackage")
@@ -175,7 +175,7 @@ public class Program
             Console.WriteLine("You can use standard SqlPackage modes and all arguments are sent to Sqlpackage");
             Console.WriteLine("so you can use SqlPkg as the sole way to run SqlPackage, for convenience.");
             Console.WriteLine();
-            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine("▬".Repeat(Settings.ColumnWidth));
             Console.WriteLine();
             
             var cmd = Cli.Wrap("SqlPackage")
@@ -197,7 +197,7 @@ public class Program
                 elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
 
             Console.WriteLine();
-            Console.WriteLine("▬".Repeat(CliHelpers.ColumnWidth));
+            Console.WriteLine("▬".Repeat(Settings.ColumnWidth));
             Console.WriteLine();
 
             Console.Write("Action       ");

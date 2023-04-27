@@ -12,7 +12,6 @@ public class Settings
     public int SourceConnectionTimeout { get; set; } = 30;
     public int SourceCommandTimeout { get; set; } = 120;
     public bool SourceTrustServerCertificate { get; set; } = true;
-    public string SourceFilePath { get; set; } = string.Empty;
 
     public string TargetConnectionString { get; set; } = string.Empty;
     public string TargetServerName { get; set; } = string.Empty;
@@ -22,10 +21,28 @@ public class Settings
     public int TargetConnectionTimeout { get; set; } = 30;
     public int TargetCommandTimeout { get; set; } = 120;
     public bool TargetTrustServerCertificate { get; set; } = true;
-    public string TargetFilePath { get; set; } = string.Empty;
-
-    public string LogFilePath { get; set; } = string.Empty;
     
+    /// <summary>
+    /// Column width of the console output for items that require cropping.
+    /// </summary>
+    public static int ColumnWidth
+    {
+        get
+        {
+            const int minWidth = 76;
+            const int maxWidth = 110;
+            var currentWidth = Console.WindowWidth;
+
+            if (currentWidth < minWidth)
+                return minWidth;
+
+            if (currentWidth > maxWidth)
+                return maxWidth;
+
+            return currentWidth;
+        }
+    }
+
     public static string AppMajorVersion
     {
         get

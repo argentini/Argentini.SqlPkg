@@ -209,7 +209,7 @@ public class Program
                 CliHelpers.OutputBackupInfo(args, settings);
 
             if (settings.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
-                CliHelpers.OutputBackupInfo(args, settings);
+                CliHelpers.OutputRestoreInfo(args, settings);
 
             Console.Write("Completed    ");
             CliHelpers.WriteBar();

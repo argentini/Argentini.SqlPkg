@@ -12,26 +12,77 @@ public static class SqlTools
 
 	public static async Task PurgeDatabase(Settings settings)
 	{
-		Console.WriteLine($"=> Purging Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
+		var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
 		
-		Console.WriteLine("=> Setting Single User Mode...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-			ConnectionString = settings.TargetConnectionString,
-			CommandText = @"
+		builder.InitialCatalog = "master";
+		
+		using (var sqlReader = new SqlReader(new SqlReaderConfiguration
+		       {
+			       ConnectionString = builder.ToString(),
+			       CommandText = @$"
+if not exists (
+    select [name]
+        from sys.databases
+        where [name] = N'{settings.TargetDatabaseName}'
+)
+    select 0
+else
+    select 1
+"
+		       }))
+		{
+			await using (await sqlReader.ExecuteReaderAsync())
+			{
+				sqlReader.Read();
+				
+				if (await sqlReader.SafeGetIntAsync(0) == 0)
+				{
+					// Create Database
+
+					Console.WriteLine(
+						$"=> Creating Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
+					
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = builder.ToString(),
+						CommandText = $@"
+if not exists (
+    select [name]
+        from sys.databases
+        where [name] = N'{settings.TargetDatabaseName}'
+)
+	create database {settings.TargetDatabaseName}
+"
+					});
+					
+					Console.WriteLine("=> Database Created");
+				}
+
+				else
+				{
+					// Purge Existing Database
+
+					Console.WriteLine(
+						$"=> Purging Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
+
+					Console.WriteLine("=> Setting Single User Mode...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Switch to single user mode
 
 DECLARE @sqlprep NVARCHAR(max)
 SET @sqlprep = 'ALTER DATABASE ' + quotename(db_name()) + ' SET SINGLE_USER WITH ROLLBACK IMMEDIATE'
 EXEC sp_executesql @sqlprep
 "
-        });
+					});
 
-        Console.WriteLine("=> Dropping Extended Properties...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					Console.WriteLine("=> Dropping Extended Properties...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all extended properties
 
 DECLARE @rows int
@@ -48,13 +99,13 @@ BEGIN
 	EXEC sp_executesql @sql
 END
 "
-        });
-        
-        Console.WriteLine("=> Dropping Triggers...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Triggers...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all triggers
 
 DECLARE @dynsql NVARCHAR(max)
@@ -74,13 +125,13 @@ ORDER BY t.parent_id
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Foreign Keys...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Foreign Keys...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 DECLARE @sql NVARCHAR(max)
 SET @sql = ''
 SELECT @sql += ' ALTER TABLE ' + QUOTENAME(s.NAME) + '.' + QUOTENAME(t.NAME) + ' DROP CONSTRAINT ' + QUOTENAME(tc.CONSTRAINT_NAME) + ';'
@@ -93,13 +144,13 @@ WHERE t.type = 'U' AND CONSTRAINT_TYPE = 'FOREIGN KEY'
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Fulltext Catalogs...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Fulltext Catalogs...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop fulltext indexes and catalogs
 
 DECLARE @Catalog NVARCHAR(128),
@@ -211,13 +262,13 @@ END
 CLOSE FTCur
 DEALLOCATE FTCur
 "
-        });
-        
-        Console.WriteLine("=> Dropping Table Indexes...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Table Indexes...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all table indexes
 
 DECLARE @SchemaName VARCHAR(256)
@@ -282,13 +333,13 @@ IF @TSQLDropIndex <> '' BEGIN
 	EXEC sp_executesql @TSQLDropIndex
 END
 "
-        });
-        
-        Console.WriteLine("=> Dropping Table Check Constraints...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Table Check Constraints...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all table check constraints
 
 DECLARE @sql NVARCHAR(max)
@@ -303,13 +354,13 @@ WHERE t.type = 'U' AND CONSTRAINT_TYPE = 'CHECK'
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Views...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Views...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all views
 
 DECLARE @dynsql NVARCHAR(max)
@@ -322,13 +373,13 @@ WHERE s.NAME <> 'sys'
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Stored Procedures...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Stored Procedures...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all stored procedures
 
 DECLARE @dynsql NVARCHAR(max)
@@ -340,13 +391,13 @@ ON t.[schema_id] = s.[schema_id]
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Table Primary Keys...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Table Primary Keys...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all table primary keys
 
 DECLARE @sql NVARCHAR(max)
@@ -361,13 +412,13 @@ WHERE t.type = 'U' AND CONSTRAINT_TYPE = 'PRIMARY KEY'
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Tables...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Tables...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all tables
 
 DECLARE @sql NVARCHAR(max)
@@ -381,13 +432,13 @@ AND 1=1
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Dropping User-Defined Table Types...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping User-Defined Table Types...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all user-defined data types
 
 DECLARE @dynsql NVARCHAR(max)
@@ -400,13 +451,13 @@ WHERE s.[name]<>'sys' AND t.is_table_type=1
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping User-Defined Data Types...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping User-Defined Data Types...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all user-defined data types
 
 DECLARE @dynsql NVARCHAR(max)
@@ -419,13 +470,13 @@ WHERE s.[name]<>'sys' AND t.is_table_type=0
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping User-Defined Functions...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping User-Defined Functions...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop all user-defined functions
 
 DECLARE @dynsql NVARCHAR(max)
@@ -437,13 +488,13 @@ ON t.[schema_id] = s.[schema_id]
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping XML Schema Collections...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping XML Schema Collections...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop XML schema collections
 
 DECLARE @dynsql NVARCHAR(max)
@@ -460,13 +511,13 @@ WHERE ss.name <> 'sys'
 
 EXEC sp_executesql @dynsql
 "
-        });
-        
-        Console.WriteLine("=> Dropping Default Types...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping Default Types...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop default types
 
 DECLARE @sql NVARCHAR(max)
@@ -477,13 +528,13 @@ WHERE so.type = 'D' AND so.parent_object_id = 0
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Dropping User Schemas...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Dropping User Schemas...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Drop user schemas
 
 DECLARE @sql NVARCHAR(max)
@@ -498,22 +549,25 @@ u.name NOT IN ('sys', 'guest', 'INFORMATION_SCHEMA') AND s.name <> 'dbo'
 
 EXEC sp_executesql @sql
 "
-        });
-        
-        Console.WriteLine("=> Restoring multi-user mode...");
-        await Sql.ExecuteAsync(new SqlExecuteSettings
-        {
-	        ConnectionString = settings.TargetConnectionString,
-	        CommandText = @"
+					});
+
+					Console.WriteLine("=> Restoring multi-user mode...");
+					await Sql.ExecuteAsync(new SqlExecuteSettings
+					{
+						ConnectionString = settings.TargetConnectionString,
+						CommandText = @"
 -- Switch to multi user mode
 
 DECLARE @sqlfinish2 NVARCHAR(max)
 SET @sqlfinish2 = 'ALTER DATABASE ' + quotename(db_name()) + ' SET MULTI_USER'
 EXEC sp_executesql @sqlfinish2
 "
-        });
-        
-        Console.WriteLine("=> Database Purge Complete");
+					});
+
+					Console.WriteLine("=> Database Purge Complete");
+				}
+			}
+		}
 	}
 	
 	/// <summary>

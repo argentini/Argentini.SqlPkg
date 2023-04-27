@@ -381,7 +381,7 @@ public static class CliHelpers
         var splits = args.First(a => a.StartsWith($"{startsWith}{delimiter}", StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(startsWithAbbrev) == false && a.StartsWith($"{startsWithAbbrev}{delimiter}", StringComparison.CurrentCultureIgnoreCase))).Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                     
         if (splits.Length == 2)
-	        return splits[1];
+	        return splits[1].Trim('\"').Trim('\'');
 
         return defaultValue;
     }
@@ -412,8 +412,8 @@ public static class CliHelpers
     /// <param name="settings"></param>
     public static void NormalizeConnectionInfo(this string[] args, Settings settings)
     {
-	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"');
-	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"');
+	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"').Trim('\'');
+	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"').Trim('\'');
 
 	    #region Source
 	    
@@ -575,7 +575,7 @@ public static class CliHelpers
 	    if (fileSplits.Length != 2)
 		    return;
 
-	    var fileName = fileSplits[1].Trim('\"');
+	    var fileName = fileSplits[1].Trim('\"').Trim('\"');
 
 	    #region Ensure Target Paths Exist
 
@@ -594,35 +594,7 @@ public static class CliHelpers
 	    
 	    #endregion
     }
-
-    /*
-    /// <summary>
-    /// Process CLI arguments and filter based on allowed arguments for Action:Extract.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-	public static List<string> BuildExtractArguments(this IEnumerable<string> args)
-	{
-		var arguments = new List<string>();
-
-		foreach (var arg in args)
-		{
-		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
-		    
-		    if (ExtractOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
-			    arguments.Add(arg);
-		}
-
-		arguments.Insert(0, "/a:Extract");
-		arguments.Add("/p:ExtractAllTableData=false");
-		arguments.SetArgumentFileExtension("/TargetFile:", ".dacpac", true);
-		arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", true, "schema");
-		arguments.BetterDefaults(ExtractOptions);
-
-		return arguments;
-	}
-	*/
-
+    
     /// <summary>
     /// Process CLI arguments and filter based on allowed arguments for Action:Export.
     /// </summary>
@@ -648,34 +620,7 @@ public static class CliHelpers
 	    
 	    return arguments;
     }
-
-    /*
-    /// <summary>
-    /// Process CLI arguments and filter based on allowed arguments for Action:Extract.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static List<string> BuildPublishArguments(this IEnumerable<string> args)
-    {
-	    var arguments = new List<string>();
-
-	    foreach (var arg in args)
-	    {
-		    var argPrefix = arg.Split(arg.Contains('=') ? '=' : ':')[0] + (arg.Contains('=') ? '=' : ':');
-		    
-		    if (PublishOptions.Any(a => a.StartsWith(argPrefix, StringComparison.CurrentCultureIgnoreCase)))
-			    arguments.Add(arg);
-	    }
-
-	    arguments.Insert(0, "/a:Publish");
-	    arguments.SetArgumentFileExtension("/SourceFile:", ".dacpac");
-	    arguments.SetArgumentFileExtension("/DiagnosticsFile:", ".log", false, "schema");
-	    arguments.BetterDefaults(PublishOptions);
-	    
-	    return arguments;
-    }
-	*/
-
+    
     /// <summary>
     /// Process CLI arguments and filter based on allowed arguments for Action:Export.
     /// </summary>
@@ -720,7 +665,7 @@ public static class CliHelpers
 
                 if (splits.Length == 2)
                 {
-                    tableDataList.Add(splits[1]);
+                    tableDataList.Add(splits[1].Trim('\"').Trim('\''));
                 }
             }
         }
@@ -735,7 +680,7 @@ public static class CliHelpers
             {
                 foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+                    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1].Trim('\"').Trim('\'') : string.Empty;
 
                     if (string.IsNullOrEmpty(excludedTableName))
                         continue;
@@ -783,7 +728,7 @@ public static class CliHelpers
 	    
 	    foreach (var exclusion in args.Where(a => a.StartsWith("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
 	    {
-		    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1] : string.Empty;
+		    var excludedTableName = exclusion.Split('=').Length == 2 ? exclusion.Split('=')[1].Trim('\"').Trim('\'') : string.Empty;
 
 		    if (string.IsNullOrEmpty(excludedTableName))
 			    continue;
@@ -1029,12 +974,12 @@ public static class CliHelpers
                 
 	    Console.Write("Destination  ");
 	    WriteBar();
-	    Console.WriteLine("  " + (args.HasArgument("/TargetFile:", "/tf:") ? args.GetArgumentValue("/TargetFile", "/tf", ':').Trim('\"') : "None"));
+	    Console.WriteLine("  " + (args.HasArgument("/TargetFile:", "/tf:") ? args.GetArgumentValue("/TargetFile", "/tf", ':').Trim('\"').Trim('\'') : "None"));
 	    Console.WriteLine();
                 
 	    Console.Write("Log File     ");
 	    WriteBar();
-	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"') : "None"));
+	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"').Trim('\'') : "None"));
 	    Console.WriteLine();
     }
 
@@ -1049,7 +994,7 @@ public static class CliHelpers
 	    
 	    Console.Write("Source       ");
 	    WriteBar();
-	    Console.WriteLine("  " + (args.HasArgument("/SourceFile:", "/sf:") ? args.GetArgumentValue("/SourceFile", "/sf", ':').Trim('\"') : "None"));
+	    Console.WriteLine("  " + (args.HasArgument("/SourceFile:", "/sf:") ? args.GetArgumentValue("/SourceFile", "/sf", ':').Trim('\"').Trim('\'') : "None"));
 	    Console.WriteLine();
                 
 	    Console.Write("Destination  ");
@@ -1061,7 +1006,7 @@ public static class CliHelpers
 
 	    Console.Write("Log File     ");
 	    WriteBar();
-	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"') : "None"));
+	    Console.WriteLine("  " + (args.HasArgument("/DiagnosticsFile:", "/df:") ? args.GetArgumentValue("/DiagnosticsFile", "/df", ':').Trim('\"').Trim('\'') : "None"));
 	    Console.WriteLine();
     }
     

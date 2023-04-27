@@ -12,10 +12,11 @@ public static class SqlTools
 
 	public static async Task PurgeDatabase(Settings settings)
 	{
-		var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
-		
-		builder.InitialCatalog = "master";
-		
+		var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)
+		{
+			InitialCatalog = "master"
+		};
+
 		using (var sqlReader = new SqlReader(new SqlReaderConfiguration
 		       {
 			       ConnectionString = builder.ToString(),
@@ -51,7 +52,7 @@ if not exists (
         from sys.databases
         where [name] = N'{settings.TargetDatabaseName}'
 )
-	create database {settings.TargetDatabaseName}
+	create database [{settings.TargetDatabaseName}]
 "
 					});
 					

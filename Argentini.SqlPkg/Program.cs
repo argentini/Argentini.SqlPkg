@@ -26,7 +26,7 @@ public class Program
         //     "/SourceServerName:sqlserver,1433",
         //     "/SourceDatabaseName:athepedia",
         //     "/SourceUser:sa",
-        //     "/SourcePassword:P@ssw0rdz!"
+        //     "/SourcePassword:'P@ssw0rdz!'"
         // };
 
         // args = new[]

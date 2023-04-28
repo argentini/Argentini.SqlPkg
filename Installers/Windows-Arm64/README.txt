@@ -1,6 +1,6 @@
 To install SqlPkg follow these steps:
 
-1. Open a PowerShell window as Administrator (right click PowerShell and choose run as adminiistrator)
+1. Open a PowerShell window as Administrator (right click PowerShell and choose run as administrator)
 2. Navigate to the folder where this README file is
 3. Run the following command:
 

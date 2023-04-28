@@ -45,8 +45,8 @@ else
 				{
 					// Create Database
 
-					Console.WriteLine(
-						$"=> Creating Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
+					CliOutputHelpers.WriteArrow();
+					Console.WriteLine($"Creating Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
 					
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
@@ -61,15 +61,17 @@ if not exists (
 "
 					});
 					
-					Console.WriteLine("=> Database Created");
+					CliOutputHelpers.WriteArrow();
+					Console.WriteLine("Database Created");
+					Console.WriteLine();
 				}
 
 				else
 				{
 					// Purge Existing Database
 
-					Console.WriteLine(
-						$"=> Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
+					CliOutputHelpers.WriteArrow();
+					Console.WriteLine($"Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
 					
 					var executableFilePath = ApplicationState.GetAppPath();
 					
@@ -77,12 +79,14 @@ if not exists (
 
 					var cmd = Cli.Wrap("SqlPackage")
 						.WithArguments($"/a:publish /SourceFile:\"{executableFilePath}blank.dacpac\" /TargetConnectionString:\"{applicationState.TargetConnectionString}\" /p:AllowIncompatiblePlatform=true /p:BlockOnPossibleDataLoss=false /p:IncludeCompositeObjects=false /p:DropObjectsNotInSource=true /p:DropConstraintsNotInSource=true /p:DropDmlTriggersNotInSource=true /p:DropExtendedPropertiesNotInSource=true /p:DropIndexesNotInSource=true /p:DropPermissionsNotInSource=true /p:DropRoleMembersNotInSource=true /p:DropStatisticsNotInSource=true")
-						.WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+						.WithStandardOutputPipe(PipeTarget.Null)
 						.WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
 					_ = await cmd.ExecuteAsync();
 
-					Console.WriteLine("=> Database Purge Complete");
+					CliOutputHelpers.WriteArrow();
+					Console.WriteLine("Database Purge Complete");
+					Console.WriteLine();
 				}
 			}
 		}

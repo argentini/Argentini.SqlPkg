@@ -62,20 +62,19 @@ public class AppInstance
 
         AppState.ImportArguments(args);
         
-        // var title = $"SQLPKG for SqlPackage {AppState.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action.ToUpper())} MODE —{{{{gap}}}}{Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); CLR {Identify.GetRuntimeVersion()}".FillWidth(ApplicationState.ColumnWidth);
-        // Console.WriteLine(title);
-        // Console.WriteLine(CliOutputHelpers.GetHeaderBar().Repeat(ApplicationState.ColumnWidth));
-
         Console.WriteLine();
-        Console.WriteLine("SqlPkg: Command-line tool for backing up and restoring SQL Server databases with Microsoft SqlPackage.");
+        Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
         Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); .NET {Identify.GetRuntimeVersion()}");
         Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
         Console.WriteLine();
-        
-        Console.Write("Action    ");
-        CliOutputHelpers.WriteBar();
-        Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
-        Console.WriteLine();
+
+        if (string.IsNullOrEmpty(AppState.Action) == false)
+        {
+            Console.Write("Action    ");
+            CliOutputHelpers.WriteBar();
+            Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
+            Console.WriteLine();
+        }
 
         if (await AppState.SqlPackageIsInstalled() == false)
             return -1;
@@ -98,18 +97,10 @@ public class AppInstance
                 
                 await AppState.ProcessTableDataArguments();
                 
-                // Console.WriteLine();
-                // Console.WriteLine(AppState.GetWorkingArgumentsStringForCli());
-                // Console.WriteLine();
-                
                 var cmd = Cli.Wrap("SqlPackage")
                     .WithArguments(AppState.WorkingArguments.GetArgumentsStringForCli())
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
-
-                // Console.WriteLine();
-                // Console.WriteLine(cmd.Arguments);
-                // Console.WriteLine();
                 
                 var result = await cmd.ExecuteAsync();
 
@@ -146,7 +137,7 @@ public class AppInstance
             
             Console.Write(" ".Repeat(10));
             CliOutputHelpers.WriteBar();
-            Console.WriteLine($"  Backup/Restore Not Used, Passing Control to SqlPackage{CliOutputHelpers.Ellipsis}");
+            Console.WriteLine("  Backup/Restore Not Used, Passing Control to SqlPackage");
             Console.WriteLine();
 
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
@@ -169,26 +160,22 @@ public class AppInstance
 
         else
         {
-            Console.WriteLine("SqlPkg can be used in 'Backup' or 'Restore' action modes, which are");
-            Console.WriteLine("functionally equivalent to SqlPackage's 'Export' and 'Import' action modes.");
-            Console.WriteLine("These modes have tailored default values and provide additional features.");
-            Console.WriteLine();
-            Console.WriteLine("/Action:Backup (/a:Backup)");
-            Console.WriteLine("    Accepts all Action:Export arguments, and also provides /ExcludeTableData:");
-            Console.WriteLine("    which is functionally equivalent to /TableData: but excludes the specified");
-            Console.WriteLine("    tables. Can be listed multiple times to exclude multiple tables.");
-            Console.WriteLine();
-            Console.WriteLine("/Action:Restore (/a:Restore)");
-            Console.WriteLine("    Accepts all Action:Import arguments. This mode will always fully erase the");
-            Console.WriteLine("    target database prior to restoring the .bacpac file, so there's no need to");
-            Console.WriteLine("    create a new database each time.");
-            Console.WriteLine();
-            Console.WriteLine("You can use standard SqlPackage modes and all arguments are sent to Sqlpackage");
-            Console.WriteLine("so you can use SqlPkg as the sole way to run SqlPackage, for convenience.");
+            const string helpText = @"
+SqlPkg can be used in 'Backup' or 'Restore' action modes, which are functionally equivalent to SqlPackage's 'Export' and 'Import' action modes. These modes have tailored default values and provide additional features.
+
+/Action:Backup (/a:Backup)
+    Accepts all Action:Export arguments, and also provides /ExcludeTableData: which is functionally equivalent to /TableData: but excludes the specified tables. Can be listed multiple times to exclude multiple tables.
+
+/Action:Restore (/a:Restore)
+    Accepts all Action:Import arguments. This mode will always fully erase the target database prior to restoring the .bacpac file, so there's no need to create a new database each time.
+
+For convenience, you can also use SqlPkg in place of SqlPackage for all other operations as all arguments are passed through.";
+
+            helpText.WriteToConsole(ApplicationState.ColumnWidth);
             Console.WriteLine();
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
             Console.WriteLine();
-            
+
             var cmd = Cli.Wrap("SqlPackage")
                 .WithArguments(string.Join(" ", args))
                 .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
@@ -212,22 +199,11 @@ public class AppInstance
         Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
         Console.WriteLine();
 
-        Console.Write("Action    ");
-        CliOutputHelpers.WriteBar();
-        Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
+        Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliOutputHelpers.GetDateTime()}");
         Console.WriteLine();
 
-        if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
-            CliOutputHelpers.OutputBackupInfo(AppState);
+        CliOutputHelpers.OutputCompleteInfo(AppState);
 
-        if (AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
-            CliOutputHelpers.OutputRestoreInfo(AppState);
-
-        Console.Write("Complete  ");
-        CliOutputHelpers.WriteBar();
-        Console.WriteLine("  " + CliOutputHelpers.GetDateTime());
-        Console.WriteLine();
-        
         Console.Write("Elapsed   ");
         CliOutputHelpers.WriteBar();
         Console.WriteLine($"  {elapsed}");

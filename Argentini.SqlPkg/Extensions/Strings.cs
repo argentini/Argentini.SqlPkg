@@ -264,6 +264,52 @@ public static class Strings
 	
 	#region Transform
 
+    private static IEnumerable<string> WrapTextAtMaxWidth(string input, int maxLength)
+    {
+	    var result = new List<string>();
+	    var indentation = Regex.Match(input, @"^\s+").Value;
+		var words = input.TrimStart().Split(' ');
+	    var currentLineLength = indentation.Length;
+	    var currentLine = new StringBuilder(indentation);
+
+	    foreach (var word in words)
+	    {
+		    if (currentLineLength + word.Length > maxLength)
+		    {
+			    result.Add(currentLine.ToString());
+			    currentLine.Clear();
+			    currentLine.Append(indentation);
+			    currentLineLength = indentation.Length;
+		    }
+
+		    currentLine.Append(word);
+		    currentLine.Append(' ');
+		    currentLineLength += word.Length + 1;
+	    }
+
+	    if (currentLine.Length > indentation.Length)
+		    result.Add(currentLine.ToString());
+
+	    return result;
+    }
+	
+	public static void WriteToConsole(this string text, int maxCharacters)
+	{
+		if (string.IsNullOrEmpty(text))
+			return;
+
+		var result = new List<string>();
+		var lines = text.Trim().NormalizeLinebreaks().Split('\n');
+
+		foreach (var line in lines)
+			result.AddRange(WrapTextAtMaxWidth(line, maxCharacters));
+
+		foreach (var line in result)
+		{
+			Console.WriteLine(line.NormalizeLinebreaks(Environment.NewLine));
+		}
+	}
+	
 	/// <summary>
 	/// Fixes folder paths that have duplicate separator characters, replaces "~" with the
 	/// user's home path, and ensures a trailing path separator.

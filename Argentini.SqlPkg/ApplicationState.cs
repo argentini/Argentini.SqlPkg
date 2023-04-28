@@ -333,27 +333,11 @@ public class ApplicationState
     #endregion
     
     #region Output Settings
-    
+
     /// <summary>
     /// Column width of the console output for items that require cropping.
     /// </summary>
-    public static int ColumnWidth
-    {
-        get
-        {
-            const int minWidth = 76;
-            const int maxWidth = 110;
-            var currentWidth = Console.WindowWidth;
-
-            if (currentWidth < minWidth)
-                return minWidth;
-
-            if (currentWidth > maxWidth)
-                return maxWidth;
-
-            return currentWidth;
-        }
-    }
+    public static int ColumnWidth => 80;
 
     #endregion
     

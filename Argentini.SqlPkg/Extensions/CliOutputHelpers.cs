@@ -324,6 +324,49 @@ public static class CliOutputHelpers
 	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
 	    Console.WriteLine();
     }
+
+    /// <summary>
+    /// Restore information output.
+    /// </summary>
+    /// <param name="appState"></param>
+    public static void OutputCompleteInfo(ApplicationState appState)
+    {
+	    var backupActions = new[] { "Backup", "Extract", "Export" };
+	    
+	    Console.Write("Source    ");
+	    WriteBar();
+
+	    if (backupActions.Contains(appState.Action, StringComparer.CurrentCultureIgnoreCase))
+	    {
+		    Console.Write("  " + appState.SourceServerName);
+		    WriteArrow(true);
+		    Console.WriteLine(appState.SourceDatabaseName);
+	    }
+
+	    else
+	    {
+		    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/SourceFile:", "/sf:") ? appState.OriginalArguments.GetArgumentValue("/SourceFile:", "/sf:").RemoveWrappedQuotes() : "None"));
+	    }
+
+	    Console.Write("Target    ");
+	    WriteBar();
+	    
+	    if (backupActions.Contains(appState.Action, StringComparer.CurrentCultureIgnoreCase))
+	    {
+		    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/TargetFile:", "/tf:") ? appState.OriginalArguments.GetArgumentValue("/TargetFile:", "/tf:").RemoveWrappedQuotes() : "None"));
+	    }
+
+	    else
+	    {
+		    Console.Write("  " + appState.TargetServerName);
+		    WriteArrow(true);
+		    Console.WriteLine(appState.TargetDatabaseName);
+	    }
+
+	    Console.Write("Log File  ");
+	    WriteBar();
+	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
+    }
     
     #endregion
 }

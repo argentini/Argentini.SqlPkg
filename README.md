@@ -6,13 +6,13 @@ SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPack
 
 The following SqlPackage action modes provide enhanced features.
 
-### Action:Backup
+### /Action:Backup
 
 This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the following differences.
 
 - Specify one or more `/p:ExcludeTableData=` properties to exclude sepcific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
 
-### Action:Restore
+### /Action:Restore
 
 This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
 

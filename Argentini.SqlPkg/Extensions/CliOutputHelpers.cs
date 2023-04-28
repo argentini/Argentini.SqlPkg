@@ -75,9 +75,10 @@ public static class CliOutputHelpers
     /// <summary>
     /// Output a separator arrow.
     /// </summary>
-    public static void WriteArrow()
+    /// <param name="leadingSpace"></param>
+    public static void WriteArrow(bool leadingSpace = false)
     {
-	    Console.Write(GetArrow());
+	    Console.Write((leadingSpace ? " " : string.Empty) + GetArrow());
     }
 
     /// <summary>
@@ -280,7 +281,7 @@ public static class CliOutputHelpers
 	    Console.Write("Source    ");
 	    WriteBar();
 	    Console.Write("  " + appState.SourceServerName);
-	    WriteArrow();
+	    WriteArrow(true);
 	    Console.WriteLine(appState.SourceDatabaseName);
 	    Console.WriteLine();
 	    
@@ -314,7 +315,7 @@ public static class CliOutputHelpers
 	    Console.Write("Target    ");
 	    WriteBar();
 	    Console.Write("  " + appState.TargetServerName);
-	    WriteArrow();
+	    WriteArrow(true);
 	    Console.WriteLine(appState.TargetDatabaseName);
 	    Console.WriteLine();
 

@@ -111,6 +111,25 @@ public static class ArgumentHelpers
     }
 
     /// <summary>
+    /// Ensure the directory path exists for a given argument file path.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="argumentName"></param>
+    /// <param name="argumentNameAbbrev"></param>
+    public static void EnsureDirectoryExists(this List<CliArgument> arguments, string argumentName, string argumentNameAbbrev)
+    {
+        var targetFilePath = arguments.GetArgumentValue(argumentName, argumentNameAbbrev).RemoveWrappedQuotes();
+	    
+        if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false)
+            return;
+
+        var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
+        
+        if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
+            Directory.CreateDirectory(directoryPath);
+    }
+    
+    /// <summary>
     /// Ensure all required argument values are wrapped in quotes.
     /// </summary>
     /// <param name="arguments"></param>

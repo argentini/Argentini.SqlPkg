@@ -152,6 +152,9 @@ public class AppInstance
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
             Console.WriteLine();
             
+            AppState.OriginalArguments.EnsureDirectoryExists("/TargetFile:", "/df:");
+            AppState.OriginalArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
+            
             AppState.OriginalArguments.WrapPathsInQuotes();
             
             var cmd = Cli.Wrap("SqlPackage")

@@ -183,24 +183,6 @@ public class ApplicationState
     }
     
     /// <summary>
-    /// Ensure the directory path exists for a given argument file path.
-    /// </summary>
-    /// <param name="argumentName"></param>
-    /// <param name="argumentNameAbbrev"></param>
-    private void EnsureDirectoryExists(string argumentName, string argumentNameAbbrev)
-    {
-	    var targetFilePath = WorkingArguments.GetArgumentValue(argumentName, argumentNameAbbrev).RemoveWrappedQuotes();
-	    
-	    if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false)
-		    return;
-
-	    var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
-        
-	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
-		    Directory.CreateDirectory(directoryPath);
-    }
-    
-    /// <summary>
     /// Process CLI arguments into WorkingArguments.
     /// </summary>
     /// <returns></returns>
@@ -226,8 +208,8 @@ public class ApplicationState
 		    Value = SourceConnectionString.RemoveWrappedQuotes()
 	    });
 
-	    EnsureDirectoryExists("/TargetFile:", "/tf:");
-	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
+	    WorkingArguments.EnsureDirectoryExists("/TargetFile:", "/tf:");
+	    WorkingArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
 
 	    WorkingArguments.SetDefault("/p:VerifyExtraction=", "false");
 	    WorkingArguments.WrapPathsInQuotes();
@@ -259,7 +241,7 @@ public class ApplicationState
 		    Value = TargetConnectionString.RemoveWrappedQuotes()
 	    });
 	    
-	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
+	    WorkingArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
 	    WorkingArguments.WrapPathsInQuotes();
     }
     

@@ -283,17 +283,17 @@ public static class CliOutputHelpers
 	    WriteArrow();
 	    Console.WriteLine(appState.SourceDatabaseName);
 	    Console.WriteLine();
-
-	    Console.Write("Data      ");
-	    WriteBar();
-	    Console.WriteLine("  " + appState.GetExcludedTableDataList());
-	    Console.WriteLine();
-                
+	    
 	    Console.Write("Target    ");
 	    WriteBar();
 	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/TargetFile:", "/tf:") ? appState.OriginalArguments.GetArgumentValue("/TargetFile:", "/tf:").RemoveWrappedQuotes() : "None"));
 	    Console.WriteLine();
-                
+        
+	    Console.Write("Data      ");
+	    WriteBar();
+	    Console.WriteLine("  " + appState.GetExcludedTableDataList());
+	    Console.WriteLine();
+	    
 	    Console.Write("Log File  ");
 	    WriteBar();
 	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));

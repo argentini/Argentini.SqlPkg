@@ -264,6 +264,19 @@ public static class Strings
 	
 	#region Transform
 
+	public static string RemoveWrappedQuotes(this string value)
+	{
+		var result = value;
+        
+		if (result.StartsWith('\"') && result.EndsWith('\"'))
+			result = result.Trim('\"');
+
+		if (result.StartsWith('\'') && result.EndsWith('\''))
+			result = result.Trim('\'');
+        
+		return result;        
+	}
+	
 	/// <summary>
 	/// Repeat a string a specified number of times.
 	/// </summary>

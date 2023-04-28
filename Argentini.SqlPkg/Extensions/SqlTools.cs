@@ -10,134 +10,13 @@ public static class SqlTools
 {
 	#region Data Helpers
 
-    /// <summary>
-    /// Process server/database info to ensure connection strings exist.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="settings"></param>
-    public static void NormalizeConnectionInfo(this string[] args, Settings settings)
-    {
-	    settings.SourceConnectionString = args.GetArgumentValue("/SourceConnectionString", "/scs", ':').Trim('\"').Trim('\'');
-	    settings.TargetConnectionString = args.GetArgumentValue("/TargetConnectionString", "/tcs", ':').Trim('\"').Trim('\'');
-
-	    #region Source
-	    
-	    if (string.IsNullOrEmpty(settings.SourceConnectionString) == false)
-	    {
-		    var builder = new SqlConnectionStringBuilder(settings.SourceConnectionString);
-
-		    builder.TrustServerCertificate =
-			    args.HasArgument("/SourceTrustServerCertificate:", "/stsc:")
-				    ? args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
-				    : builder.TrustServerCertificate;
-
-		    builder.ConnectTimeout =
-			    args.HasArgument("/SourceTimeout:", "/st:")
-				    ? int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"))
-				    : builder.ConnectTimeout;
-		    
-		    builder.CommandTimeout =
-			    args.HasArgument("/p:CommandTimeout=")
-				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
-				    : builder.CommandTimeout;
-
-		    settings.SourceServerName = builder.DataSource;
-		    settings.SourceUserName = builder.UserID;
-		    settings.SourcePassword = builder.Password;
-		    settings.SourceDatabaseName = builder.InitialCatalog;
-		    settings.SourceConnectionTimeout = builder.ConnectTimeout;
-		    settings.SourceCommandTimeout = builder.CommandTimeout;
-		    settings.SourceTrustServerCertificate = builder.TrustServerCertificate;
-		    settings.SourceConnectionString = builder.ToString();
-	    }
-
-	    else
-	    {
-		    settings.SourceServerName = args.GetArgumentValue("/SourceServerName", "/ssn", ':');
-		    settings.SourceDatabaseName = args.GetArgumentValue("/SourceDatabaseName", "/sdn", ':');
-		    settings.SourceUserName = args.GetArgumentValue("/SourceUser", "/su", ':');
-		    settings.SourcePassword = args.GetArgumentValue("/SourcePassword", "/sp", ':');
-		    settings.SourceConnectionTimeout = int.Parse(args.GetArgumentValue("/SourceTimeout", "/st", ':', "30"));
-		    settings.SourceCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
-		    settings.SourceTrustServerCertificate = args.GetArgumentValue("/SourceTrustServerCertificate", "/stsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
-
-		    var builder = new SqlConnectionStringBuilder
-		    {
-			    DataSource = settings.SourceServerName,
-			    InitialCatalog = settings.SourceDatabaseName,
-			    UserID = settings.SourceUserName,
-			    Password = settings.SourcePassword,
-			    TrustServerCertificate = settings.SourceTrustServerCertificate,
-			    ConnectTimeout = settings.SourceConnectionTimeout,
-			    CommandTimeout = settings.SourceCommandTimeout
-		    };
-
-		    settings.SourceConnectionString = builder.ToString();
-	    }
-
-	    #endregion
-	    
-	    #region Target
-	    
-	    if (string.IsNullOrEmpty(settings.TargetConnectionString) == false)
-	    {
-		    var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString);
-
-		    builder.TrustServerCertificate =
-			    args.HasArgument("/TargetTrustServerCertificate:", "/ttsc:")
-				    ? args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase)
-				    : builder.TrustServerCertificate;
-
-		    builder.ConnectTimeout =
-			    args.HasArgument("/TargetTimeout:", "/tt:")
-				    ? int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"))
-				    : builder.ConnectTimeout;
-		    
-		    builder.CommandTimeout =
-			    args.HasArgument("/p:CommandTimeout=")
-				    ? int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"))
-				    : builder.CommandTimeout;
-
-		    settings.TargetServerName = builder.DataSource;
-		    settings.TargetUserName = builder.UserID;
-		    settings.TargetPassword = builder.Password;
-		    settings.TargetDatabaseName = builder.InitialCatalog;
-		    settings.TargetConnectionTimeout = builder.ConnectTimeout;
-		    settings.TargetCommandTimeout = builder.CommandTimeout;
-		    settings.TargetTrustServerCertificate = builder.TrustServerCertificate;
-		    settings.TargetConnectionString = builder.ToString();
-	    }
-
-	    else
-	    {
-		    settings.TargetServerName = args.GetArgumentValue("/TargetServerName", "/tsn", ':');
-		    settings.TargetDatabaseName = args.GetArgumentValue("/TargetDatabaseName", "/tdn", ':');
-		    settings.TargetUserName = args.GetArgumentValue("/TargetUser", "/tu", ':');
-		    settings.TargetPassword = args.GetArgumentValue("/TargetPassword", "/tp", ':');
-		    settings.TargetConnectionTimeout = int.Parse(args.GetArgumentValue("/TargetTimeout", "/tt", ':', "30"));
-		    settings.TargetCommandTimeout = int.Parse(args.GetArgumentValue("/p:CommandTimeout", string.Empty, '=', "120"));
-		    settings.TargetTrustServerCertificate = args.GetArgumentValue("/TargetTrustServerCertificate", "/ttsc", ':', "true").Equals("true", StringComparison.CurrentCultureIgnoreCase);
-
-		    var builder = new SqlConnectionStringBuilder
-		    {
-			    DataSource = settings.TargetServerName,
-			    InitialCatalog = settings.TargetDatabaseName,
-			    UserID = settings.TargetUserName,
-			    Password = settings.TargetPassword,
-			    TrustServerCertificate = settings.TargetTrustServerCertificate,
-			    ConnectTimeout = settings.TargetConnectionTimeout,
-			    CommandTimeout = settings.TargetCommandTimeout
-		    };
-
-		    settings.TargetConnectionString = builder.ToString();
-	    }
-
-	    #endregion
-    }
-	
-	public static async Task PurgeDatabase(Settings settings)
+	/// <summary>
+	/// Purge all user objects from a database or create it if it doesn't exist. 
+	/// </summary>
+	/// <param name="applicationState"></param>
+	public static async Task PurgeOrCreateDatabaseAsync(ApplicationState applicationState)
 	{
-		var builder = new SqlConnectionStringBuilder(settings.TargetConnectionString)
+		var builder = new SqlConnectionStringBuilder(applicationState.TargetConnectionString)
 		{
 			InitialCatalog = "master"
 		};
@@ -149,7 +28,7 @@ public static class SqlTools
 if not exists (
     select [name]
         from sys.databases
-        where [name] = N'{settings.TargetDatabaseName}'
+        where [name] = N'{applicationState.TargetDatabaseName}'
 )
     select 0
 else
@@ -166,7 +45,7 @@ else
 					// Create Database
 
 					Console.WriteLine(
-						$"=> Creating Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
+						$"=> Creating Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
 					
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
@@ -175,9 +54,9 @@ else
 if not exists (
     select [name]
         from sys.databases
-        where [name] = N'{settings.TargetDatabaseName}'
+        where [name] = N'{applicationState.TargetDatabaseName}'
 )
-	create database [{settings.TargetDatabaseName}]
+	create database [{applicationState.TargetDatabaseName}]
 "
 					});
 					
@@ -189,12 +68,12 @@ if not exists (
 					// Purge Existing Database
 
 					Console.WriteLine(
-						$"=> Purging Database [{settings.TargetDatabaseName}] on {settings.TargetServerName}...");
+						$"=> Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
 
 					Console.WriteLine("=> Setting Single User Mode...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Switch to single user mode
 
@@ -207,7 +86,7 @@ EXEC sp_executesql @sqlprep
 					Console.WriteLine("=> Dropping Extended Properties...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all extended properties
 
@@ -230,7 +109,7 @@ END
 					Console.WriteLine("=> Dropping Triggers...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all triggers
 
@@ -256,7 +135,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping Foreign Keys...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 DECLARE @sql NVARCHAR(max)
 SET @sql = ''
@@ -275,7 +154,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Dropping Fulltext Catalogs...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop fulltext indexes and catalogs
 
@@ -393,7 +272,7 @@ DEALLOCATE FTCur
 					Console.WriteLine("=> Dropping Table Indexes...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all table indexes
 
@@ -464,7 +343,7 @@ END
 					Console.WriteLine("=> Dropping Table Check Constraints...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all table check constraints
 
@@ -485,7 +364,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Dropping Views...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all views
 
@@ -504,7 +383,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping Stored Procedures...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all stored procedures
 
@@ -522,7 +401,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping Table Primary Keys...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all table primary keys
 
@@ -543,7 +422,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Dropping Tables...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all tables
 
@@ -563,7 +442,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Dropping User-Defined Table Types...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all user-defined data types
 
@@ -582,7 +461,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping User-Defined Data Types...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all user-defined data types
 
@@ -601,7 +480,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping User-Defined Functions...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop all user-defined functions
 
@@ -619,7 +498,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping XML Schema Collections...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop XML schema collections
 
@@ -642,7 +521,7 @@ EXEC sp_executesql @dynsql
 					Console.WriteLine("=> Dropping Default Types...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop default types
 
@@ -659,7 +538,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Dropping User Schemas...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Drop user schemas
 
@@ -680,7 +559,7 @@ EXEC sp_executesql @sql
 					Console.WriteLine("=> Restoring multi-user mode...");
 					await Sql.ExecuteAsync(new SqlExecuteSettings
 					{
-						ConnectionString = settings.TargetConnectionString,
+						ConnectionString = applicationState.TargetConnectionString,
 						CommandText = @"
 -- Switch to multi user mode
 
@@ -701,7 +580,7 @@ EXEC sp_executesql @sqlfinish2
 	/// </summary>
 	/// <param name="connectionString"></param>
 	/// <returns></returns>
-	public static async Task<List<string>> LoadUserTableNames(string connectionString)
+	public static async Task<List<string>> LoadUserTableNamesAsync(string connectionString)
 	{
 		var tableNameList = new List<string>();
 		

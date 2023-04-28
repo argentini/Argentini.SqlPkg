@@ -29,8 +29,8 @@ public class AppInstance
         // args = new[]
         // {
         //     "/a:backup",
-        //     "/TargetFile:\"Database/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database/athepedia.log\"",
+        //     "/TargetFile:\"Database Backups/athepedia.bacpac\"",
+        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
         //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
         //     "/p:ExcludeTableData=[dbo].[umbracoLog2]",
         //     "/p:ExcludeTableData=[dbo].[umbracoLog3]",
@@ -43,8 +43,8 @@ public class AppInstance
         // args = new[]
         // {
         //     "/a:Restore",
-        //     "/SourceFile:\"Database/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database/athepedia.log\"",
+        //     "/SourceFile:\"Database Backups/athepedia.bacpac\"",
+        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
         //     "/TargetServerName:sqlserver,1433",
         //     "/TargetDatabaseName:temp",
         //     "/TargetUser:sa",
@@ -85,8 +85,6 @@ public class AppInstance
                 Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
                 Console.WriteLine();
                 
-                #region Backup Database as BACPAC
-
                 AppState.BuildBackupArguments();
                 
                 await AppState.ProcessTableDataArguments();
@@ -99,8 +97,6 @@ public class AppInstance
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
-                
-                #endregion
             }
 
             else if (AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
@@ -109,8 +105,6 @@ public class AppInstance
 
                 Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
                 Console.WriteLine();
-                
-                #region Restore Database from BACPAC
                 
                 AppState.BuildRestoreArguments();
                 
@@ -124,8 +118,6 @@ public class AppInstance
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
-                
-                #endregion
             }
         }
 

@@ -181,6 +181,24 @@ public class ApplicationState
 
 	    #endregion
     }
+
+    /// <summary>
+    /// Ensure the directory path exists for a given argument file path.
+    /// </summary>
+    /// <param name="argumentName"></param>
+    /// <param name="argumentNameAbbrev"></param>
+    private void EnsureDirectoryExists(string argumentName, string argumentNameAbbrev)
+    {
+	    var targetFilePath = WorkingArguments.GetArgumentValue(argumentName, argumentNameAbbrev).RemoveWrappedQuotes();
+	    
+	    if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false)
+		    return;
+
+	    var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
+        
+	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
+		    Directory.CreateDirectory(directoryPath);
+    }
     
     /// <summary>
     /// Process CLI arguments into WorkingArguments.
@@ -208,17 +226,8 @@ public class ApplicationState
 		    Value = $"\"{SourceConnectionString}\""
 	    });
 
-	    var targetFilePath = WorkingArguments.GetArgumentValue("/TargetFile:", "/tf:");
-	    
-	    if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false)
-		    return;
-
-	    var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
-        
-	    if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
-		    Directory.CreateDirectory(directoryPath);
-	    
-	    File.Delete(targetFilePath);
+	    EnsureDirectoryExists("/TargetFile:", "/tf:");
+	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
 
 	    WorkingArguments.SetDefault("/p:VerifyExtraction=", "false");
     }
@@ -248,6 +257,8 @@ public class ApplicationState
 		    Key = "/TargetConnectionString:",
 		    Value = $"\"{TargetConnectionString}\""
 	    });
+	    
+	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
     }
     
     /// <summary>

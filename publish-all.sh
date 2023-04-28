@@ -11,3 +11,10 @@ cp -r Argentini.SqlPkg/bin/Release/net7.0/osx-arm64/publish Installers/macOS-Arm
 cp -r Argentini.SqlPkg/bin/Release/net7.0/osx-x64/publish Installers/macOS-x64/
 cp -r Argentini.SqlPkg/bin/Release/net7.0/win-arm64/publish Installers/Windows-Arm64/
 cp -r Argentini.SqlPkg/bin/Release/net7.0/win-x64/publish Installers/Windows-x64/
+
+cp blank.dacpac Installers/Linux-Arm64/publish/
+cp blank.dacpac Installers/Linux-x64/publish/
+cp blank.dacpac Installers/macOS-Arm64/publish/
+cp blank.dacpac Installers/macOS-x64/publish/
+cp blank.dacpac Installers/Windows-Arm64/publish/
+cp blank.dacpac Installers/Windows-x64/publish/

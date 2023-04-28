@@ -264,6 +264,23 @@ public static class Strings
 	
 	#region Transform
 
+	/// <summary>
+	/// Fixes folder paths that have duplicate separator characters, replaces "~" with the
+	/// user's home path, and ensures a trailing path separator.
+	/// </summary>
+	/// <param name="folderPath">Folder path to process</param>
+	/// <returns>A processed folder path</returns>
+	public static string ProcessFolderPath(this string folderPath)
+	{
+		var result = folderPath.Trim(new[] { '\"' });
+
+		result = result.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+		result = result.Replace($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", $"{Path.DirectorySeparatorChar}");
+		result = Path.GetFullPath(result).TrimEnd(new [] { Path.DirectorySeparatorChar }) + Path.DirectorySeparatorChar;
+
+		return result;
+	}
+	
 	public static string RemoveWrappedQuotes(this string value)
 	{
 		var result = value;

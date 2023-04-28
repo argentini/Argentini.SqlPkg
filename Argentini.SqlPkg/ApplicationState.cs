@@ -360,6 +360,53 @@ public class ApplicationState
     #region App Info
 
     /// <summary>
+    /// Get the path to the currently executing application. Identifies local project source
+    /// path as well as an executing assembly based on the existence of the HELP.txt file.
+    /// </summary>
+    /// <returns>Application folder path</returns>
+    public static string GetAppPath()
+    {
+	    var path = AppContext.BaseDirectory;
+	    var result = path.ProcessFolderPath();
+	    var filePath = result + "blank.dacpac";
+
+	    if (File.Exists(filePath))
+		    return result;
+        
+	    result = Directory.GetCurrentDirectory().ProcessFolderPath();
+	    filePath = result + "blank.dacpac";
+
+	    if (File.Exists(filePath) == false)
+		    result = string.Empty;
+
+	    #region Fallback When Debugging...
+
+	    if (string.IsNullOrEmpty(result) == false)
+		    return result;
+	    
+	    result = Directory.GetCurrentDirectory().ProcessFolderPath();
+
+	    if (result.ToLower().Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "debug"))
+	    {
+		    result = result.Left(Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            
+		    filePath = result + "blank.dacpac";
+
+		    if (File.Exists(filePath) == false)
+			    result = string.Empty;
+	    }
+
+	    else
+	    {
+		    result = string.Empty;
+	    }
+
+	    #endregion        
+        
+	    return result;
+    }
+    
+    /// <summary>
     /// Determine if SqlPackage is installed.
     /// </summary>
     /// <returns></returns>

@@ -26,19 +26,19 @@ public class AppInstance
 
         #region Backup Debug Test
 
-        args = new[]
-        {
-            "/a:backup",
-            "/TargetFile:\"Database Backups/athepedia.bacpac\"",
-            "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
-            "/p:ExcludeTableData=[dbo].[umbracoLog]",
-            "/p:ExcludeTableData=[dbo].[umbracoLog2]",
-            "/p:ExcludeTableData=[dbo].[umbracoLog3]",
-            "/SourceServerName:sqlserver,1433",
-            "/SourceDatabaseName:athepedia",
-            "/SourceUser:sa",
-            "/SourcePassword:'P@ssw0rdz!'"
-        };
+        // args = new[]
+        // {
+        //     "/a:backup",
+        //     "/TargetFile:\"Database Backups/athepedia.bacpac\"",
+        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog2]",
+        //     "/p:ExcludeTableData=[dbo].[umbracoLog3]",
+        //     "/SourceServerName:sqlserver,1433",
+        //     "/SourceDatabaseName:athepedia",
+        //     "/SourceUser:sa",
+        //     "/SourcePassword:'P@ssw0rdz!'"
+        // };
 
         // args = new[]
         // {

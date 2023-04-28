@@ -26,19 +26,19 @@ public class AppInstance
 
         #region Backup Debug Test
 
-        // args = new[]
-        // {
-        //     "/a:backup",
-        //     "/TargetFile:\"Database Backups/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog2]",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog3]",
-        //     "/SourceServerName:sqlserver,1433",
-        //     "/SourceDatabaseName:athepedia",
-        //     "/SourceUser:sa",
-        //     "/SourcePassword:'P@ssw0rdz!'"
-        // };
+        args = new[]
+        {
+            "/a:backup",
+            "/TargetFile:\"Database Backups/athepedia.bacpac\"",
+            "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
+            "/p:ExcludeTableData=[dbo].[umbracoLog]",
+            "/p:ExcludeTableData=[dbo].[umbracoLog2]",
+            "/p:ExcludeTableData=[dbo].[umbracoLog3]",
+            "/SourceServerName:sqlserver,1433",
+            "/SourceDatabaseName:athepedia",
+            "/SourceUser:sa",
+            "/SourcePassword:'P@ssw0rdz!'"
+        };
 
         // args = new[]
         // {
@@ -62,10 +62,18 @@ public class AppInstance
 
         AppState.ImportArguments(args);
         
-        var title = $"SQLPKG for SqlPackage {AppState.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action.ToUpper())} MODE —{{{{gap}}}}{Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); CLR {Identify.GetRuntimeVersion()}".FillWidth(ApplicationState.ColumnWidth);
-        
-        Console.WriteLine(title);
-        Console.WriteLine(CliOutputHelpers.GetHeaderBar().Repeat(ApplicationState.ColumnWidth));
+        // var title = $"SQLPKG for SqlPackage {AppState.Version}{{{{gap}}}}— {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action.ToUpper())} MODE —{{{{gap}}}}{Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); CLR {Identify.GetRuntimeVersion()}".FillWidth(ApplicationState.ColumnWidth);
+        // Console.WriteLine(title);
+        // Console.WriteLine(CliOutputHelpers.GetHeaderBar().Repeat(ApplicationState.ColumnWidth));
+
+        Console.WriteLine();
+        Console.WriteLine("SqlPkg: Command-line tool for backing up and restoring SQL Server databases with Microsoft SqlPackage.");
+        Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); .NET {Identify.GetRuntimeVersion()}");
+        Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+        Console.WriteLine();
+        Console.Write("Action    ");
+        CliOutputHelpers.WriteBar();
+        Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
         Console.WriteLine();
 
         if (await AppState.SqlPackageIsInstalled() == false)
@@ -204,9 +212,11 @@ public class AppInstance
         Console.Write("Complete  ");
         CliOutputHelpers.WriteBar();
         Console.WriteLine("  " + CliOutputHelpers.GetDateTime());
-        Console.Write(" ".Repeat(10));
+        Console.WriteLine();
+        
+        Console.Write("Elapsed   ");
         CliOutputHelpers.WriteBar();
-        Console.WriteLine($"  {elapsed} Total Time");
+        Console.WriteLine($"  {elapsed}");
         Console.WriteLine();
 
         return resultCode;

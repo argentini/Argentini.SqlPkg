@@ -33,17 +33,17 @@ public static class CliOutputHelpers
 	/// <summary>
 	/// Arrow for console output (Windows)
 	/// </summary>
-	public static string Arrow => " → ";
+	public static string Arrow => "→ ";
 
 	/// <summary>
 	/// Arrow for console output (Linux)
 	/// </summary>
-	public static string ArrowLinux => " ➜  ";
+	public static string ArrowLinux => "➜  ";
 
 	/// <summary>
 	/// Arrow for console output (Mac)
 	/// </summary>
-	public static string ArrowMac => " → ";
+	public static string ArrowMac => "→ ";
 
 	/// <summary>
 	/// Indentation for console output (Windows)
@@ -102,7 +102,7 @@ public static class CliOutputHelpers
     public static string GetDateTime()
     {
 	    // Thu-2018-May-10 @ 12:30 PM
-	    return DateTime.Now.ToString("ddd-dd-MMM-yyyy @ ") + DateTime.Now.ToString("h:mm tt");
+	    return DateTime.Now.ToString("ddd-dd-MMM-yyyy @ ") + DateTime.Now.ToString("h:mm:ss tt");
     }
 	
     /// <summary>

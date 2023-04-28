@@ -98,11 +98,19 @@ public class AppInstance
                 
                 await AppState.ProcessTableDataArguments();
                 
+                // Console.WriteLine();
+                // Console.WriteLine(AppState.GetWorkingArgumentsStringForCli());
+                // Console.WriteLine();
+                
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.GetWorkingArgumentsForCli())
+                    .WithArguments(AppState.GetWorkingArgumentsStringForCli())
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
+                // Console.WriteLine();
+                // Console.WriteLine(cmd.Arguments);
+                // Console.WriteLine();
+                
                 var result = await cmd.ExecuteAsync();
 
                 resultCode = result.ExitCode;
@@ -120,7 +128,7 @@ public class AppInstance
                 await SqlTools.PurgeOrCreateDatabaseAsync(AppState);
                 
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.GetWorkingArgumentsForCli())
+                    .WithArguments(AppState.GetWorkingArgumentsStringForCli())
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 

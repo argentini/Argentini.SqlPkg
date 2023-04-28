@@ -71,6 +71,7 @@ public class AppInstance
         Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); .NET {Identify.GetRuntimeVersion()}");
         Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
         Console.WriteLine();
+        
         Console.Write("Action    ");
         CliOutputHelpers.WriteBar();
         Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
@@ -131,7 +132,7 @@ public class AppInstance
 
         else if (string.IsNullOrEmpty(AppState.Action) == false)
         {
-            Console.Write("Started      ");
+            Console.Write("Started   ");
             CliOutputHelpers.WriteBar();
             Console.WriteLine("  " + CliOutputHelpers.GetDateTime());
             

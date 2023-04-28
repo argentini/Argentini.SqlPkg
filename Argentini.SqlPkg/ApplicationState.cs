@@ -181,30 +181,6 @@ public class ApplicationState
 
 	    #endregion
     }
-
-    private void WrapPathsInQuotes()
-    {
-	    var pathArguments = new []
-	    {
-		    "/SourceFile:",
-		    "/sf:",
-		    "/TargetFile:",
-		    "/tf:",
-		    "/DiagnosticsFile:",
-		    "/df:",
-		    "/ModelFilePath:",
-		    "/mfp:",
-		    "/p:TempDirectoryForTableData="
-	    };
-	    
-	    foreach (var argument in WorkingArguments)
-	    {
-		    if (pathArguments.Contains(argument.Key, StringComparer.CurrentCultureIgnoreCase))
-		    {
-			    argument.Value = $"\"{argument.Value.RemoveWrappedQuotes()}\"";
-		    }
-	    }
-    }
     
     /// <summary>
     /// Ensure the directory path exists for a given argument file path.
@@ -247,14 +223,14 @@ public class ApplicationState
 	    WorkingArguments.Insert(1, new CliArgument
 	    {
 		    Key = "/SourceConnectionString:",
-		    Value = $"\"{SourceConnectionString.RemoveWrappedQuotes()}\""
+		    Value = SourceConnectionString.RemoveWrappedQuotes()
 	    });
 
 	    EnsureDirectoryExists("/TargetFile:", "/tf:");
 	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
 
 	    WorkingArguments.SetDefault("/p:VerifyExtraction=", "false");
-	    WrapPathsInQuotes();
+	    WorkingArguments.WrapPathsInQuotes();
     }
     
     /// <summary>
@@ -280,11 +256,11 @@ public class ApplicationState
 	    WorkingArguments.Insert(1, new CliArgument
 	    {
 		    Key = "/TargetConnectionString:",
-		    Value = $"\"{TargetConnectionString.RemoveWrappedQuotes()}\""
+		    Value = TargetConnectionString.RemoveWrappedQuotes()
 	    });
 	    
 	    EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
-	    WrapPathsInQuotes();
+	    WorkingArguments.WrapPathsInQuotes();
     }
     
     /// <summary>
@@ -370,40 +346,6 @@ public class ApplicationState
 
             #endregion
         }
-    }
-
-    /// <summary>
-    /// Assemble the WorkingArguments into a string for the CLI.
-    /// </summary>
-    /// <returns></returns>
-    public string GetWorkingArgumentsStringForCli()
-    {
-	    var result = new StringBuilder();
-
-	    foreach (var argument in WorkingArguments)
-	    {
-		    result.Append(argument.Key);
-		    result.Append(argument.Value);
-		    result.Append(' ');
-	    }
-
-	    return result.ToString().TrimEnd();
-    }
-
-    /// <summary>
-    /// Assemble the WorkingArguments into a string array for the CLI.
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<string> GetWorkingArgumentsForCli()
-    {
-	    var result = new List<string>();
-
-	    foreach (var argument in WorkingArguments)
-	    {
-		    result.Add(argument.Key + argument.Value);
-	    }
-
-	    return result.ToArray();
     }
     
     #endregion

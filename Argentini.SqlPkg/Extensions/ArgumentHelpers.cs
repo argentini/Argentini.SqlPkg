@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Argentini.SqlPkg.Extensions;
 
 public static class ArgumentHelpers
@@ -106,5 +108,56 @@ public static class ArgumentHelpers
         return arguments.First(a =>
             a.Key.Equals(argumentName, StringComparison.CurrentCultureIgnoreCase) ||
             (string.IsNullOrEmpty(argumentNameAbbrev) == false && a.Key.Equals(argumentNameAbbrev, StringComparison.CurrentCultureIgnoreCase))).Value;
+    }
+
+    /// <summary>
+    /// Ensure all required argument values are wrapped in quotes.
+    /// </summary>
+    /// <param name="arguments"></param>
+    public static void WrapPathsInQuotes(this List<CliArgument> arguments)
+    {
+        var pathArguments = new []
+        {
+            "/SourceConnectionString:",
+            "/scs:",
+            "/SourceFile:",
+            "/sf:",
+            "/TargetConnectionString:",
+            "/tcs:",
+            "/TargetFile:",
+            "/tf:",
+            "/DiagnosticsFile:",
+            "/df:",
+            "/ModelFilePath:",
+            "/mfp:",
+            "/p:TempDirectoryForTableData="
+        };
+	    
+        foreach (var argument in arguments)
+        {
+            if (pathArguments.Contains(argument.Key, StringComparer.CurrentCultureIgnoreCase))
+            {
+                argument.Value = $"\"{argument.Value.RemoveWrappedQuotes()}\"";
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Assemble the WorkingArguments into a string for the CLI.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <returns></returns>
+    public static string GetArgumentsStringForCli(this List<CliArgument> arguments)
+    {
+        var result = new StringBuilder();
+
+        foreach (var argument in arguments)
+        {
+            result.Append(argument.Key);
+            result.Append(argument.Value);
+            result.Append(' ');
+        }
+
+        return result.ToString().TrimEnd();
     }
 }

@@ -103,7 +103,7 @@ public class AppInstance
                 // Console.WriteLine();
                 
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.GetWorkingArgumentsStringForCli())
+                    .WithArguments(AppState.WorkingArguments.GetArgumentsStringForCli())
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
@@ -128,7 +128,7 @@ public class AppInstance
                 await SqlTools.PurgeOrCreateDatabaseAsync(AppState);
                 
                 var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.GetWorkingArgumentsStringForCli())
+                    .WithArguments(AppState.WorkingArguments.GetArgumentsStringForCli())
                     .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                     .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
@@ -152,8 +152,10 @@ public class AppInstance
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
             Console.WriteLine();
             
+            AppState.OriginalArguments.WrapPathsInQuotes();
+            
             var cmd = Cli.Wrap("SqlPackage")
-                .WithArguments(string.Join(" ", args))
+                .WithArguments(AppState.OriginalArguments.GetArgumentsStringForCli())
                 .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
                 .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 

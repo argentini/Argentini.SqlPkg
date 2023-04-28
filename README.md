@@ -38,7 +38,7 @@ Here's a restore example:
 sqlpkg /Action:Restore /SourceFile:MyDatabaseBackup.bacpac /DiagnosticsFile:MyDatabaseBackup.log /TargetServerName:mydatabase.net,1433 /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
 ```
 
-Keep in mind that you may need to escape certain characters in your argument list based on the console applications being used. For example, Bash needs brackets encoded, unless you wrap the argument value in apostrophes, like below:
+Keep in mind that you may need to escape certain characters in your argument list based on the console application being used. For example, Bash needs brackets encoded unless you wrap the argument value in apostrophes, like below:
 
 ```
 sqlpkg /Action:Backup ... /p:ExcludeTableData='[dbo].[IpAddresses]'

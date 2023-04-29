@@ -38,7 +38,7 @@ public class ApplicationState
     {
         foreach (var arg in args)
         {
-            if (arg.Length <= 5)
+            if (arg == null || arg.Length < 2)
                 continue;
 
             var delimiter = arg.StartsWith("/p:", StringComparison.CurrentCultureIgnoreCase) ? '=' : ':';
@@ -46,8 +46,8 @@ public class ApplicationState
             
             OriginalArguments.Add(new CliArgument
             {
-	            Key = $"{arg[..delimiterIndex]}{delimiter}",
-	            Value = arg[^(arg.Length - delimiterIndex - 1)..]
+	            Key = delimiterIndex > 0 ? $"{arg[..delimiterIndex]}{delimiter}" : arg,
+	            Value = delimiterIndex > -1 ? arg[^(arg.Length - delimiterIndex - 1)..] : string.Empty
             });
         }
 
@@ -370,7 +370,7 @@ public class ApplicationState
 
 	    if (result.ToLower().Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "debug"))
 	    {
-		    result = result.Left(Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+		    result = result.Left(Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar;
             
 		    filePath = result + "blank.dacpac";
 

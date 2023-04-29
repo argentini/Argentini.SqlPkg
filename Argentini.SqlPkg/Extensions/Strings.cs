@@ -322,7 +322,8 @@ public static class Strings
 
 		result = result.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 		result = result.Replace($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", $"{Path.DirectorySeparatorChar}");
-		result = Path.GetFullPath(result).TrimEnd(new [] { Path.DirectorySeparatorChar }) + Path.DirectorySeparatorChar;
+        result = result.Replace($"{Path.AltDirectorySeparatorChar}{Path.AltDirectorySeparatorChar}", $"{Path.DirectorySeparatorChar}");
+        result = Path.GetFullPath(result).TrimEnd(new [] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) + Path.DirectorySeparatorChar;
 
 		return result;
 	}
@@ -840,9 +841,9 @@ public static class Strings
 	{
 		if (filePath == null || filePath.IsEmpty()) return string.Empty;
 		
-		var separator = filePath.Contains(Path.DirectorySeparatorChar) ? Path.DirectorySeparatorChar.ToString() : "/";
+		var separator = filePath.Contains(Path.DirectorySeparatorChar) ? Path.DirectorySeparatorChar.ToString() : Path.AltDirectorySeparatorChar.ToString();
 
-		if (filePath.EndsWith(separator))
+        if (filePath.EndsWith(separator))
 			return string.Empty;
 
 		var x = filePath.LastIndexOf(separator, StringComparison.Ordinal);

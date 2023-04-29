@@ -20,37 +20,39 @@ public class AppInstance
     public async Task<int> Run(IEnumerable<string> args)
     {
         var resultCode = 0;
-        
+
         #region Backup Debug Test
 
-        // args = new[]
-        // {
+        //args = new[]
+        //{
+        //     "/?"
+        // };
+
+        //args = new[]
+        //{
         //     "/a:backup",
-        //     "/TargetFile:\"Database Backups/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
+        //     "/TargetFile:\"Database Backups/AdventureWorks2019.bacpac\"",
+        //     "/DiagnosticsFile:\"Database Backups/Logs/AdventureWorks2019.log\"",
         //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog2]",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog3]",
         //     "/SourceServerName:sqlserver,1433",
-        //     "/SourceDatabaseName:athepedia",
+        //     "/SourceDatabaseName:AdventureWorks2019",
         //     "/SourceUser:sa",
         //     "/SourcePassword:'P@ssw0rdz!'"
         // };
 
-        // args = new[]
-        // {
+        //args = new[]
+        //{
         //     "/a:Restore",
-        //     "/SourceFile:\"Database Backups/athepedia.bacpac\"",
-        //     "/DiagnosticsFile:\"Database Backups/Logs/athepedia.log\"",
+        //     "/SourceFile:\"Database Backups/AdventureWorks2019.bacpac\"",
+        //     "/DiagnosticsFile:\"Database Backups/Logs/AdventureWorks2019.log\"",
         //     "/TargetServerName:sqlserver,1433",
         //     "/TargetDatabaseName:temp",
         //     "/TargetUser:sa",
-        //     "/TargetPassword:P@ssw0rdz!",
-        //     //"/p:ExcludeObjectTypes=Filegroups;Files;FileTables;PartitionFunctions;PartitionSchemes;ServerTriggers;DatabaseTriggers"
+        //     "/TargetPassword:P@ssw0rdz!"
         // };
-        
+
         #endregion
-        
+
         var timer = new Stopwatch();
 
         timer.Start();
@@ -112,7 +114,7 @@ public class AppInstance
             }
         }
 
-        else if (string.IsNullOrEmpty(AppState.Action) == false)
+        else if (string.IsNullOrEmpty(AppState.Action) == false || AppState.OriginalArguments.Count > 0)
         {
             Console.Write("Started   ");
             CliHelpers.WriteBar();

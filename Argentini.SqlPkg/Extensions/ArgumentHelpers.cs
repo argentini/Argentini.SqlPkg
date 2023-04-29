@@ -120,7 +120,7 @@ public static class ArgumentHelpers
     {
         var targetFilePath = arguments.GetArgumentValue(argumentName, argumentNameAbbrev).RemoveWrappedQuotes();
 	    
-        if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false)
+        if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false && targetFilePath.Contains(Path.AltDirectorySeparatorChar) == false)
             return;
 
         var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;

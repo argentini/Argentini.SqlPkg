@@ -1,6 +1,4 @@
-using System.Text;
 using Argentini.SqlPkg.Extensions;
-using CliWrap;
 using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg;
@@ -394,23 +392,20 @@ public class ApplicationState
     /// Determine if SqlPackage is installed.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> SqlPackageIsInstalled()
+    public static async Task<bool> SqlPackageIsInstalled()
     {
-	    var sb = new StringBuilder();
-	    var cmd = Cli.Wrap("SqlPackage")
-		    .WithArguments(arguments => { arguments.Add("/version:true"); })
-		    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(sb))
-		    .WithStandardErrorPipe(PipeTarget.ToStringBuilder(sb));
-
 	    try
 	    {
-		    await cmd.ExecuteAsync();
+		    _ = await CliHelpers.ExecuteSqlPackageAsync("/version:true", false, false);
+
 		    return true;
 	    }
 
 	    catch
 	    {
-		    Console.WriteLine("ERROR => Could not execute the 'SqlPackage' command.");
+		    Console.Write("ERROR");
+		    CliHelpers.WriteArrow(true);
+			Console.WriteLine("Could not execute the 'SqlPackage' command.");
 		    Console.WriteLine("Be sure to install it using \"dotnet tool install -g microsoft.sqlpackage\".");
 		    Console.WriteLine("You will need the dotnet tool (version 6 or later) installed from \"https://dotnet.microsoft.com\" in order to install Microsoft SqlPackage.");
             

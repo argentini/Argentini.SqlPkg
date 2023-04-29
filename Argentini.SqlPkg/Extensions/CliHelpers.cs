@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using CliWrap;
 
 namespace Argentini.SqlPkg.Extensions;
 
-public static class CliOutputHelpers
+public static class CliHelpers
 {
 	#region Constants
 	
@@ -368,5 +370,52 @@ public static class CliOutputHelpers
 	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
     }
     
+    #endregion
+    
+    #region Execution
+
+    public static async Task<int> ExecuteSqlPackageAsync(string arguments = "", bool showOutput = true, bool showErrors = true)
+    {
+	    if (OperatingSystem.IsWindows())
+	    {
+		    // BEGIN: Workaround for Windows Issues with CliWrap
+
+		    var p = new Process();
+
+		    p.StartInfo.UseShellExecute = false;
+		    p.StartInfo.FileName = "sqlpackage.exe";
+		    p.StartInfo.Arguments = arguments;
+		    p.StartInfo.RedirectStandardOutput = showOutput == false;
+		    p.StartInfo.RedirectStandardError = showErrors == false;
+
+		    if (showErrors == false)
+			    p.ErrorDataReceived += (_, e) => { _ += e.Data; };
+		    
+		    p.Start();
+
+		    if (showErrors == false)
+			    p.BeginErrorReadLine();
+		    
+		    if (showOutput == false)
+			    _ = await p.StandardOutput.ReadToEndAsync();  			    
+		    
+		    await p.WaitForExitAsync();
+
+		    return p.ExitCode;
+
+		    // END: Workaround for Windows Issues with CliWrap
+	    }
+
+	    await using var stdOut = Console.OpenStandardOutput();
+	    
+	    var result = await Cli.Wrap("sqlpackage")
+		    .WithArguments(arguments)
+		    .WithStandardOutputPipe(showOutput ? PipeTarget.ToStream(stdOut) : PipeTarget.Null)
+		    .WithStandardErrorPipe(showErrors ? PipeTarget.ToStream(stdOut) : PipeTarget.Null)
+		    .ExecuteAsync();
+
+	    return result.ExitCode;
+    }
+ 
     #endregion
 }

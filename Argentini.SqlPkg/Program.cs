@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using Argentini.SqlPkg.Extensions;
-using CliWrap;
 
 namespace Argentini.SqlPkg;
 
@@ -18,12 +17,10 @@ public class AppInstance
 {
     public ApplicationState AppState { get; } = new();
 
-    public async Task<int> Run(string[] args)
+    public async Task<int> Run(IEnumerable<string> args)
     {
         var resultCode = 0;
         
-        await using var stdOut = Console.OpenStandardOutput();
-
         #region Backup Debug Test
 
         // args = new[]
@@ -71,24 +68,24 @@ public class AppInstance
         if (string.IsNullOrEmpty(AppState.Action) == false)
         {
             Console.Write("Action    ");
-            CliOutputHelpers.WriteBar();
+            CliHelpers.WriteBar();
             Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
             Console.WriteLine();
         }
 
-        if (await AppState.SqlPackageIsInstalled() == false)
+        if (await ApplicationState.SqlPackageIsInstalled() == false)
             return -1;
         
         if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
         {
             Console.Write("Started   ");
-            CliOutputHelpers.WriteBar();
-            Console.WriteLine("  " + CliOutputHelpers.GetDateTime());
+            CliHelpers.WriteBar();
+            Console.WriteLine("  " + CliHelpers.GetDateTime());
             Console.WriteLine();
             
             if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
             {
-                CliOutputHelpers.OutputBackupInfo(AppState);
+                CliHelpers.OutputBackupInfo(AppState);
                 
                 Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
                 Console.WriteLine();
@@ -96,20 +93,13 @@ public class AppInstance
                 AppState.BuildBackupArguments();
                 
                 await AppState.ProcessTableDataArguments();
-                
-                var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.WorkingArguments.GetArgumentsStringForCli())
-                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
-                
-                var result = await cmd.ExecuteAsync();
 
-                resultCode = result.ExitCode;
+                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments.GetArgumentsStringForCli());
             }
 
             else if (AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
             {
-                CliOutputHelpers.OutputRestoreInfo(AppState);
+                CliHelpers.OutputRestoreInfo(AppState);
 
                 Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
                 Console.WriteLine();
@@ -117,26 +107,19 @@ public class AppInstance
                 AppState.BuildRestoreArguments();
                 
                 await SqlTools.PurgeOrCreateDatabaseAsync(AppState);
-                
-                var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.WorkingArguments.GetArgumentsStringForCli())
-                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
 
-                var result = await cmd.ExecuteAsync();
-
-                resultCode = result.ExitCode;
+                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments.GetArgumentsStringForCli());
             }
         }
 
         else if (string.IsNullOrEmpty(AppState.Action) == false)
         {
             Console.Write("Started   ");
-            CliOutputHelpers.WriteBar();
-            Console.WriteLine("  " + CliOutputHelpers.GetDateTime());
+            CliHelpers.WriteBar();
+            Console.WriteLine("  " + CliHelpers.GetDateTime());
             
             Console.Write(" ".Repeat(10));
-            CliOutputHelpers.WriteBar();
+            CliHelpers.WriteBar();
             Console.WriteLine("  Backup/Restore Not Used, Passing Control to SqlPackage");
             Console.WriteLine();
 
@@ -148,35 +131,7 @@ public class AppInstance
             
             AppState.OriginalArguments.WrapPathsInQuotes();
             
-            if (OperatingSystem.IsWindows())
-            {
-                // BEGIN: Workaround for Windows Bug with SqlPackage
-
-                var p = new Process();
-
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.FileName = "sqlpackage.exe";
-                p.StartInfo.Arguments = AppState.OriginalArguments.GetArgumentsStringForCli();
-                p.Start();
-
-                await p.WaitForExitAsync();
-
-                resultCode = p.ExitCode;
-
-                // END: Workaround for Windows Bug with SqlPackage Help
-            }
-
-            else
-            {
-                var cmd = Cli.Wrap("SqlPackage")
-                    .WithArguments(AppState.OriginalArguments.GetArgumentsStringForCli())
-                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
-
-                var result = await cmd.ExecuteAsync();
-
-                resultCode = result.ExitCode;
-            }
+            resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.OriginalArguments.GetArgumentsStringForCli());
         }
 
         else
@@ -197,33 +152,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
             Console.WriteLine();
 
-            if (OperatingSystem.IsWindows())
-            {
-                // BEGIN: Workaround for Windows Bug with SqlPackage
-
-                var p = new Process();
-
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.FileName = "sqlpackage.exe";
-                p.Start();
-
-                await p.WaitForExitAsync();
-
-                resultCode = p.ExitCode;
-
-                // END: Workaround for Windows Bug with SqlPackage
-            }
-
-            else
-            {
-                var cmd = Cli.Wrap("SqlPackage")
-                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
-
-                var result = await cmd.ExecuteAsync();
-
-                resultCode = result.ExitCode;
-            }
+            resultCode = await CliHelpers.ExecuteSqlPackageAsync();
         }
 
         if (string.IsNullOrEmpty(AppState.Action))
@@ -239,13 +168,13 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
         Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
         Console.WriteLine();
 
-        Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliOutputHelpers.GetDateTime()}");
+        Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliHelpers.GetDateTime()}");
         Console.WriteLine();
 
-        CliOutputHelpers.OutputCompleteInfo(AppState);
+        CliHelpers.OutputCompleteInfo(AppState);
 
         Console.Write("Elapsed   ");
-        CliOutputHelpers.WriteBar();
+        CliHelpers.WriteBar();
         Console.WriteLine($"  {elapsed}");
         Console.WriteLine();
 

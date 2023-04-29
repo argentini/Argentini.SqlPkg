@@ -337,7 +337,7 @@ public class ApplicationState
     /// <summary>
     /// Column width of the console output for items that require cropping.
     /// </summary>
-    public static int ColumnWidth => 80;
+    public static int ColumnWidth => Console.WindowWidth < 80 ? 80 : Console.WindowWidth;
 
     #endregion
     

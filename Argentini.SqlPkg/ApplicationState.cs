@@ -38,7 +38,7 @@ public class ApplicationState
     {
         foreach (var arg in args)
         {
-            if (arg == null || arg.Length < 2)
+            if (string.IsNullOrEmpty(arg) || arg.Length < 2)
                 continue;
 
             var delimiter = arg.StartsWith("/p:", StringComparison.CurrentCultureIgnoreCase) ? '=' : ':';
@@ -335,7 +335,8 @@ public class ApplicationState
     /// <summary>
     /// Column width of the console output for items that require cropping.
     /// </summary>
-    public static int ColumnWidth => Console.WindowWidth < 80 ? 80 : Console.WindowWidth - 1;
+    public static int ColumnWidth => 78;
+    public static int FullColumnWidth => Console.WindowWidth - 1;
 
     #endregion
     

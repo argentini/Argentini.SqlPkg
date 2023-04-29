@@ -64,7 +64,7 @@ public class AppInstance
         Console.WriteLine();
         Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
         Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); .NET {Identify.GetRuntimeVersion()}");
-        Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
         Console.WriteLine();
 
         if (string.IsNullOrEmpty(AppState.Action) == false)
@@ -89,7 +89,7 @@ public class AppInstance
             {
                 CliHelpers.OutputBackupInfo(AppState);
                 
-                Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
                 Console.WriteLine();
                 
                 AppState.BuildBackupArguments();
@@ -103,7 +103,7 @@ public class AppInstance
             {
                 CliHelpers.OutputRestoreInfo(AppState);
 
-                Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
                 Console.WriteLine();
                 
                 AppState.BuildRestoreArguments();
@@ -125,7 +125,7 @@ public class AppInstance
             Console.WriteLine("  Backup/Restore Not Used, Passing Control to SqlPackage");
             Console.WriteLine();
 
-            Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+            Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
             
             AppState.OriginalArguments.EnsureDirectoryExists("/TargetFile:", "/df:");
@@ -151,7 +151,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
 
             helpText.WriteToConsole(ApplicationState.ColumnWidth);
             Console.WriteLine();
-            Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+            Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
 
             resultCode = await CliHelpers.ExecuteSqlPackageAsync();
@@ -167,7 +167,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
 
         Console.WriteLine();
-        Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
+        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
         Console.WriteLine();
 
         Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliHelpers.GetDateTime()}");

@@ -148,14 +148,35 @@ public class AppInstance
             
             AppState.OriginalArguments.WrapPathsInQuotes();
             
-            var cmd = Cli.Wrap("SqlPackage")
-                .WithArguments(AppState.OriginalArguments.GetArgumentsStringForCli())
-                .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+            if (OperatingSystem.IsWindows())
+            {
+                // BEGIN: Workaround for Windows Bug with SqlPackage
 
-            var result = await cmd.ExecuteAsync();
+                var p = new Process();
 
-            resultCode = result.ExitCode;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.FileName = "sqlpackage.exe";
+                p.StartInfo.Arguments = AppState.OriginalArguments.GetArgumentsStringForCli();
+                p.Start();
+
+                await p.WaitForExitAsync();
+
+                resultCode = p.ExitCode;
+
+                // END: Workaround for Windows Bug with SqlPackage Help
+            }
+
+            else
+            {
+                var cmd = Cli.Wrap("SqlPackage")
+                    .WithArguments(AppState.OriginalArguments.GetArgumentsStringForCli())
+                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+                var result = await cmd.ExecuteAsync();
+
+                resultCode = result.ExitCode;
+            }
         }
 
         else
@@ -178,7 +199,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
 
             if (OperatingSystem.IsWindows())
             {
-                // BEGIN: Workaround for Windows 11 Bug with SqlPackage Help Mode
+                // BEGIN: Workaround for Windows Bug with SqlPackage
 
                 var p = new Process();
 
@@ -190,7 +211,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
 
                 resultCode = p.ExitCode;
 
-                // END: Workaround for Windows 11 Bug with SqlPackage Help Mode
+                // END: Workaround for Windows Bug with SqlPackage
             }
 
             else

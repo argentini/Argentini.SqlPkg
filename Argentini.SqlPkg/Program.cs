@@ -176,14 +176,32 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             Console.WriteLine("▬".Repeat(ApplicationState.ColumnWidth));
             Console.WriteLine();
 
-            var cmd = Cli.Wrap("SqlPackage")
-                .WithArguments(string.Join(" ", args))
-                .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
-                .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+            if (OperatingSystem.IsWindows())
+            {
+                // BEGIN: Workaround for Windows 11 Bug with SqlPackage Help Mode
 
-            var result = await cmd.ExecuteAsync();
+                Process p;
+                p = new Process();
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.FileName = "sqlpackage.exe";
+                p.Start();
+                p.WaitForExit();
 
-            resultCode = result.ExitCode;
+                resultCode = p.ExitCode;
+
+                // END: Workaround for Windows 11 Bug with SqlPackage Help Mode
+            }
+
+            else
+            {
+                var cmd = Cli.Wrap("SqlPackage")
+                    .WithStandardOutputPipe(PipeTarget.ToStream(stdOut))
+                    .WithStandardErrorPipe(PipeTarget.ToStream(stdOut));
+
+                var result = await cmd.ExecuteAsync();
+
+                resultCode = result.ExitCode;
+            }
         }
 
         if (string.IsNullOrEmpty(AppState.Action))

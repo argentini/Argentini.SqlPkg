@@ -180,12 +180,13 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             {
                 // BEGIN: Workaround for Windows 11 Bug with SqlPackage Help Mode
 
-                Process p;
-                p = new Process();
+                var p = new Process();
+
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.FileName = "sqlpackage.exe";
                 p.Start();
-                p.WaitForExit();
+
+                await p.WaitForExitAsync();
 
                 resultCode = p.ExitCode;
 

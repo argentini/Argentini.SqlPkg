@@ -167,7 +167,7 @@ SqlPkg can be used in 'Backup' or 'Restore' action modes, which are functionally
     Accepts all Action:Export arguments, and also provides /ExcludeTableData: which is functionally equivalent to /TableData: but excludes the specified tables. Can be listed multiple times to exclude multiple tables.
 
 /Action:Restore (/a:Restore)
-    Accepts all Action:Import arguments. This mode will always fully erase the target database prior to restoring the .bacpac file, so there's no need to create a new database each time.
+    Accepts all Action:Import arguments. This mode will always fully erase the target database or create a new database if none is found, prior to restoring the .bacpac file.
 
 For convenience, you can also use SqlPkg in place of SqlPackage for all other operations as all arguments are passed through.";
 

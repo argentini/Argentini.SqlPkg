@@ -52,7 +52,7 @@ sqlpkg /Action:Restore /SourceFile:'Backups/Local/MyBackup.bacpac' /TargetServer
 
 Here's a *Restore* example for PowerShell:
 
-```bash
+```powershell
 sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServerName:"mydatabase.net,1433" /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
 ```
 

@@ -10,23 +10,23 @@ The following SqlPackage action modes provide enhanced features.
 
 This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the following differences.
 
-- `/Action:Export` is used.
 - Specify one or more `/p:ExcludeTableData=` properties to exclude sepcific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
 - `/SourceTrustServerCertificate:` defaults to `true`.
 - `/SourceTimeout:` defaults to `30`.
 - `/CommandTimeout:` defaults to `120`.
 - `/p:VerifyExtraction=` defaults to `false`.
+- Destination file paths will be created if they do not exist.
 
 ### /Action:Restore
 
 This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
 
-- `/Action:Import` is used.
 - The destination database will be purged of all user objects (tables, views, etc.) before the restoration.
 - If the destination database doesn't exist it will be created.
 - `/TargetTrustServerCertificate:` defaults to `true`.
 - `/TargetTimeout:` defaults to `30`.
 - `/CommandTimeout:` defaults to `120`.
+- Destination file paths will be created if they do not exist.
 
 ### Other Actions
 
@@ -36,22 +36,28 @@ When not using Backup or Restore modes, the entire argument list is simply piped
 
 You use SqlPkg as you would use the Microsoft SqlPackage CLI application. All arguments are passed to SqlPackage as-is, but some default values have been changed to make using it easier, like defaulting to ignore permissions and to accept server certificates.
 
-Here's a backup example:
+Here's a backup example for Bash:
 
-```
-sqlpkg /Action:Backup /TargetFile:MyDatabaseBackup.bacpac /DiagnosticsFile:MyDatabaseBackup.log /SourceServerName:mydatabase.net,1433 /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
-```
-
-Here's a restore example:
-
-```
-sqlpkg /Action:Restore /SourceFile:MyDatabaseBackup.bacpac /DiagnosticsFile:MyDatabaseBackup.log /TargetServerName:mydatabase.net,1433 /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
+```bash
+sqlpkg /Action:Backup /TargetFile:'Backups/Local/MyBackup.bacpac' /SourceServerName:'mydatabase.net,1433' /SourceDatabaseName:'MyDatabase' /SourceUser:'sa' /SourcePassword:'MyP@ssw0rd' /p:ExcludeTableData='[dbo].[Log]' /p:ExcludeTableData='[dbo].[IpAddresses]'
 ```
 
-Keep in mind that you may need to escape certain characters in your argument list based on the console application being used. For example, Bash needs brackets encoded unless you wrap the argument value in apostrophes, like below:
+Here's a backup example for PowerShell:
 
+```powershell
+sqlpkg /Action:Backup /TargetFile:"Backups/Local/MyBackup.bacpac" /SourceServerName:"mydatabase.net,1433" /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
 ```
-sqlpkg /Action:Backup ... /p:ExcludeTableData='[dbo].[IpAddresses]'
+
+Here's a restore example for Bash:
+
+```bash
+sqlpkg /Action:Restore /SourceFile:'Backups/Local/MyBackup.bacpac' /TargetServerName:'mydatabase.net,1433' /TargetDatabaseName:'MyDatabase' /TargetUser:'sa' /TargetPassword:'MyP@ssw0rd'
+```
+
+Here's a restore example for PowerShell:
+
+```bash
+sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServerName:"mydatabase.net,1433" /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
 ```
 
 ## Installation

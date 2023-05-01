@@ -17,7 +17,7 @@ This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the 
 This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
 
 - The destination database will be purged of all user objects (tables, views, etc.), except security objects, before the restoration.
-- If the destination database doesn't exist, one will be created.
+- If the destination database doesn't exist it will be created.
 
 ### Other Actions
 

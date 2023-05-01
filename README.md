@@ -28,33 +28,29 @@ This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the
 - `/CommandTimeout:` defaults to `120`.
 - Destination file paths will be created if they do not exist.
 
-### Other Actions
-
-When not using Backup or Restore modes, the entire argument list is simply piped to SqlPackage and will run normally. So you can use `sqlpkg` everywhere SqlPackage is used.
-
 ## Usage
 
-You use SqlPkg as you would use the Microsoft SqlPackage CLI application. All arguments are passed to SqlPackage as-is, but some default values have been changed to make using it easier, like defaulting to ignore permissions and to accept server certificates.
+You can use SqlPkg as you would use the Microsoft SqlPackage CLI application. When not using *Backup* or *Restore* modes, the entire argument list is simply piped to SqlPackage and will run normally. So you can use `sqlpkg` everywhere SqlPackage is used.
 
-Here's a backup example for Bash:
+Here's a *Backup* example for Bash:
 
 ```bash
 sqlpkg /Action:Backup /TargetFile:'Backups/Local/MyBackup.bacpac' /SourceServerName:'mydatabase.net,1433' /SourceDatabaseName:'MyDatabase' /SourceUser:'sa' /SourcePassword:'MyP@ssw0rd' /p:ExcludeTableData='[dbo].[Log]' /p:ExcludeTableData='[dbo].[IpAddresses]'
 ```
 
-Here's a backup example for PowerShell:
+Here's a *Backup* example for PowerShell:
 
 ```powershell
 sqlpkg /Action:Backup /TargetFile:"Backups/Local/MyBackup.bacpac" /SourceServerName:"mydatabase.net,1433" /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
 ```
 
-Here's a restore example for Bash:
+Here's a *Restore* example for Bash:
 
 ```bash
 sqlpkg /Action:Restore /SourceFile:'Backups/Local/MyBackup.bacpac' /TargetServerName:'mydatabase.net,1433' /TargetDatabaseName:'MyDatabase' /TargetUser:'sa' /TargetPassword:'MyP@ssw0rd'
 ```
 
-Here's a restore example for PowerShell:
+Here's a *Restore* example for PowerShell:
 
 ```bash
 sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServerName:"mydatabase.net,1433" /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
@@ -70,11 +66,11 @@ According to the SqlPackage [website](https://learn.microsoft.com/en-us/sql/tool
 dotnet tool install -g microsoft.sqlpackage
 ```
 
-This requires that you already have the Microsoft dotnet CLI tool installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+This requires that you already have dotnet installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
 
 ### 2. Install SqlPkg
 
-Download the latest release and follow the instructions in the release for your operating system and platform.
+Download the [latest release](https://github.com/argentini/Argentini.SqlPkg/releases) (zip file) for your operating system and CPU architecture and follow the instructions in the README file.
 
 ## Project Status
 

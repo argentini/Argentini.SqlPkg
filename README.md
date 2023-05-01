@@ -10,14 +10,23 @@ The following SqlPackage action modes provide enhanced features.
 
 This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the following differences.
 
+- `/Action:Export` is used.
 - Specify one or more `/p:ExcludeTableData=` properties to exclude sepcific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
+- `/SourceTrustServerCertificate:` defaults to `true`.
+- `/SourceTimeout:` defaults to `30`.
+- `/CommandTimeout:` defaults to `120`.
+- `/p:VerifyExtraction=` defaults to `false`.
 
 ### /Action:Restore
 
 This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
 
+- `/Action:Import` is used.
 - The destination database will be purged of all user objects (tables, views, etc.), except security objects, before the restoration.
 - If the destination database doesn't exist it will be created.
+- `/TargetTrustServerCertificate:` defaults to `true`.
+- `/TargetTimeout:` defaults to `30`.
+- `/CommandTimeout:` defaults to `120`.
 
 ### Other Actions
 

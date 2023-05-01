@@ -22,7 +22,7 @@ This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the 
 This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
 
 - `/Action:Import` is used.
-- The destination database will be purged of all user objects (tables, views, etc.), except security objects, before the restoration.
+- The destination database will be purged of all user objects (tables, views, etc.) before the restoration.
 - If the destination database doesn't exist it will be created.
 - `/TargetTrustServerCertificate:` defaults to `true`.
 - `/TargetTimeout:` defaults to `30`.

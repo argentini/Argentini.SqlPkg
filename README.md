@@ -1,6 +1,6 @@
 # SqlPkg for Microsoft SqlPackage
 
-SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool, providing additional features, like the exclusion of specific table data and destination purging prior to import.
+SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new `Backup` and `Restore` actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore.
 
 ## Features
 

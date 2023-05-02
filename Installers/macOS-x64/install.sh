@@ -1,4 +1,6 @@
 #!/bin/bash
+echo ">>> Installing Microsoft SqlPackage..."
+dotnet tool install -g microsoft.sqlpackage
 echo ">>> Create SqlPkg application folder..."
 [[ -d /Applications/SqlPkg ]] || sudo mkdir /Applications/SqlPkg
 echo ">>> Copy SqlPkg files..."

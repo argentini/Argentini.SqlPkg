@@ -58,19 +58,15 @@ sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServer
 
 ## Installation
 
-### 1. Install Microsoft SqlPackage
+### 1. Install Microsoft .NET
 
-According to the SqlPackage [website](https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage), the recommended way to install SqlPackage is as a dotnet tool.
-
-```
-dotnet tool install -g microsoft.sqlpackage
-```
-
-This requires that you already have dotnet installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+SqlPkg requires that you already have dotnet installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
 
 ### 2. Install SqlPkg
 
 Download the [latest release](https://github.com/argentini/Argentini.SqlPkg/releases) (zip file) for your operating system and CPU architecture and follow the instructions in the README file.
+
+Note: this process will also install Microsoft SqlPackage.
 
 ## Project Status
 

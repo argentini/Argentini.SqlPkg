@@ -1,3 +1,7 @@
+Write-Host ">>> Installing Microsoft SqlPackage..."
+
+dotnet tool install -g microsoft.sqlpackage
+
 Write-Host ">>> Create SqlPkg application folder..."
 
 md -Force c:\SqlPkg

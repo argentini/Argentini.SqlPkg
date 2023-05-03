@@ -17,21 +17,6 @@ This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the 
 - `/p:VerifyExtraction=` defaults to `false`.
 - Destination file paths will be created if they do not exist.
 
-### /Action:Restore
-
-This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
-
-- The destination database will be purged of all user objects (tables, views, etc.) before the restoration.
-- If the destination database doesn't exist it will be created.
-- `/TargetTrustServerCertificate:` defaults to `true`.
-- `/TargetTimeout:` defaults to `30`.
-- `/CommandTimeout:` defaults to `120`.
-- Destination file paths will be created if they do not exist.
-
-## Usage
-
-You can use SqlPkg as you would use the Microsoft SqlPackage CLI application. When not using *Backup* or *Restore* modes, the entire argument list is simply piped to SqlPackage and will run normally. So you can use `sqlpkg` everywhere SqlPackage is used.
-
 Here's a *Backup* example for Bash:
 
 ```bash
@@ -44,6 +29,17 @@ Here's a *Backup* example for PowerShell:
 sqlpkg /Action:Backup /TargetFile:"Backups/Local/MyBackup.bacpac" /SourceServerName:"mydatabase.net,1433" /SourceDatabaseName:MyDatabase /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
 ```
 
+### /Action:Restore
+
+This mode is equivalent to `Action:Import` to restore a `.bacpac` file, with the following differences.
+
+- The destination database will be purged of all user objects (tables, views, etc.) before the restoration.
+- If the destination database doesn't exist it will be created.
+- `/TargetTrustServerCertificate:` defaults to `true`.
+- `/TargetTimeout:` defaults to `30`.
+- `/CommandTimeout:` defaults to `120`.
+- Destination file paths will be created if they do not exist.
+
 Here's a *Restore* example for Bash:
 
 ```bash
@@ -55,6 +51,52 @@ Here's a *Restore* example for PowerShell:
 ```powershell
 sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServerName:"mydatabase.net,1433" /TargetDatabaseName:MyDatabase /TargetUser:sa /TargetPassword:MyP@ssw0rd
 ```
+
+### /Action:Backup-All
+
+This mode will back up all user databases on a server.
+
+- Provide a source connection to the master database.
+- Provide a target file path ending with 'master.bacpac' (same for optional log file).
+- The target file and log paths will be used for each database backup, adjusting the file names accordingly.
+- Accepts all arguments that the Backup action mode accepts.
+
+Here's a *Backup-All* example for Bash:
+
+```bash
+sqlpkg /Action:Backup-All /TargetFile:'Backups/Local/master.bacpac' /SourceServerName:'mydatabase.net,1433' /SourceDatabaseName:'master' /SourceUser:'sa' /SourcePassword:'MyP@ssw0rd' /p:ExcludeTableData='[dbo].[Log]' /p:ExcludeTableData='[dbo].[IpAddresses]'
+```
+
+Here's a *Backup-All* example for PowerShell:
+
+```powershell
+sqlpkg /Action:Backup-All /TargetFile:"Backups/Local/master.bacpac" /SourceServerName:"mydatabase.net,1433" /SourceDatabaseName:master /SourceUser:sa /SourcePassword:MyP@ssw0rd /p:ExcludeTableData=[dbo].[Log] /p:ExcludeTableData=[dbo].[IpAddresses]
+```
+
+### /Action:Restore-All
+
+This mode will restore all \*.bacpac files in a given path to databases with the same names as the filenames.
+
+- Provide a source file path to 'master.bacpac' in the location of the bacpac files. The master.bacpac file does not need to exist. It is used to specify the source path to your bacpac files.
+- Provide a target connection to the master database.
+- Provide an optional log file path for master.log; the log file path will be used for each database restore log, adjusting the file names accordingly.
+- Accepts all arguments that the Restore action mode accepts.
+
+Here's a *Restore-All* example for Bash:
+
+```bash
+sqlpkg /Action:Restore-All /SourceFile:'Backups/Local/master.bacpac' /TargetServerName:'mydatabase.net,1433' /TargetDatabaseName:'master' /TargetUser:'sa' /TargetPassword:'MyP@ssw0rd'
+```
+
+Here's a *Restore-All* example for PowerShell:
+
+```powershell
+sqlpkg /Action:Restore-All /SourceFile:"Backups/Local/master.bacpac" /TargetServerName:"mydatabase.net,1433" /TargetDatabaseName:master /TargetUser:sa /TargetPassword:MyP@ssw0rd
+```
+
+## Additional Usage
+
+When not using SqlPkg special action modes, the entire argument list is simply piped to SqlPackage and will run normally. So you can use `sqlpkg` everywhere `SqlPackage` is used.
 
 ## Installation
 

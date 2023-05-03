@@ -10,6 +10,10 @@ public static class ArgumentHelpers
     {
         "/Action:",
         "/a:",
+        "/TargetFile:",
+        "/tf:",
+        "/DiagnosticsFile:",
+        "/df:",
         "/SourceConnectionString:",
         "/scs:",
         "/SourceDatabaseName:",
@@ -32,6 +36,10 @@ public static class ArgumentHelpers
     {
         "/Action:",
         "/a:",
+        "/SourceFile:",
+        "/sf:",
+        "/DiagnosticsFile:",
+        "/df:",
         "/TargetConnectionString:",
         "/tcs:",
         "/TargetDatabaseName:",
@@ -113,52 +121,16 @@ public static class ArgumentHelpers
     /// <summary>
     /// Ensure the directory path exists for a given argument file path.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <param name="argumentName"></param>
-    /// <param name="argumentNameAbbrev"></param>
-    public static void EnsureDirectoryExists(this List<CliArgument> arguments, string argumentName, string argumentNameAbbrev)
+    /// <param name="filePath"></param>
+    public static void EnsureDirectoryExists(this string filePath)
     {
-        var targetFilePath = arguments.GetArgumentValue(argumentName, argumentNameAbbrev).RemoveWrappedQuotes();
-	    
-        if (targetFilePath.Contains(Path.DirectorySeparatorChar) == false && targetFilePath.Contains(Path.AltDirectorySeparatorChar) == false)
+        if (filePath.Contains(Path.DirectorySeparatorChar) == false && filePath.Contains(Path.AltDirectorySeparatorChar) == false)
             return;
 
-        var directoryPath = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
+        var directoryPath = Path.GetDirectoryName(filePath) ?? string.Empty;
         
         if (string.IsNullOrEmpty(directoryPath) == false && Directory.Exists(directoryPath) == false)
             Directory.CreateDirectory(directoryPath);
-    }
-    
-    /// <summary>
-    /// Ensure all required argument values are wrapped in quotes.
-    /// </summary>
-    /// <param name="arguments"></param>
-    public static void WrapPathsInQuotes(this List<CliArgument> arguments)
-    {
-        var pathArguments = new []
-        {
-            "/SourceConnectionString:",
-            "/scs:",
-            "/SourceFile:",
-            "/sf:",
-            "/TargetConnectionString:",
-            "/tcs:",
-            "/TargetFile:",
-            "/tf:",
-            "/DiagnosticsFile:",
-            "/df:",
-            "/ModelFilePath:",
-            "/mfp:",
-            "/p:TempDirectoryForTableData="
-        };
-	    
-        foreach (var argument in arguments)
-        {
-            if (pathArguments.Contains(argument.Key, StringComparer.CurrentCultureIgnoreCase))
-            {
-                argument.Value = $"\"{argument.Value.RemoveWrappedQuotes()}\"";
-            }
-        }
     }
     
     /// <summary>
@@ -178,5 +150,43 @@ public static class ArgumentHelpers
         }
 
         return result.ToString().TrimEnd();
+    }
+
+    /// <summary>
+    /// Assemble the WorkingArguments into a string array for the CLI.
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <returns></returns>
+    public static List<string> GetArgumentsForCli(this List<CliArgument> arguments)
+    {
+        var result = new List<string>();
+
+        foreach (var argument in arguments)
+        {
+            result.Add($"{argument.Key}{argument.Value}");
+        }
+
+        return result;
+    }
+    
+    /// <summary>
+    /// Change the filename portion of a file path.
+    /// If just a filename, it returns the new filename.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="newFileName"></param>
+    /// <returns></returns>
+    public static string ChangeFileNameInPath(this string filePath, string newFileName)
+    {
+        if (string.IsNullOrEmpty(filePath))
+            return newFileName;
+
+        if (filePath.Contains(Path.DirectorySeparatorChar) == false && filePath.Contains(Path.AltDirectorySeparatorChar) == false)
+            return newFileName;
+        
+        var separator = filePath.Contains(Path.DirectorySeparatorChar) ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
+        var path = filePath[..filePath.LastIndexOf(separator)];
+        
+        return Path.Combine(path, newFileName);        
     }
 }

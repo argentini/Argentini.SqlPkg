@@ -11,12 +11,15 @@ public static class SqlTools
 	#region Data Helpers
 
 	/// <summary>
-	/// Purge all user objects from a database or create it if it doesn't exist. 
+	/// Get a list of user database names from a server.
 	/// </summary>
 	/// <param name="applicationState"></param>
-	public static async Task PurgeOrCreateDatabaseAsync(ApplicationState applicationState)
+	/// <param name="useSource"></param>
+	public static async Task<List<string>> GetAllDatabaseNamesAsync(ApplicationState applicationState, bool useSource = true)
 	{
-		var builder = new SqlConnectionStringBuilder(applicationState.TargetConnectionString)
+		var results = new List<string>();
+		
+		var builder = new SqlConnectionStringBuilder(useSource ? applicationState.SourceConnectionString : applicationState.TargetConnectionString)
 		{
 			InitialCatalog = "master"
 		};
@@ -24,63 +27,144 @@ public static class SqlTools
 		using (var sqlReader = new SqlReader(new SqlReaderConfiguration
 		       {
 			       ConnectionString = builder.ToString(),
-			       CommandText = @$"
-if not exists (
-    select [name]
-        from sys.databases
-        where [name] = N'{applicationState.TargetDatabaseName}'
-)
-    select 0
-else
-    select 1
+			       CommandText = @"
+select [name]
+from sys.databases
+where [name] not in ('master', 'model', 'msdb', 'tempdb', 'resource', 'distribution' , 'reportserver', 'reportservertempdb')
 "
 		       }))
 		{
 			await using (await sqlReader.ExecuteReaderAsync())
 			{
-				sqlReader.Read();
-				
-				if (await sqlReader.SafeGetIntAsync(0) == 0)
-				{
-					// Create Database
-
-					CliHelpers.WriteArrow();
-					Console.WriteLine($"Creating Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
-					
-					await Sql.ExecuteAsync(new SqlExecuteSettings
-					{
-						ConnectionString = builder.ToString(),
-						CommandText = $@"
-if not exists (
-    select [name]
-        from sys.databases
-        where [name] = N'{applicationState.TargetDatabaseName}'
-)
-	create database [{applicationState.TargetDatabaseName}]
-"
-					});
-					
-					CliHelpers.WriteArrow();
-					Console.WriteLine("Database Created");
-					Console.WriteLine();
-				}
-
-				else
-				{
-					// Purge Existing Database
-
-					CliHelpers.WriteArrow();
-					Console.WriteLine($"Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
-					
-					var executableFilePath = ApplicationState.GetAppPath();
-					
-					_ = await CliHelpers.ExecuteSqlPackageAsync($"/a:publish /SourceFile:\"{executableFilePath}blank.dacpac\" /TargetConnectionString:\"{applicationState.TargetConnectionString}\" /p:AllowIncompatiblePlatform=true /p:BlockOnPossibleDataLoss=false /p:IncludeCompositeObjects=false /p:DropObjectsNotInSource=true /p:DropConstraintsNotInSource=true /p:DropDmlTriggersNotInSource=true /p:DropExtendedPropertiesNotInSource=true /p:DropIndexesNotInSource=true /p:DropPermissionsNotInSource=true /p:DropRoleMembersNotInSource=true /p:DropStatisticsNotInSource=true", false);
-
-					CliHelpers.WriteArrow();
-					Console.WriteLine("Database Purge Complete");
-					Console.WriteLine();
-				}
+				while (sqlReader.Read())
+					results.Add(await sqlReader.SafeGetStringAsync(0));
 			}
+		}
+
+		return results;
+	}
+	
+	/// <summary>
+	/// Purge all user objects from a database or create it if it doesn't exist. 
+	/// </summary>
+	/// <param name="applicationState"></param>
+	public static async Task PurgeOrCreateTargetDatabaseAsync(ApplicationState applicationState)
+	{
+		var databaseNames = await GetAllDatabaseNamesAsync(applicationState, useSource: false);
+
+		if (databaseNames.Contains(applicationState.TargetDatabaseName, StringComparer.CurrentCultureIgnoreCase) == false)
+		{
+			// Create Database
+
+			CliHelpers.WriteArrow();
+			Console.WriteLine($"Creating Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
+
+			var builder = new SqlConnectionStringBuilder(applicationState.TargetConnectionString)
+			{
+				InitialCatalog = "master"
+			};
+			
+			await Sql.ExecuteAsync(new SqlExecuteSettings
+			{
+				ConnectionString = builder.ToString(),
+				CommandText = $@"
+create database [{applicationState.TargetDatabaseName}]
+"
+			});
+					
+			CliHelpers.WriteArrow();
+			Console.WriteLine("Database Created");
+			Console.WriteLine();
+		}
+
+		else
+		{
+			// Purge Existing Database
+
+			CliHelpers.WriteArrow();
+			Console.WriteLine($"Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
+
+			var executableFilePath = ApplicationState.GetAppPath();
+
+			var arguments = new List<CliArgument>
+			{
+				new CliArgument
+				{
+					Key = "/a:",
+					Value = "publish"
+				},
+				new CliArgument
+				{
+					Key = "/sf:",
+					Value = $"{executableFilePath}blank.dacpac"
+				},
+				new CliArgument
+				{
+					Key = "/tcs:",
+					Value = $"{applicationState.TargetConnectionString}"
+				},
+				new CliArgument
+				{
+					Key = "/p:AllowIncompatiblePlatform=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:BlockOnPossibleDataLoss=",
+					Value = "false"
+				},
+				new CliArgument
+				{
+					Key = "/p:IncludeCompositeObjects=",
+					Value = "false"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropObjectsNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropConstraintsNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropDmlTriggersNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropExtendedPropertiesNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropIndexesNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropPermissionsNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropRoleMembersNotInSource=",
+					Value = "true"
+				},
+				new CliArgument
+				{
+					Key = "/p:DropStatisticsNotInSource=",
+					Value = "true"
+				}
+			};
+
+			_ = await CliHelpers.ExecuteSqlPackageAsync(arguments, false);
+
+			CliHelpers.WriteArrow();
+			Console.WriteLine("Database Purge Complete");
+			Console.WriteLine();
 		}
 	}
 	

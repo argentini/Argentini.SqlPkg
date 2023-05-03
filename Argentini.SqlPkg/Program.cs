@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Argentini.SqlPkg.Extensions;
+using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg;
 
@@ -28,6 +29,29 @@ public class AppInstance
         //     "/?"
         // };
 
+        // args = new[]
+        // {
+        //      "/a:backup-all",
+        //      "/TargetFile:\"Database Backups/master.bacpac\"",
+        //      "/DiagnosticsFile:\"Database Backups/Logs/master.log\"",
+        //      "/p:ExcludeTableData=[dbo].[umbracoLog]",
+        //      "/SourceServerName:sqlserver,1433",
+        //      "/SourceDatabaseName:AdventureWorks2019",
+        //      "/SourceUser:sa",
+        //      "/SourcePassword:'P@ssw0rdz!'"
+        //  };
+
+        // args = new[]
+        // {
+        //      "/a:Restore-All",
+        //      "/SourceFile:\"Database Backups/master.bacpac\"",
+        //      "/DiagnosticsFile:\"Database Backups/Logs/master.log\"",
+        //      "/TargetServerName:sqlserver,1433",
+        //      "/TargetDatabaseName:temp",
+        //      "/TargetUser:sa",
+        //      "/TargetPassword:P@ssw0rdz!"
+        //  };
+        
         //args = new[]
         //{
         //     "/a:backup",
@@ -39,7 +63,7 @@ public class AppInstance
         //     "/SourceUser:sa",
         //     "/SourcePassword:'P@ssw0rdz!'"
         // };
-
+        
         //args = new[]
         //{
         //     "/a:Restore",
@@ -78,14 +102,122 @@ public class AppInstance
         if (await ApplicationState.SqlPackageIsInstalled() == false)
             return -1;
         
-        if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
+        if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
         {
             Console.Write("Started   ");
             CliHelpers.WriteBar();
             Console.WriteLine("  " + CliHelpers.GetDateTime());
             Console.WriteLine();
-            
-            if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
+
+            if (AppState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var databaseNames = await SqlTools.GetAllDatabaseNamesAsync(AppState);
+
+                if (databaseNames.Any())
+                {
+                    foreach (var databaseName in databaseNames)
+                    {
+                        var builder = new SqlConnectionStringBuilder(AppState.SourceConnectionString)
+                        {
+                            InitialCatalog = databaseName
+                        };
+
+                        AppState.SourceConnectionString = builder.ToString();
+                        AppState.SourceDatabaseName = databaseName;
+                        AppState.TargetFile = AppState.TargetFile.ChangeFileNameInPath($"{databaseName}.bacpac");
+
+                        if (string.IsNullOrEmpty(AppState.LogFile) == false)
+                            AppState.LogFile = AppState.LogFile.ChangeFileNameInPath($"{databaseName}.log");
+                        
+                        if (databaseNames.First() != databaseName)
+                            Console.WriteLine();
+                        
+                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine();
+                        
+                        CliHelpers.OutputBackupInfo(AppState);
+                
+                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine();
+                
+                        AppState.BuildBackupArguments();
+                
+                        await AppState.ProcessTableDataArguments();
+
+                        resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
+                    }
+                }
+
+                else
+                {
+                    Console.Write("Error");
+                    CliHelpers.WriteArrow(true);
+                    Console.WriteLine("No databases found.");
+                    Console.WriteLine();
+                }
+            }
+
+            else if (AppState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var separator = AppState.SourceFile.Contains(Path.DirectorySeparatorChar) ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
+                var path = string.Empty;
+                
+                if (AppState.SourceFile.Contains(Path.DirectorySeparatorChar) || AppState.SourceFile.Contains(Path.AltDirectorySeparatorChar))
+                    path = AppState.SourceFile[..AppState.SourceFile.LastIndexOf(separator)];
+
+                var files = Directory.GetFiles(path, "*.bacpac").OrderBy(f => f).ToList();
+
+                if (files.Any())
+                {
+                    foreach (var file in files)
+                    {
+                        var separator2 = file.Contains(Path.DirectorySeparatorChar)
+                            ? Path.DirectorySeparatorChar
+                            : Path.AltDirectorySeparatorChar;
+                        var fileName = file[(file.LastIndexOf(separator2) + 1)..];
+                        var databaseName = fileName[..fileName.LastIndexOf('.')];
+
+                        var builder = new SqlConnectionStringBuilder(AppState.TargetConnectionString)
+                        {
+                            InitialCatalog = databaseName
+                        };
+
+                        AppState.TargetConnectionString = builder.ToString();
+                        AppState.TargetDatabaseName = databaseName;
+                        AppState.SourceFile = AppState.SourceFile.ChangeFileNameInPath($"{databaseName}.bacpac");
+
+                        if (string.IsNullOrEmpty(AppState.LogFile) == false)
+                            AppState.LogFile = AppState.LogFile.ChangeFileNameInPath($"{databaseName}.log");
+
+                        if (files.First() != file)
+                            Console.WriteLine();
+
+                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine();
+
+                        CliHelpers.OutputRestoreInfo(AppState);
+
+                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine();
+                
+                        AppState.BuildRestoreArguments();
+                
+                        await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
+
+                        resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
+                    }
+                }
+
+                else
+                {
+                    Console.Write("Error");
+                    CliHelpers.WriteArrow(true);
+                    Console.WriteLine("No database backups found.");
+                    Console.WriteLine();
+                }
+            }
+
+            else if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase))
             {
                 CliHelpers.OutputBackupInfo(AppState);
                 
@@ -96,7 +228,7 @@ public class AppInstance
                 
                 await AppState.ProcessTableDataArguments();
 
-                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments.GetArgumentsStringForCli());
+                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
             }
 
             else if (AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase))
@@ -108,9 +240,9 @@ public class AppInstance
                 
                 AppState.BuildRestoreArguments();
                 
-                await SqlTools.PurgeOrCreateDatabaseAsync(AppState);
+                await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
 
-                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments.GetArgumentsStringForCli());
+                resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
             }
         }
 
@@ -128,12 +260,10 @@ public class AppInstance
             Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
             
-            AppState.OriginalArguments.EnsureDirectoryExists("/TargetFile:", "/df:");
-            AppState.OriginalArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
+            AppState.TargetFile.EnsureDirectoryExists();
+            AppState.LogFile.EnsureDirectoryExists();
             
-            AppState.OriginalArguments.WrapPathsInQuotes();
-            
-            resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.OriginalArguments.GetArgumentsStringForCli());
+            resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.OriginalArguments);
         }
 
         else
@@ -147,6 +277,12 @@ SqlPkg can be used in 'Backup' or 'Restore' action modes, which are functionally
 /Action:Restore (/a:Restore)
     Accepts all Action:Import arguments. This mode will always fully erase the target database or create a new database if none is found, prior to restoring the .bacpac file.
 
+/Action:Backup-All (/a:Backup-All)
+    This mode will back up all user databases on a server. Provide a source connection to the master database and a target file path ending with 'master.bacpac' (same for optional log file). The outputs will be used as a template and all user databases will be processed, using the templates to name the .bacpac and log files with the database names. Accepts all arguments that the Backup action mode accepts.
+
+/Action:Restore-All (/a:Restore-All)
+    This mode will restore all *.bacpac files to databases with the same name as the filename in a given path. Provide a source file path to one of the files and a target connection to the master database (and optional log file path for master.log). The connection will be used for all target restored databases, and the optional log file path will be used as a template for writing logs for each restored database. Accepts all arguments that the Restore action mode accepts.
+
 For convenience, you can also use SqlPkg in place of SqlPackage for all other operations as all arguments are passed through.";
 
             helpText.WriteToConsole(ApplicationState.ColumnWidth);
@@ -154,9 +290,11 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
 
-            resultCode = await CliHelpers.ExecuteSqlPackageAsync();
+            resultCode = await CliHelpers.ExecuteSqlPackageAsync(new List<CliArgument>());
         }
 
+        #region Finished...
+        
         if (string.IsNullOrEmpty(AppState.Action))
             return resultCode;
         
@@ -181,5 +319,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
         Console.WriteLine();
 
         return resultCode;
+        
+        #endregion
     }
 }

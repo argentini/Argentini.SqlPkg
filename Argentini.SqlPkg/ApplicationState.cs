@@ -29,6 +29,10 @@ public class ApplicationState
     public int TargetConnectionTimeout { get; set; } = 30;
     public int TargetCommandTimeout { get; set; } = 120;
     public bool TargetTrustServerCertificate { get; set; } = true;
+    
+    public string SourceFile { get; set; } = string.Empty;
+    public string TargetFile { get; set; } = string.Empty;
+    public string LogFile { get; set; } = string.Empty;
 
     #endregion
     
@@ -53,6 +57,10 @@ public class ApplicationState
 
         if (OriginalArguments.HasArgument("/Action:", "/a:"))
 	        Action = OriginalArguments.GetArgumentValue("/Action:", "/a:").ApTitleCase();
+
+        SourceFile = OriginalArguments.GetArgumentValue("/SourceFile:", "/sf:").RemoveWrappedQuotes();
+        TargetFile = OriginalArguments.GetArgumentValue("/TargetFile:", "/tf:").RemoveWrappedQuotes();
+        LogFile = OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes();
         
         NormalizeConnectionInfo();
     }
@@ -206,11 +214,23 @@ public class ApplicationState
 		    Value = SourceConnectionString.RemoveWrappedQuotes()
 	    });
 
-	    WorkingArguments.EnsureDirectoryExists("/TargetFile:", "/tf:");
-	    WorkingArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
+	    WorkingArguments.Insert(2, new CliArgument
+	    {
+		    Key = "/TargetFile:",
+		    Value = TargetFile
+	    });
+
+	    if (string.IsNullOrEmpty(LogFile) == false)
+		    WorkingArguments.Insert(3, new CliArgument
+		    {
+			    Key = "/DiagnosticsFile:",
+			    Value = LogFile
+		    });
+	    
+	    TargetFile.EnsureDirectoryExists();
+	    LogFile.EnsureDirectoryExists();
 
 	    WorkingArguments.SetDefault("/p:VerifyExtraction=", "false");
-	    WorkingArguments.WrapPathsInQuotes();
     }
     
     /// <summary>
@@ -238,9 +258,21 @@ public class ApplicationState
 		    Key = "/TargetConnectionString:",
 		    Value = TargetConnectionString.RemoveWrappedQuotes()
 	    });
+
+	    WorkingArguments.Insert(2, new CliArgument
+	    {
+		    Key = "/SourceFile:",
+		    Value = SourceFile
+	    });
+
+	    if (string.IsNullOrEmpty(LogFile) == false)
+		    WorkingArguments.Insert(3, new CliArgument
+		    {
+			    Key = "/DiagnosticsFile:",
+			    Value = LogFile
+		    });
 	    
-	    WorkingArguments.EnsureDirectoryExists("/DiagnosticsFile:", "/df:");
-	    WorkingArguments.WrapPathsInQuotes();
+	    LogFile.EnsureDirectoryExists();
     }
     
     /// <summary>
@@ -257,7 +289,7 @@ public class ApplicationState
                 tableDataList.Add(new CliArgument
                 {
 	                Key = "/p:TableData=",
-	                Value = argument.Value.RemoveWrappedQuotes() 
+	                Value = argument.Value.RemoveWrappedQuotes().NormalizeTableName() 
                 });
             }
         }
@@ -269,7 +301,7 @@ public class ApplicationState
 		        tableDataList.Add(new CliArgument
 		        {
 			        Key = "/p:TableData=",
-			        Value = tableName.RemoveWrappedQuotes() 
+			        Value = tableName.RemoveWrappedQuotes().NormalizeTableName()
 		        });
 	        }
 	        
@@ -279,25 +311,23 @@ public class ApplicationState
             {
                 foreach (var exclusion in OriginalArguments.Where(a => a.Key.Equals("/p:ExcludeTableData=", StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    var excludedTableName = exclusion.Value.RemoveWrappedQuotes();
+                    var excludedTableName = exclusion.Value.RemoveWrappedQuotes().NormalizeTableName();
 
                     if (string.IsNullOrEmpty(excludedTableName))
                         continue;
 
-                    excludedTableName = excludedTableName.NormalizeTableName();
-
                     if (excludedTableName.Contains('*'))
                     {
-                        if (excludedTableName.EndsWith("*"))
+                        if (excludedTableName.EndsWith("*]"))
                         {
 	                        var wildcard = excludedTableName.Left("*");
 
 	                        tableDataList.RemoveAll(t => t.Value.StartsWith(wildcard, StringComparison.CurrentCultureIgnoreCase));
                         }
 
-                        else if (excludedTableName.StartsWith("*"))
+                        else
                         {
-	                        var wildcard = excludedTableName.Right("*");
+	                        var wildcard = excludedTableName.Right("].[*");
 
 							tableDataList.RemoveAll(t => t.Value.EndsWith(wildcard, StringComparison.CurrentCultureIgnoreCase));
                         }
@@ -344,7 +374,7 @@ public class ApplicationState
 
     /// <summary>
     /// Get the path to the currently executing application. Identifies local project source
-    /// path as well as an executing assembly based on the existence of the HELP.txt file.
+    /// path as well as an executing assembly based on the existence of the blank.dacpac file.
     /// </summary>
     /// <returns>Application folder path</returns>
     public static string GetAppPath()
@@ -397,7 +427,16 @@ public class ApplicationState
     {
 	    try
 	    {
-		    _ = await CliHelpers.ExecuteSqlPackageAsync("/version:true", false, false);
+		    var arguments = new List<CliArgument>
+		    {
+			    new CliArgument
+			    {
+				    Key = "/version:",
+				    Value = "true"
+			    }
+		    };
+
+		    _ = await CliHelpers.ExecuteSqlPackageAsync(arguments, false, false);
 
 		    return true;
 	    }

@@ -289,7 +289,7 @@ public static class CliHelpers
 	    
 	    Console.Write("Target    ");
 	    WriteBar();
-	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/TargetFile:", "/tf:") ? appState.OriginalArguments.GetArgumentValue("/TargetFile:", "/tf:").RemoveWrappedQuotes() : "None"));
+	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.TargetFile) == false ? appState.TargetFile : "None"));
 	    Console.WriteLine();
         
 	    Console.Write("Data      ");
@@ -299,7 +299,7 @@ public static class CliHelpers
 	    
 	    Console.Write("Log File  ");
 	    WriteBar();
-	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
+	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None"));
 	    Console.WriteLine();
     }
 
@@ -311,7 +311,7 @@ public static class CliHelpers
     {
 	    Console.Write("Source    ");
 	    WriteBar();
-	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/SourceFile:", "/sf:") ? appState.OriginalArguments.GetArgumentValue("/SourceFile:", "/sf:").RemoveWrappedQuotes() : "None"));
+	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.SourceFile) == false ? appState.SourceFile : "None"));
 	    Console.WriteLine();
                 
 	    Console.Write("Target    ");
@@ -323,7 +323,7 @@ public static class CliHelpers
 
 	    Console.Write("Log File  ");
 	    WriteBar();
-	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
+	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None"));
 	    Console.WriteLine();
     }
 
@@ -333,7 +333,7 @@ public static class CliHelpers
     /// <param name="appState"></param>
     public static void OutputCompleteInfo(ApplicationState appState)
     {
-	    var backupActions = new[] { "Backup", "Extract", "Export" };
+	    var backupActions = new[] { "Backup", "Backup-All", "Extract", "Export" };
 	    
 	    Console.Write("Source    ");
 	    WriteBar();
@@ -342,12 +342,33 @@ public static class CliHelpers
 	    {
 		    Console.Write("  " + appState.SourceServerName);
 		    WriteArrow(true);
-		    Console.WriteLine(appState.SourceDatabaseName);
+
+		    if (appState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase))
+		    {
+			    Console.WriteLine("All Databases");
+		    }
+
+		    else
+		    {
+			    Console.WriteLine(appState.SourceDatabaseName);
+		    }		    
 	    }
 
 	    else
 	    {
-		    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/SourceFile:", "/sf:") ? appState.OriginalArguments.GetArgumentValue("/SourceFile:", "/sf:").RemoveWrappedQuotes() : "None"));
+		    if (appState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
+		    {
+			    var path = appState.SourceFile;
+
+			    path = path.ChangeFileNameInPath("*.bacpac");
+
+			    Console.WriteLine($"  {path}");
+		    }
+
+		    else
+		    {
+			    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.SourceFile) == false ? appState.SourceFile : "None"));
+		    }
 	    }
 
 	    Console.Write("Target    ");
@@ -355,7 +376,19 @@ public static class CliHelpers
 	    
 	    if (backupActions.Contains(appState.Action, StringComparer.CurrentCultureIgnoreCase))
 	    {
-		    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/TargetFile:", "/tf:") ? appState.OriginalArguments.GetArgumentValue("/TargetFile:", "/tf:").RemoveWrappedQuotes() : "None"));
+		    if (appState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase))
+		    {
+			    var path = appState.TargetFile;
+
+			    path = path.ChangeFileNameInPath("*.bacpac");
+			    
+			    Console.WriteLine($"  {path}");
+		    }
+
+		    else
+		    {
+			    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.TargetFile) == false ? appState.TargetFile : "None"));
+		    }
 	    }
 
 	    else
@@ -367,16 +400,30 @@ public static class CliHelpers
 
 	    Console.Write("Log File  ");
 	    WriteBar();
-	    Console.WriteLine("  " + (appState.OriginalArguments.HasArgument("/DiagnosticsFile:", "/df:") ? appState.OriginalArguments.GetArgumentValue("/DiagnosticsFile:", "/df:").RemoveWrappedQuotes() : "None"));
+
+	    if (appState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase) || appState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
+	    {
+		    var path = string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None";
+
+		    if (path != "None")
+				path = path.ChangeFileNameInPath("*.log");
+		    
+		    Console.WriteLine($"  {path}");
+	    }
+
+	    else
+	    {
+		    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None"));
+	    }
     }
     
     #endregion
     
     #region Execution
 
-    public static async Task<int> ExecuteSqlPackageAsync(string arguments = "", bool showOutput = true, bool showErrors = true)
+    public static async Task<int> ExecuteSqlPackageAsync(List<CliArgument> arguments, bool showOutput = true, bool showErrors = true)
     {
-	    if (OperatingSystem.IsWindows())
+	    if (OperatingSystem.IsWindows() && arguments.Count < 2)
 	    {
 		    // BEGIN: Workaround for Windows Issues with CliWrap
 
@@ -384,7 +431,7 @@ public static class CliHelpers
 
 		    p.StartInfo.UseShellExecute = false;
 		    p.StartInfo.FileName = "sqlpackage.exe";
-		    p.StartInfo.Arguments = arguments;
+		    p.StartInfo.Arguments = arguments.GetArgumentsStringForCli();
 		    p.StartInfo.RedirectStandardOutput = showOutput == false;
 		    p.StartInfo.RedirectStandardError = showErrors == false;
 
@@ -408,11 +455,12 @@ public static class CliHelpers
 
 	    await using var stdOut = Console.OpenStandardOutput();
 	    
-	    var result = await Cli.Wrap("sqlpackage")
-		    .WithArguments(arguments)
+	    var cmd = Cli.Wrap("sqlpackage")
+		    .WithArguments(arguments.GetArgumentsForCli())
 		    .WithStandardOutputPipe(showOutput ? PipeTarget.ToStream(stdOut) : PipeTarget.Null)
-		    .WithStandardErrorPipe(showErrors ? PipeTarget.ToStream(stdOut) : PipeTarget.Null)
-		    .ExecuteAsync();
+		    .WithStandardErrorPipe(showErrors ? PipeTarget.ToStream(stdOut) : PipeTarget.Null);
+		    
+		var result = await cmd.ExecuteAsync();
 
 	    return result.ExitCode;
     }

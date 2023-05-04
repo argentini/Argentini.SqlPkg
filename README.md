@@ -57,8 +57,8 @@ sqlpkg /Action:Restore /SourceFile:"Backups/Local/MyBackup.bacpac" /TargetServer
 This mode will back up all user databases on a server.
 
 - Provide a source connection to the master database.
-- Provide a target file path ending with 'master.bacpac' (same for optional log file).
-- The target file and log paths will be used for each database backup, adjusting the file names accordingly.
+- Provide a target file path ending with 'master.bacpac'. The path will be used as the destination for each database backup file, ignoring 'master.bacpac'.
+- Optionally provide a log file path ending with 'master.log'. The path will be used as the destination for each database backup log file, ignoring 'master.log'.
 - Accepts all arguments that the Backup action mode accepts.
 
 Here's a *Backup-All* example for Bash:
@@ -77,9 +77,9 @@ sqlpkg /Action:Backup-All /TargetFile:"Backups/Local/master.bacpac" /SourceServe
 
 This mode will restore all \*.bacpac files in a given path to databases with the same names as the filenames.
 
-- Provide a source file path to 'master.bacpac' in the location of the bacpac files. The master.bacpac file does not need to exist. It is used to specify the source path to your bacpac files.
+- Provide a source file path to 'master.bacpac' in the location of the bacpac files. The path will be used as the source location for each database backup file to restore, ignoring 'master.bacpac'.
 - Provide a target connection to the master database.
-- Provide an optional log file path for master.log; the log file path will be used for each database restore log, adjusting the file names accordingly.
+- Optionally provide a log file path ending with 'master.log'. The path will be used as the destination for each database backup log file, ignoring 'master.log'.
 - Accepts all arguments that the Restore action mode accepts.
 
 Here's a *Restore-All* example for Bash:

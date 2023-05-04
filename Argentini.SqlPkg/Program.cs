@@ -272,16 +272,30 @@ public class AppInstance
 SqlPkg can be used in 'Backup' or 'Restore' action modes, which are functionally equivalent to SqlPackage's 'Export' and 'Import' action modes. These modes have tailored default values and provide additional features.
 
 /Action:Backup (/a:Backup)
+
     Accepts all Action:Export arguments, and also provides /ExcludeTableData: which is functionally equivalent to /TableData: but excludes the specified tables. Can be listed multiple times to exclude multiple tables.
 
 /Action:Restore (/a:Restore)
+
     Accepts all Action:Import arguments. This mode will always fully erase the target database or create a new database if none is found, prior to restoring the .bacpac file.
 
 /Action:Backup-All (/a:Backup-All)
-    This mode will back up all user databases on a server. Provide a source connection to the master database and a target file path ending with 'master.bacpac' (same for optional log file). The outputs will be used as a template and all user databases will be processed, using the templates to name the .bacpac and log files with the database names. Accepts all arguments that the Backup action mode accepts.
+
+    This mode will back up all user databases on a server.
+
+    - Provide a source connection to the master database.
+    - Provide a target file path ending with 'master.bacpac'. The path will be used as the destination for each database backup file, ignoring 'master.bacpac'.
+    - Optionally provide a log file path ending with 'master.log'. The path will be used as the destination for each database backup log file, ignoring 'master.log'.
+    - Accepts all arguments that the Backup action mode accepts.
 
 /Action:Restore-All (/a:Restore-All)
-    This mode will restore all *.bacpac files to databases with the same name as the filename in a given path. Provide a source file path to one of the files and a target connection to the master database (and optional log file path for master.log). The connection will be used for all target restored databases, and the optional log file path will be used as a template for writing logs for each restored database. Accepts all arguments that the Restore action mode accepts.
+
+    This mode will restore all *.bacpac files in a given path to databases with the same names as the filenames.
+
+    - Provide a source file path to 'master.bacpac' in the location of the bacpac files. The path will be used as the source location for each database backup file to restore, ignoring 'master.bacpac'.
+    - Provide a target connection to the master database.
+    - Optionally provide a log file path ending with 'master.log'. The path will be used as the destination for each database backup log file, ignoring 'master.log'.
+    - Accepts all arguments that the Restore action mode accepts.
 
 For convenience, you can also use SqlPkg in place of SqlPackage for all other operations as all arguments are passed through.";
 

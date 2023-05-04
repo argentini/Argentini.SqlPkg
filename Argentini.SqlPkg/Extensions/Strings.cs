@@ -271,12 +271,16 @@ public static class Strings
 		var words = input.TrimStart().Split(' ');
 	    var currentLineLength = indentation.Length;
 	    var currentLine = new StringBuilder(indentation);
+	    var bulletIndentation = string.Empty;
 
+	    if (input.Trim().StartsWith("- ") || input.Trim().StartsWith("* "))
+		    bulletIndentation = "  ";
+	    
 	    foreach (var word in words)
 	    {
-		    if (currentLineLength + word.Length > maxLength)
+		    if (currentLineLength + word.Length + (result.Count > 0 ? bulletIndentation.Length : 0) > maxLength)
 		    {
-			    result.Add(currentLine.ToString());
+			    result.Add($"{(result.Count > 0 ? bulletIndentation : string.Empty)}{currentLine}");
 			    currentLine.Clear();
 			    currentLine.Append(indentation);
 			    currentLineLength = indentation.Length;
@@ -287,8 +291,8 @@ public static class Strings
 		    currentLineLength += word.Length + 1;
 	    }
 
-	    if (currentLine.Length > indentation.Length)
-		    result.Add(currentLine.ToString());
+	    if (currentLine.Length > indentation.Length + (result.Count > 0 ? bulletIndentation.Length : 0))
+		    result.Add($"{(result.Count > 0 ? bulletIndentation : string.Empty)}{currentLine}");
 
 	    return result;
     }

@@ -191,6 +191,7 @@ from
     sys.tables as [Tables]
 where
     [Tables].is_ms_shipped = 0
+    and NOT EXISTS (SELECT * FROM sys.extended_properties EP WHERE EP.major_id = [Tables].[object_id] AND EP.name = 'microsoft_database_tools_support')
 group by
     schema_name(schema_id), [Tables].name, [Tables].is_memory_optimized, [Tables].durability, [Tables].durability_desc
 order by

@@ -52,17 +52,17 @@ public class AppInstance
         //      "/TargetPassword:P@ssw0rdz!"
         //  };
         
-        //args = new[]
-        //{
-        //     "/a:backup",
-        //     "/TargetFile:\"Database Backups/AdventureWorks2019.bacpac\"",
-        //     "/DiagnosticsFile:\"Database Backups/Logs/AdventureWorks2019.log\"",
-        //     "/p:ExcludeTableData=[dbo].[umbracoLog]",
-        //     "/SourceServerName:sqlserver,1433",
-        //     "/SourceDatabaseName:AdventureWorks2019",
-        //     "/SourceUser:sa",
-        //     "/SourcePassword:'P@ssw0rdz!'"
-        // };
+        // args = new[]
+        // {
+        //      "/a:backup",
+        //      "/TargetFile:\"Database Backups/AdventureWorks2019.bacpac\"",
+        //      "/DiagnosticsFile:\"Database Backups/Logs/AdventureWorks2019.log\"",
+        //      "/p:ExcludeTableData=[dbo].[umbracoLog]",
+        //      "/SourceServerName:sqlserver,1433",
+        //      "/SourceDatabaseName:AdventureWorks2019",
+        //      "/SourceUser:sa",
+        //      "/SourcePassword:'P@ssw0rdz!'"
+        //  };
         
         //args = new[]
         //{

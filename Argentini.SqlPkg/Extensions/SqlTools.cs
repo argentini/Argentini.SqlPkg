@@ -105,6 +105,16 @@ create database [{applicationState.TargetDatabaseName}]
 				},
 				new CliArgument
 				{
+					Key = "/p:VerifyDeployment=",
+					Value = "false"
+				},
+				new CliArgument
+				{
+					Key = "/p:TreatVerificationErrorsAsWarnings=",
+					Value = "true"
+				},
+				new CliArgument
+				{
 					Key = "/p:AllowIncompatiblePlatform=",
 					Value = "true"
 				},

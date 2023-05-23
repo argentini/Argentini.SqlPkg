@@ -74,12 +74,7 @@ public static class Identify
 	/// <returns>OSPlatform object</returns> 
 	public static string GetPlatformArchitecture()
 	{
-		var architecture = RuntimeInformation.ProcessArchitecture.ToString();
-
-		if (GetOsPlatformName() == "macOS" && architecture.Equals("Arm64", StringComparison.CurrentCultureIgnoreCase))
-			architecture = "Apple Silicon";
-		
-		return architecture;
+		return RuntimeInformation.ProcessArchitecture.ToString();
 	}
 	
 	/// <summary>

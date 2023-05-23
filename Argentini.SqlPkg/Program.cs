@@ -85,9 +85,12 @@ public class AppInstance
 
         AppState.ImportArguments(args);
         
+        if (await AppState.SqlPackageIsInstalled() == false)
+            return -1;
+
         Console.WriteLine();
         Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
-        Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} ({Identify.GetPlatformArchitecture()}); .NET {Identify.GetRuntimeVersion()}");
+        Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} (.NET {Identify.GetRuntimeVersion()}/{Identify.GetPlatformArchitecture()}); SqlPackage Version {AppState.SqlPackageVersion}");
         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
         Console.WriteLine();
 
@@ -98,9 +101,6 @@ public class AppInstance
             Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
             Console.WriteLine();
         }
-
-        if (await ApplicationState.SqlPackageIsInstalled() == false)
-            return -1;
         
         if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
         {

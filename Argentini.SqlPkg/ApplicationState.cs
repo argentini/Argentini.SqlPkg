@@ -1,4 +1,6 @@
+using System.Text;
 using Argentini.SqlPkg.Extensions;
+using CliWrap;
 using Microsoft.Data.SqlClient;
 
 namespace Argentini.SqlPkg;
@@ -11,6 +13,7 @@ public class ApplicationState
     public List<CliArgument> WorkingArguments { get; set; } = new();
     
     public string Action { get; set; } = string.Empty;
+    public string SqlPackageVersion { get; set; } = "0.0.0.0";
 
     public string SourceConnectionString { get; set; } = string.Empty;
     public string SourceServerName { get; set; } = string.Empty;
@@ -423,21 +426,30 @@ public class ApplicationState
     /// Determine if SqlPackage is installed.
     /// </summary>
     /// <returns></returns>
-    public static async Task<bool> SqlPackageIsInstalled()
+    public async Task<bool> SqlPackageIsInstalled()
     {
 	    try
 	    {
 		    var arguments = new List<CliArgument>
 		    {
-			    new CliArgument
+			    new ()
 			    {
 				    Key = "/version:",
 				    Value = "true"
 			    }
 		    };
 
-		    _ = await CliHelpers.ExecuteSqlPackageAsync(arguments, false, false);
+		    var stdOut = new StringBuilder();
 
+		    var cmd = Cli.Wrap("sqlpackage")
+			    .WithArguments(arguments.GetArgumentsForCli())
+			    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOut))
+			    .WithStandardErrorPipe(PipeTarget.Null);
+		    
+		    _ = await cmd.ExecuteAsync();
+		    
+		    SqlPackageVersion = stdOut.ToString().Trim();
+		    
 		    return true;
 	    }
 

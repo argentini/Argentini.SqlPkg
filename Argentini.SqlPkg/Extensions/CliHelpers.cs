@@ -285,22 +285,18 @@ public static class CliHelpers
 	    Console.Write("  " + appState.SourceServerName);
 	    WriteArrow(true);
 	    Console.WriteLine(appState.SourceDatabaseName);
-	    Console.WriteLine();
 	    
 	    Console.Write("Target    ");
 	    WriteBar();
 	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.TargetFile) == false ? appState.TargetFile : "None"));
-	    Console.WriteLine();
-        
-	    Console.Write("Data      ");
-	    WriteBar();
-	    Console.WriteLine("  " + appState.GetExcludedTableDataList());
-	    Console.WriteLine();
-	    
+
 	    Console.Write("Log File  ");
 	    WriteBar();
 	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None"));
-	    Console.WriteLine();
+	    
+	    Console.Write("Data      ");
+	    WriteBar();
+	    Console.WriteLine("  " + appState.GetExcludedTableDataList());
     }
 
     /// <summary>
@@ -312,19 +308,16 @@ public static class CliHelpers
 	    Console.Write("Source    ");
 	    WriteBar();
 	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.SourceFile) == false ? appState.SourceFile : "None"));
-	    Console.WriteLine();
                 
 	    Console.Write("Target    ");
 	    WriteBar();
 	    Console.Write("  " + appState.TargetServerName);
 	    WriteArrow(true);
 	    Console.WriteLine(appState.TargetDatabaseName);
-	    Console.WriteLine();
 
 	    Console.Write("Log File  ");
 	    WriteBar();
 	    Console.WriteLine("  " + (string.IsNullOrEmpty(appState.LogFile) == false ? appState.LogFile : "None"));
-	    Console.WriteLine();
     }
 
     /// <summary>
@@ -393,9 +386,17 @@ public static class CliHelpers
 
 	    else
 	    {
-		    Console.Write("  " + appState.TargetServerName);
-		    WriteArrow(true);
-		    Console.WriteLine(appState.TargetDatabaseName);
+		    if (appState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
+		    {
+			    Console.WriteLine("  " + appState.TargetServerName);
+		    }
+
+		    else
+		    {
+			    Console.Write("  " + appState.TargetServerName);
+			    WriteArrow(true);
+			    Console.WriteLine(appState.TargetDatabaseName);
+		    }
 	    }
 
 	    Console.Write("Log File  ");

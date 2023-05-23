@@ -74,7 +74,6 @@ create database [{applicationState.TargetDatabaseName}]
 					
 			CliHelpers.WriteArrow();
 			Console.WriteLine("Database Created");
-			Console.WriteLine();
 		}
 
 		else
@@ -174,7 +173,6 @@ create database [{applicationState.TargetDatabaseName}]
 
 			CliHelpers.WriteArrow();
 			Console.WriteLine("Database Purge Complete");
-			Console.WriteLine();
 		}
 	}
 	

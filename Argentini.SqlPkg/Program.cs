@@ -92,14 +92,12 @@ public class AppInstance
         Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
         Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} (.NET {Identify.GetRuntimeVersion()}/{Identify.GetPlatformArchitecture()}); SqlPackage Version {AppState.SqlPackageVersion}");
         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-        Console.WriteLine();
 
         if (string.IsNullOrEmpty(AppState.Action) == false)
         {
             Console.Write("Action    ");
             CliHelpers.WriteBar();
             Console.WriteLine($"  {(string.IsNullOrEmpty(AppState.Action) ? "HELP" : AppState.Action)}");
-            Console.WriteLine();
         }
         
         if (AppState.Action.Equals("Backup", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase) || AppState.Action.Equals("Restore-All", StringComparison.CurrentCultureIgnoreCase))
@@ -107,7 +105,6 @@ public class AppInstance
             Console.Write("Started   ");
             CliHelpers.WriteBar();
             Console.WriteLine("  " + CliHelpers.GetDateTime());
-            Console.WriteLine();
 
             if (AppState.Action.Equals("Backup-All", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -115,6 +112,8 @@ public class AppInstance
 
                 if (databaseNames.Any())
                 {
+                    var counter = 1;
+                    
                     foreach (var databaseName in databaseNames)
                     {
                         var builder = new SqlConnectionStringBuilder(AppState.SourceConnectionString)
@@ -129,12 +128,14 @@ public class AppInstance
                         if (string.IsNullOrEmpty(AppState.LogFile) == false)
                             AppState.LogFile = AppState.LogFile.ChangeFileNameInPath($"{databaseName}.log");
                         
-                        if (databaseNames.First() != databaseName)
+                        if (databaseName != databaseNames.First())
                             Console.WriteLine();
                         
                         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-                        Console.WriteLine();
-                        
+                        Console.Write("Job       ");
+                        CliHelpers.WriteBar();
+                        Console.WriteLine($"  {counter++:N0} of {databaseNames.Count:N0}");
+
                         CliHelpers.OutputBackupInfo(AppState);
                 
                         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
@@ -169,6 +170,8 @@ public class AppInstance
 
                 if (files.Any())
                 {
+                    var counter = 1;
+                    
                     foreach (var file in files)
                     {
                         var separator2 = file.Contains(Path.DirectorySeparatorChar)
@@ -189,20 +192,24 @@ public class AppInstance
                         if (string.IsNullOrEmpty(AppState.LogFile) == false)
                             AppState.LogFile = AppState.LogFile.ChangeFileNameInPath($"{databaseName}.log");
 
-                        if (files.First() != file)
+                        if (file != files.First())
                             Console.WriteLine();
 
                         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-                        Console.WriteLine();
-
+                        Console.Write("Job       ");
+                        CliHelpers.WriteBar();
+                        Console.WriteLine($"  {counter++:N0} of {files.Count:N0}");
+                        
                         CliHelpers.OutputRestoreInfo(AppState);
 
                         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-                        Console.WriteLine();
                 
                         AppState.BuildRestoreArguments();
                 
                         await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
+
+                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine();
 
                         resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
                     }
@@ -236,12 +243,14 @@ public class AppInstance
                 CliHelpers.OutputRestoreInfo(AppState);
 
                 Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-                Console.WriteLine();
                 
                 AppState.BuildRestoreArguments();
                 
                 await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
 
+                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                Console.WriteLine();
+                
                 resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
             }
         }
@@ -299,6 +308,7 @@ SqlPkg can be used in 'Backup' or 'Restore' action modes, which are functionally
 
 For convenience, you can also use SqlPkg in place of SqlPackage for all other operations as all arguments are passed through.";
 
+            Console.WriteLine();
             helpText.WriteToConsole(ApplicationState.ColumnWidth);
             Console.WriteLine();
             Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
@@ -320,10 +330,8 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
 
         Console.WriteLine();
         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
-        Console.WriteLine();
-
         Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliHelpers.GetDateTime()}");
-        Console.WriteLine();
+        Console.WriteLine("-".Repeat(ApplicationState.FullColumnWidth));
 
         CliHelpers.OutputCompleteInfo(AppState);
 

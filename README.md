@@ -10,7 +10,7 @@ The following SqlPackage action modes provide enhanced features.
 
 This mode is equivalent to `Action:Export` to create a `.bacpac` file, with the following differences.
 
-- Specify one or more `/p:ExcludeTableData=` properties to exclude sepcific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
+- Specify one or more `/p:ExcludeTableData=` properties to exclude specific table data from the bacpac file. The table name format is the same as the `/p:TableData=` property.
 - `/SourceTrustServerCertificate:` defaults to `true`.
 - `/SourceTimeout:` defaults to `30`.
 - `/CommandTimeout:` defaults to `120`.

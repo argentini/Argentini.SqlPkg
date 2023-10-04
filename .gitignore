@@ -35,6 +35,5 @@ msbuild.wrn
 
 # Binary installer packages
 *.deb
-/Installers/**/publish/
+**/nupkg/
 .idea
-publish/

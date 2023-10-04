@@ -83,8 +83,6 @@ create database [{applicationState.TargetDatabaseName}]
 			CliHelpers.WriteArrow();
 			Console.WriteLine($"Purging Database [{applicationState.TargetDatabaseName}] on {applicationState.TargetServerName}...");
 
-			var executableFilePath = ApplicationState.GetAppPath();
-
 			var arguments = new List<CliArgument>
 			{
 				new CliArgument
@@ -95,7 +93,7 @@ create database [{applicationState.TargetDatabaseName}]
 				new CliArgument
 				{
 					Key = "/sf:",
-					Value = $"{executableFilePath}blank.dacpac"
+					Value = $"{ApplicationState.GetBlankDacPacPath()}"
 				},
 				new CliArgument
 				{

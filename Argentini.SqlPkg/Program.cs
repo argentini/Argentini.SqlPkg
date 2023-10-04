@@ -90,7 +90,7 @@ public class AppInstance
 
         Console.WriteLine();
         Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
-        Console.WriteLine($"Version {AppState.Version} for {Identify.GetOsPlatformName()} (.NET {Identify.GetRuntimeVersion()}/{Identify.GetPlatformArchitecture()}); SqlPackage Version {AppState.SqlPackageVersion}");
+        Console.WriteLine($"Version {ApplicationState.Version} for {Identify.GetOsPlatformName()} (.NET {Identify.GetRuntimeVersion()}/{Identify.GetPlatformArchitecture()}); SqlPackage Version {AppState.SqlPackageVersion}");
         Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
 
         if (string.IsNullOrEmpty(AppState.Action) == false)

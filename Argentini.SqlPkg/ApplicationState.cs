@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Argentini.SqlPkg.Extensions;
 using CliWrap;
@@ -376,50 +377,27 @@ public class ApplicationState
     #region App Info
 
     /// <summary>
-    /// Get the path to the currently executing application. Identifies local project source
-    /// path as well as an executing assembly based on the existence of the blank.dacpac file.
+    /// Get the full path to the blank.dacpac file.
     /// </summary>
-    /// <returns>Application folder path</returns>
-    public static string GetAppPath()
+    /// <returns></returns>
+    public static string GetBlankDacPacPath()
     {
-	    var path = AppContext.BaseDirectory;
-	    var result = path.ProcessFolderPath();
-	    var filePath = result + "blank.dacpac";
+	    var resourcePath = Assembly.GetExecutingAssembly().Location;
 
-	    if (File.Exists(filePath))
-		    return result;
-        
-	    result = Directory.GetCurrentDirectory().ProcessFolderPath();
-	    filePath = result + "blank.dacpac";
-
-	    if (File.Exists(filePath) == false)
-		    result = string.Empty;
-
-	    #region Fallback When Debugging...
-
-	    if (string.IsNullOrEmpty(result) == false)
-		    return result;
-	    
-	    result = Directory.GetCurrentDirectory().ProcessFolderPath();
-
-	    if (result.ToLower().Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "debug"))
+	    while (resourcePath.LastIndexOf(Path.DirectorySeparatorChar) > -1)
 	    {
-		    result = result.Left(Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + "Argentini.SqlPkg" + Path.DirectorySeparatorChar;
-            
-		    filePath = result + "blank.dacpac";
+		    resourcePath = resourcePath[..resourcePath.LastIndexOf(Path.DirectorySeparatorChar)];
 
-		    if (File.Exists(filePath) == false)
-			    result = string.Empty;
+		    if (Directory.Exists(Path.Combine(resourcePath, "contentFiles")) == false)
+			    continue;
+
+		    resourcePath = Path.Combine(resourcePath, "contentFiles", "any", "any", "blank.dacpac");
+
+		    if (File.Exists(resourcePath))
+			    break;
 	    }
 
-	    else
-	    {
-		    result = string.Empty;
-	    }
-
-	    #endregion        
-        
-	    return result;
+	    return resourcePath;
     }
     
     /// <summary>
@@ -428,6 +406,8 @@ public class ApplicationState
     /// <returns></returns>
     public async Task<bool> SqlPackageIsInstalled()
     {
+	    var stdOut = new StringBuilder();
+
 	    try
 	    {
 		    var arguments = new List<CliArgument>
@@ -438,8 +418,6 @@ public class ApplicationState
 				    Value = "true"
 			    }
 		    };
-
-		    var stdOut = new StringBuilder();
 
 		    var cmd = Cli.Wrap("sqlpackage")
 			    .WithArguments(arguments.GetArgumentsForCli())
@@ -455,17 +433,31 @@ public class ApplicationState
 
 	    catch
 	    {
-		    Console.Write("ERROR");
-		    CliHelpers.WriteArrow(true);
-			Console.WriteLine("Could not execute the 'SqlPackage' command.");
-		    Console.WriteLine("Be sure to install it using \"dotnet tool install -g microsoft.sqlpackage\".");
-		    Console.WriteLine("You will need the dotnet tool (version 6 or later) installed from \"https://dotnet.microsoft.com\" in order to install Microsoft SqlPackage.");
+		    try
+		    {
+			    var cmd = Cli.Wrap("dotnet")
+				    .WithArguments(new [] { "tool", "install", "--global", "microsoft.sqlpackage" })
+				    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOut))
+				    .WithStandardErrorPipe(PipeTarget.Null);
+		    
+			    _ = await cmd.ExecuteAsync();
+
+			    return true;
+		    }
+
+		    catch
+		    {
+			    Console.Write("ERROR");
+			    CliHelpers.WriteArrow(true);
+			    Console.WriteLine("Could not install Microsoft's 'SqlPackage' command.");
+			    Console.WriteLine("Try manually installing it in your command line interface/terminal using \"dotnet tool install --global microsoft.sqlpackage\".");
             
-		    return false;
+			    return false;
+		    }
 	    }
     }
     
-    public string AppMajorVersion
+    public static string AppMajorVersion
     {
         get
         {
@@ -473,7 +465,7 @@ public class ApplicationState
 
             try
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var assembly = Assembly.GetExecutingAssembly();
                 result = assembly.GetName().Version?.Major.ToString();
             }
 
@@ -486,7 +478,7 @@ public class ApplicationState
         }
     }
     
-    public string AppMinorVersion
+    public static string AppMinorVersion
     {
         get
         {
@@ -494,7 +486,7 @@ public class ApplicationState
 
             try
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var assembly = Assembly.GetExecutingAssembly();
                 result = assembly.GetName().Version?.Minor.ToString();
             }
 
@@ -507,7 +499,7 @@ public class ApplicationState
         }
     }
     
-    public string AppBuildVersion
+    public static string AppBuildVersion
     {
         get
         {
@@ -515,7 +507,7 @@ public class ApplicationState
 
             try
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var assembly = Assembly.GetExecutingAssembly();
                 result = assembly.GetName().Version?.Build.ToString();
             }
 
@@ -528,7 +520,7 @@ public class ApplicationState
         }
     }
 
-    public string AppRevisionVersion
+    public static string AppRevisionVersion
     {
         get
         {
@@ -536,7 +528,7 @@ public class ApplicationState
 
             try
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var assembly = Assembly.GetExecutingAssembly();
                 result = assembly.GetName().Version?.Revision.ToString();
             }
 
@@ -549,7 +541,7 @@ public class ApplicationState
         }
     }
     
-    public string Version
+    public static string Version
     {
         get
         {

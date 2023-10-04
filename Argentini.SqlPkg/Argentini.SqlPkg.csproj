@@ -6,15 +6,47 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>sqlpkg</AssemblyName>
-        <AssemblyVersion>1.0.11.0</AssemblyVersion>
-        <FileVersion>1.0.11.0</FileVersion>
-        <IsPackable>false</IsPackable>
-        <Version>1.0.0.0</Version>
+        <AssemblyVersion>1.0.12.0</AssemblyVersion>
+        <FileVersion>1.0.12.0</FileVersion>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>sqlpkg</ToolCommandName>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <PackageId>argentini.sqlpkg</PackageId>
+        <PackageVersion>1.0.12</PackageVersion>
+        <Authors>Michael Argentini</Authors>
+        <Company>Argentini Unlimited, Ltd.</Company>
+        <PackageTags>SQL Server;MSSQL;SqlPackage;Database;Backup;Restore;Clone</PackageTags>
+        <Description>
+            SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new Backup and Restore actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore. You can even backup and restore all databases on a server in one command.
+
+            Install dotnet 7 or later from https://dotnet.microsoft.com/en-us/download and then install SqlPkg with the command:
+            
+            dotnet tool install --global argentini.sqlpkg
+        </Description>
+        <Copyright>Copyright (c) Michael Argentini 2023.</Copyright>
+        <PackageProjectUrl>https://github.com/argentini/Argentini.SqlPkg</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/argentini/Argentini.SqlPkg</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageReleaseNotes>Initial release as dotnet tool</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <PackageIcon>sqlpkg-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CliWrap" Version="3.6.0" />
+      <PackageReference Include="CliWrap" Version="3.6.4" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="contentFiles\any\any\blank.dacpac">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Pack>true</Pack>
+        <PackagePath>contentFiles\any\any\</PackagePath>
+      </None>
+      <None Include="README.md" Pack="true" PackagePath="" />
+      <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+      <None Include="sqlpkg-icon.png" Pack="true" PackagePath="" />
     </ItemGroup>
 
 </Project>

@@ -112,7 +112,11 @@ Run the following command in your command line interface (e.g. cmd, PowerShell, 
 
 Note: this process will also install Microsoft SqlPackage.
 
-You can likewise use the dotnet tool uninstall or update commands to remove or update the app.
+### Update SqlPkg
+
+Run the following command in your command line interface (e.g. cmd, PowerShell, Terminal, bash, etc.) to update to the latest version of SqlPkg:
+
+```dotnet tool update --global argentini.sqlpkg```
 
 ## Project Status
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using Argentini.SqlPkg.Extensions;
 using Microsoft.Data.SqlClient;
 
@@ -21,6 +22,8 @@ public class AppInstance
     public async Task<int> Run(IEnumerable<string> args)
     {
         var resultCode = 0;
+
+        Console.OutputEncoding = Encoding.UTF8;
 
         #region Backup Debug Test
 

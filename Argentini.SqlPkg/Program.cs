@@ -94,7 +94,7 @@ public class AppInstance
         Console.WriteLine();
         Console.WriteLine("SqlPkg: Back up and restore SQL Server databases with Microsoft SqlPackage.");
         Console.WriteLine($"Version {ApplicationState.Version} for {Identify.GetOsPlatformName()} (.NET {Identify.GetRuntimeVersion()}/{Identify.GetPlatformArchitecture()}); SqlPackage Version {AppState.SqlPackageVersion}");
-        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
 
         if (string.IsNullOrEmpty(AppState.Action) == false)
         {
@@ -134,14 +134,14 @@ public class AppInstance
                         if (databaseName != databaseNames.First())
                             Console.WriteLine();
                         
-                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                         Console.Write("Job       ");
                         CliHelpers.WriteBar();
                         Console.WriteLine($"  {counter++:N0} of {databaseNames.Count:N0}");
 
                         CliHelpers.OutputBackupInfo(AppState);
                 
-                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                         Console.WriteLine();
                 
                         AppState.BuildBackupArguments();
@@ -198,20 +198,20 @@ public class AppInstance
                         if (file != files.First())
                             Console.WriteLine();
 
-                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                         Console.Write("Job       ");
                         CliHelpers.WriteBar();
                         Console.WriteLine($"  {counter++:N0} of {files.Count:N0}");
                         
                         CliHelpers.OutputRestoreInfo(AppState);
 
-                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                 
                         AppState.BuildRestoreArguments();
                 
                         await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
 
-                        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                         Console.WriteLine();
 
                         resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
@@ -231,7 +231,7 @@ public class AppInstance
             {
                 CliHelpers.OutputBackupInfo(AppState);
                 
-                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                 Console.WriteLine();
                 
                 AppState.BuildBackupArguments();
@@ -245,13 +245,13 @@ public class AppInstance
             {
                 CliHelpers.OutputRestoreInfo(AppState);
 
-                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                 
                 AppState.BuildRestoreArguments();
                 
                 await SqlTools.PurgeOrCreateTargetDatabaseAsync(AppState);
 
-                Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+                Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
                 Console.WriteLine();
                 
                 resultCode = await CliHelpers.ExecuteSqlPackageAsync(AppState.WorkingArguments);
@@ -269,7 +269,7 @@ public class AppInstance
             Console.WriteLine("  Backup/Restore Not Used, Passing Control to SqlPackage");
             Console.WriteLine();
 
-            Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+            Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
             
             AppState.TargetFile.EnsureDirectoryExists();
@@ -314,7 +314,7 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             Console.WriteLine();
             helpText.WriteToConsole(ApplicationState.ColumnWidth);
             Console.WriteLine();
-            Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+            Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
             Console.WriteLine();
 
             resultCode = await CliHelpers.ExecuteSqlPackageAsync(new List<CliArgument>());
@@ -332,9 +332,9 @@ For convenience, you can also use SqlPkg in place of SqlPackage for all other op
             elapsed = $"{elapsedSplits[0]}.{elapsedSplits[1][..2]}";
 
         Console.WriteLine();
-        Console.WriteLine("▬".Repeat(ApplicationState.FullColumnWidth));
+        Console.WriteLine("\u2501".Repeat(ApplicationState.FullColumnWidth));
         Console.WriteLine($"{AppState.Action.ToUpper()} COMPLETE on {CliHelpers.GetDateTime()}");
-        Console.WriteLine("-".Repeat(ApplicationState.FullColumnWidth));
+        Console.WriteLine("\u23bb".Repeat(ApplicationState.FullColumnWidth));
 
         CliHelpers.OutputCompleteInfo(AppState);
 

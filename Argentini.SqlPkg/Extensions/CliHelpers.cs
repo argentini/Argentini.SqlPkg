@@ -96,7 +96,7 @@ public static class CliHelpers
     /// </summary>
     public static void WriteBar()
     {
-	    Console.Write(GetBar());
+	    Console.Write(":");
     }
     
     /// <summary>

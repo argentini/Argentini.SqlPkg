@@ -427,7 +427,24 @@ public class ApplicationState
 		    _ = await cmd.ExecuteAsync();
 		    
 		    SqlPackageVersion = stdOut.ToString().Trim();
+
+		    try
+		    {
+			    // Update to latest
+			    
+			    cmd = Cli.Wrap("dotnet")
+				    .WithArguments(new [] { "tool", "update", "--global", "microsoft.sqlpackage" })
+				    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOut))
+				    .WithStandardErrorPipe(PipeTarget.Null);
 		    
+			    _ = await cmd.ExecuteAsync();
+		    }
+
+		    catch
+		    {
+			    // ignored
+		    }
+
 		    return true;
 	    }
 

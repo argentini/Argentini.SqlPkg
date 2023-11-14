@@ -102,7 +102,7 @@ When not using SqlPkg special action modes, the entire argument list is simply p
 
 ### 1. Install Microsoft .NET
 
-SqlPkg requires that you already have dotnet 8.0 runtime installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+SqlPkg requires that you already have the .NET 8.0 runtime installed, which you can get at [https://dotnet.microsoft.com/en-us/download](https://dotnet.microsoft.com/en-us/download).
 
 ### 2. Install SqlPkg
 

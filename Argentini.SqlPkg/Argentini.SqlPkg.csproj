@@ -10,9 +10,9 @@
         <ToolCommandName>sqlpkg</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
         <PackageId>argentini.sqlpkg</PackageId>
-        <AssemblyVersion>1.0.14.0</AssemblyVersion>
-        <FileVersion>1.0.14.0</FileVersion>
-        <PackageVersion>1.0.14</PackageVersion>
+        <AssemblyVersion>1.0.15.0</AssemblyVersion>
+        <FileVersion>1.0.15.0</FileVersion>
+        <PackageVersion>1.0.15</PackageVersion>
         <Authors>Michael Argentini</Authors>
         <Company>Argentini Unlimited, Ltd.</Company>
         <PackageTags>SQL Server;MSSQL;SqlPackage;Database;Backup;Restore;Clone</PackageTags>
@@ -27,15 +27,15 @@
         <PackageProjectUrl>https://github.com/argentini/Argentini.SqlPkg</PackageProjectUrl>
         <RepositoryUrl>https://github.com/argentini/Argentini.SqlPkg</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Update to .NET 8.0.0</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated nuget packages for security and performance improvements</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <PackageIcon>sqlpkg-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CliWrap" Version="3.6.4" />
-      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+      <PackageReference Include="CliWrap" Version="3.6.6" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
     </ItemGroup>
 
     <ItemGroup>

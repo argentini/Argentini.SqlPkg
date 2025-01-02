@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>sqlpkg</AssemblyName>
@@ -10,32 +10,32 @@
         <ToolCommandName>sqlpkg</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
         <PackageId>argentini.sqlpkg</PackageId>
-        <AssemblyVersion>1.0.16.0</AssemblyVersion>
-        <FileVersion>1.0.16.0</FileVersion>
-        <PackageVersion>1.0.16</PackageVersion>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <FileVersion>1.1.0.0</FileVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <Authors>Michael Argentini</Authors>
         <Company>Argentini Unlimited, Ltd.</Company>
         <PackageTags>SQL Server;MSSQL;SqlPackage;Database;Backup;Restore;Clone</PackageTags>
         <Description>
-            SqlPkg is a 64-bit .NET 8.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new Backup and Restore actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore. You can even backup and restore all databases on a server in one command.
+            SqlPkg is a 64-bit .NET 9.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new Backup and Restore actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore. You can even backup and restore all databases on a server in one command.
 
-            Install dotnet 8 or later from https://dotnet.microsoft.com/en-us/download and then install SqlPkg with the command:
+            Install dotnet 9 or later from https://dotnet.microsoft.com/en-us/download and then install SqlPkg with the command:
             
             dotnet tool install --global argentini.sqlpkg
         </Description>
-        <Copyright>Copyright (c) Michael Argentini 2023.</Copyright>
+        <Copyright>Copyright (c) Michael Argentini 2024.</Copyright>
         <PackageProjectUrl>https://github.com/argentini/Argentini.SqlPkg</PackageProjectUrl>
         <RepositoryUrl>https://github.com/argentini/Argentini.SqlPkg</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Updated nuget packages for security and performance improvements</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to .NET 9.0</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <PackageIcon>sqlpkg-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CliWrap" Version="3.6.6" />
-      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+      <PackageReference Include="CliWrap" Version="3.7.0" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
 # SqlPkg for Microsoft SqlPackage
 
-SqlPkg is a 64-bit .NET 7.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new `Backup` and `Restore` actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore.
+SqlPkg is a 64-bit .NET 9.0 command line (CLI) wrapper for the Microsoft SqlPackage CLI tool with the goal of making common backup and restore operations easier and more powerful. It does this through new `Backup` and `Restore` actions that provide additional features like the exclusion of specific table data in backups and destination prep prior to restore.
 
 ## Features
 
@@ -102,7 +102,9 @@ When not using SqlPkg special action modes, the entire argument list is simply p
 
 ### 1. Install Microsoft .NET
 
-SqlPkg requires that you already have dotnet installed, which you can get at [https://dotnet.microsoft.com](https://dotnet.microsoft.com/).
+SqlPkg requires that you already have the .NET 9.0 runtime installed, which you can get at [https://dotnet.microsoft.com/en-us/download](https://dotnet.microsoft.com/en-us/download).
+
+**Note:** Microsoft SqlPackage uses .NET 8.0.11, so you need to install that in addition to .NET 9.
 
 ### 2. Install SqlPkg
 
@@ -112,7 +114,11 @@ Run the following command in your command line interface (e.g. cmd, PowerShell, 
 
 Note: this process will also install Microsoft SqlPackage.
 
-You can likewise use the dotnet tool uninstall or update commands to remove or update the app.
+### Update SqlPkg
+
+Run the following command in your command line interface (e.g. cmd, PowerShell, Terminal, bash, etc.) to update to the latest version of SqlPkg:
+
+```dotnet tool update --global argentini.sqlpkg```
 
 ## Project Status
 

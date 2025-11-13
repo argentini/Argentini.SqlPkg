@@ -433,7 +433,7 @@ public class ApplicationState
 			    // Update to latest
 			    
 			    cmd = Cli.Wrap("dotnet")
-				    .WithArguments(new [] { "tool", "update", "--global", "microsoft.sqlpackage" })
+				    .WithArguments(["tool", "update", "--global", "microsoft.sqlpackage"])
 				    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOut))
 				    .WithStandardErrorPipe(PipeTarget.Null);
 		    
@@ -453,7 +453,7 @@ public class ApplicationState
 		    try
 		    {
 			    var cmd = Cli.Wrap("dotnet")
-				    .WithArguments(new [] { "tool", "install", "--global", "microsoft.sqlpackage" })
+				    .WithArguments(["tool", "install", "--global", "microsoft.sqlpackage"])
 				    .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOut))
 				    .WithStandardErrorPipe(PipeTarget.Null);
 		    
